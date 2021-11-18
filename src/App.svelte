@@ -1,30 +1,134 @@
 <script>
-	export let name;
+	import Button from './Components/Button.svelte';
+	import Checkbox from './Components/Checkbox.svelte';
+import CheckboxGroup from './Components/CheckboxGroup.svelte';
+	import RadioGroup from './Components/RadioGroup.svelte';
+	import Switch from './Components/Switch.svelte';
+
+	function clickButton(){
+		alert('click');
+	}
+	function changeSwitch(evt){
+		alert(evt.detail.check)
+	}
+
+	let radios = [{
+		label: 'Radio 1',
+		value: 1,
+		disable: false
+	},{
+		label: 'Radio 2',
+		value: 2,
+		disable: false
+	},{
+		label: 'Radio 3',
+		value: 3,
+		disable: true
+	}];
+	let radioValue = 1;
+	function onChangeRadio(event){
+		alert(event.detail.selectedValue);
+	}
+
+	let checkboxes = [{
+		label: 'Checkbox 1',
+		value: 1
+	},{
+		label: 'Checkbox 2',
+		value: 2
+	},{
+		label: 'Checkbox 3',
+		value: 3
+	}];
+	let checkboxValues = [1,2];
+	function onChangeCheckboxes(event){
+		alert(event.detail.selectedValues);
+	}
 </script>
 
 <main>
-	<h1>Hello {name}!</h1>
-	<p>Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn how to build Svelte apps.</p>
+	<h1>Svelte JS Components</h1>
+	<section>
+		<h2>Controls</h2>
+		<h3>Buttons</h3>
+
+		<Button
+			icon="search"
+			text="Primary"
+			primary={true}
+			colorHover="#111111"
+			colorFont="#FFFFFF"
+		/>
+		<Button
+			icon="search"
+			text="Secondary"
+			on:click={clickButton}
+		/>
+		<Button
+			text="Tertiary"
+			border={false}
+		/>
+		<Button
+			text="Disabled"
+			disable={true}
+			on:click={clickButton}
+		/>
+
+		<h3>Checkboxes</h3>
+		<Checkbox
+			label="Single checkbox"
+			check={true}
+			disable={true}
+		/>
+		<br/>
+		<CheckboxGroup
+			bind:items={checkboxes}
+			name="checkboxgroup"
+			bind:selectedValues={checkboxValues}
+			on:change={onChangeCheckboxes}
+		/>
+
+		<h3>Radios</h3>
+		<RadioGroup
+			bind:items={radios}
+			name="radiogroup"
+			bind:selectedValue={radioValue}
+			on:change={onChangeRadio}
+			inline={false}
+		/>
+
+		<h3>Switches</h3>
+		<Switch
+			on:change={changeSwitch}
+			check={true}
+		/>
+		<Switch
+			disable={true}
+		/>
+	</section>
 </main>
 
 <style>
 	main {
-		text-align: center;
-		padding: 1em;
-		max-width: 240px;
-		margin: 0 auto;
+		padding: 15px;
+		background-color: #EEEEEE;
+		margin: 0;
+		width: 100%;
+		height: 100%;
+		box-sizing: border-box;
 	}
-
-	h1 {
-		color: #ff3e00;
-		text-transform: uppercase;
-		font-size: 4em;
-		font-weight: 100;
+	section {
+		background-color: #FFFFFF;
+		border-radius: 10px;
+		padding: 15px 30px;
 	}
-
-	@media (min-width: 640px) {
-		main {
-			max-width: none;
-		}
+	h1{
+		font-size: 32px;
+	}
+	h2{
+		font-size: 26px;
+	}
+	h3{
+		font-size: 20px;
 	}
 </style>
