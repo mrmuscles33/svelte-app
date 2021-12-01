@@ -1,9 +1,11 @@
 <script>
 	import Button from './Components/Button.svelte';
 	import Checkbox from './Components/Checkbox.svelte';
-import CheckboxGroup from './Components/CheckboxGroup.svelte';
+	import CheckboxGroup from './Components/CheckboxGroup.svelte';
 	import RadioGroup from './Components/RadioGroup.svelte';
 	import Switch from './Components/Switch.svelte';
+	import Textfield from './Components/Textfield.svelte';
+	import DatePicker from './Components/DatePicker.svelte';
 
 	function clickButton(){
 		alert('click');
@@ -43,6 +45,11 @@ import CheckboxGroup from './Components/CheckboxGroup.svelte';
 	let checkboxValues = [1,2];
 	function onChangeCheckboxes(event){
 		alert(event.detail.selectedValues);
+	}
+
+	let date = '25/11/2021';
+	function onChangeDate(evt){
+		alert(evt.detail.value)
 	}
 </script>
 
@@ -104,6 +111,44 @@ import CheckboxGroup from './Components/CheckboxGroup.svelte';
 		/>
 		<Switch
 			disable={true}
+		/>
+	</section>
+	<br/>
+	<section>
+		<h2>Inputs</h2>
+		<h3>Textfields</h3>
+
+		<Textfield 
+			label="Label"
+		/>
+		<Textfield 
+			label="Icons"
+			iconLeft="search"
+			iconRight="highlight_off"
+		/>
+		<Textfield 
+			label="Disable"
+			iconLeft="search"
+			disable={true}
+		/>
+		<Textfield 
+			label="Error"
+			iconRight="home"
+			errorMessage="Le champ est vide"
+		/>
+
+		<h3>Date Pickers</h3>
+		<DatePicker
+			label="Date"
+			minDate="10/11/2021"
+			on:change={onChangeDate}
+			required={true}
+			colorPicker="#222222"
+			colorPickerBackground="#444444"
+			colorPickerFont="#FFFFFF"
+			colorPickerFontSelected="#FFFFFF"
+			colorPickerHover="#666666"
+			colorPickerFontOut="#888888"
 		/>
 	</section>
 </main>

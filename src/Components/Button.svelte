@@ -11,9 +11,11 @@
         export let primary = false;
         export let border = true;
         export let disable = false;
+        export let style = "";
         
         // PRIVATE ATTRIBUTES
-        
+        let iconPadding = text == "" ? '0 12px' : '0 16px 0 12px';
+
         // METHODS
 	const dispatch = createEventDispatcher();
         function onClick(){
@@ -23,13 +25,14 @@
 </script>
 
 <!-- svelte-ignore a11y-invalid-attribute -->
-<a href="#" class="btn-main" 
+<a class="btn-main" 
      class:btn-with-icon="{icon != ''}"
      class:primary
      class:border
      class:disable
-     on:click={onClick}
-     style="--color-primary: {color};--color-hover: {colorHover};--color-font: {colorFont}">
+     href="#"
+     on:click|stopPropagation|preventDefault={onClick}
+     style="--color-primary: {color};--color-hover: {colorHover};--color-font: {colorFont};--icon-padding: {iconPadding}; {style}">
         <span class="btn-icon material-icons-round">{icon}</span>
         <span class="btn-text">{text}</span>
 </a>
@@ -65,7 +68,7 @@
                 background-color: var(--color-hover);
         }
         .btn-with-icon {
-                padding: 0 16px 0 12px;
+                padding: var(--icon-padding);
         }
         .btn-icon {
                 font-size: inherit;
