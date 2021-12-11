@@ -102,7 +102,8 @@
                 width: var(--width);
                 background-color: var(--color-backgroud);
                 border-radius: 8px;
-                overflow: auto;
+                overflow-y: auto;
+                overflow-x: hidden;
                 display: none;
                 position: absolute;
                 top: 0;

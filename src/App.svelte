@@ -6,7 +6,8 @@
 	import Switch from './Components/Switch.svelte';
 	import Textfield from './Components/Textfield.svelte';
 	import DatePicker from './Components/DatePicker.svelte';
-import Droplist from './Components/Droplist.svelte';
+	import Droplist from './Components/Droplist.svelte';
+	import CounterButton from './Components/CounterButton.svelte';
 
 	function clickButton(){
 		alert('click');
@@ -90,6 +91,13 @@ import Droplist from './Components/Droplist.svelte';
 			text="Disabled"
 			disable={true}
 			on:click={clickButton}
+		/>
+
+		<h3>Custom Buttons</h3>
+		<CounterButton
+			text="Likes"
+			icon="favorite"
+			value="999"
 		/>
 
 		<h3>Checkboxes</h3>
