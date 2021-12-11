@@ -12,12 +12,13 @@
         export let colorFocus = "#0d31a6";
         export let colorBackground = "#EEEEEE";
         export let colorBackgroundHover = "#DDDDDD";
+        export let colorError = "#cc4141";
         export let width = 290;
         export let iconLeft = "";
         export let label = "";
         export let errorMessage = "";
-        export let colorError = "#cc4141";
         export let required = false;
+        export let readonly = false;
 
         export let minDate = '01/01/1900';
         export let maxDate = '31/12/2099';
@@ -28,6 +29,7 @@
         export let colorPickerFontSelected = "#FFFFFF";
         export let colorPickerHover = "#EEEEEE";
         export let colorPickerFontOut = "#AAAAAA";
+        export let calendarOnly = false;
         
         // PRIVATE ATTRIBUTES
         let days = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
@@ -46,7 +48,7 @@
 
         // EVENTS
         const dispatch = createEventDispatcher();
-        function onChange(evt){
+        export function onChange(evt){
                 if(errorMessage == "" && value != ""){
                         errorMessage = textToDate(value,'DD/MM/YYYY') < textToDate(minDate,'DD/MM/YYYY') || textToDate(value,'DD/MM/YYYY') > textToDate(maxDate,'DD/MM/YYYY') ? "La date doit etre comprise entre " + minDate + " et " + maxDate : "";
                 }
@@ -55,33 +57,33 @@
                         oldValue: evt.detail.oldValue
                 });
         }
-	function onClickIcon() {
+	export function onClickIcon() {
                 visible = true;
                 tmpValue = isValidDate(value,'DD/MM/YYYY') ? value : dateToText(new Date(), 'DD/MM/YYYY');
                 currentMonth = dateToText(textToDate(tmpValue,'DD/MM/YYYY'),'MM/YYYY');
                 showYears = false;
         }
-        function onClickMask(evt) {
+        export function onClickMask(evt) {
                 if(evt.target == this){
                         onClickFermer();
                 }
         }
-        function onClickFermer(){
+        export function onClickFermer(){
                 visible = false;
         }
-        function onClickValider(){
+        export function onClickValider(){
                 onClickFermer();
                 value = tmpValue;
                 setTimeout(() => {
                         input.onChange();
                 }, 200);
         }
-        function onClickDay(evt) {
+        export function onClickDay(evt) {
                 var clickedDate = evt.currentTarget.getAttribute('value');
                 if(textToDate(clickedDate,"DD/MM/YYYY") < textToDate(minDate,"DD/MM/YYYY") || textToDate(clickedDate,"DD/MM/YYYY") > textToDate(maxDate,"DD/MM/YYYY")) return false;
                 tmpValue = clickedDate;
         }
-        function onClickYearButton(){
+        export function onClickYearButton(){
                 showYears = !showYears;
                 if(showYears) {
                         var currentYear = textToDate(tmpValue,"DD/MM/YYYY").getFullYear();
@@ -94,7 +96,7 @@
                         }
                 }
         }
-        function onClickPrevious(){
+        export function onClickPrevious(){
                 if(showYears) {
                         yearsPage--;
                         displayedYears = allYear.slice(yearsPage * 18, yearsPage * 18 + 18);
@@ -104,7 +106,7 @@
                         currentMonth = dateToText(date,"MM/YYYY");
                 }
         }
-        function onClickNext(){
+        export function onClickNext(){
                 if(showYears) {
                         yearsPage++;
                         displayedYears = allYear.slice(yearsPage * 18, yearsPage * 18 + 18);
@@ -114,7 +116,7 @@
                         currentMonth = dateToText(date,"MM/YYYY");
                 }
         }
-        function onClickYear(evt){
+        export function onClickYear(evt){
                 var year = evt.currentTarget.getAttribute('value');
                 var newDate = textToDate(tmpValue,"DD/MM/YYYY");
                 newDate.setFullYear(year);
@@ -205,7 +207,8 @@
         {width}
         {iconLeft}
         {required}
-        iconRight="today"
+        readonly={readonly || calendarOnly}
+        iconRight={readonly ? "" : "today"}
         pattern="((([0-2][0-9])|(3[0-1]))(\/|-|\.)((0[13578])|10|12)(\/|-|\.)(19|20)[0-9][0-9])|((([0-2][0-9])|30)(\/|-|\.)((0[469])|11)(\/|-|\.)(19|20)[0-9][0-9])|(([0-2][0-9])(\/|-|\.)02(\/|-|\.)(19|20)[0-9][0-9])"
         {label}
         bind:errorMessage={errorMessage}
@@ -214,6 +217,7 @@
         on:blur
         on:clickIcon={onClickIcon}
         on:focus
+        on:focusout
         on:input
         on:keydown
         on:keyup
@@ -309,8 +313,8 @@
                                         text="Valider"
                                         primary={true}
                                         color={colorPicker}
-                                        colorFont={colorPickerFont}
-                                        colorHover={colorPickerHover}
+                                        colorFont={colorPickerFontSelected}
+                                        colorHover={colorPicker}
                                         on:click={onClickValider}
                                 />
                         </div>
@@ -334,6 +338,7 @@
                 display: flex;
                 justify-content: center;
                 align-items: center;
+                z-index: 2;
         }
         .datepicker-visible {
                 visibility: visible;
@@ -427,7 +432,7 @@
                 background-color: var(--color-hover);
         }
         a.datepicker-today {
-                border: 2px solid var(--color-primary);
+                border: 2px solid var(--color-font);
         }
         a.datepicker-other-month,
         a.datepicker-day-disable {

@@ -10,14 +10,15 @@
         export let colorFocus = "#0d31a6";
         export let colorBackground = "#EEEEEE";
         export let colorBackgroundHover = "#DDDDDD";
+        export let colorError = "#cc4141";
         export let width = 290;
         export let iconLeft = "";
         export let iconRight = "";
         export let label = "";
         export let errorMessage = "";
-        export let colorError = "#cc4141";
         export let pattern = "";
         export let required = false;
+        export let readonly = false;
         
         // PRIVATE ATTRIBUTES
         $: inputWidth = width - (iconLeft != "" ? 40 : 12) - (iconRight != "" ? 32 : 0) - (hasError != "" ? 32 : 0) - 12;
@@ -26,12 +27,13 @@
         let input;
         let oldValue = "";
 
-        // METHODS
+        // EVENTS
 	const dispatch = createEventDispatcher();
-        function onClick() {
+        export function onClick() {
+                if(readonly) return;
                 input.focus();
         }
-        function onClickIcon() {
+        export function onClickIcon() {
                 if(disable) return;
                 dispatch('clickIcon', {
                         value: value
@@ -49,25 +51,31 @@
                 });
                 oldValue = value;
         }
-        function onInput(){
+        export function onInput(){
                 if(disable) return;
                 dispatch('input', {
                         value: value
                 });
         }
-        function onFocus(){
+        export function onFocus(){
                 if(disable) return;
                 dispatch('focus', {
                         value: value
                 });
         }
-        function onBlur(){
+        export function onFocusOut(){
+                if(disable) return;
+                dispatch('focusout', {
+                        value: value
+                });
+        }
+        export function onBlur(){
                 if(disable) return;
                 dispatch('blur', {
                         value: value
                 });
         }
-        function onKeyDown(event){
+        export function onKeyDown(event){
                 if(disable) return;
                 dispatch('keydown', {
                         value: value,
@@ -78,7 +86,7 @@
                         altKey: event.altKey
                 });
         }
-        function onKeyUp(event){
+        export function onKeyUp(event){
                 if(disable) return;
                 dispatch('keyup', {
                         value: value,
@@ -88,6 +96,11 @@
                         shiftKey: event.shiftKey,
                         altKey: event.altKey
                 });
+        }
+
+        // METHODS
+        export function getInput(){
+                return input;
         }
 </script>
 
@@ -104,10 +117,11 @@
             --color-error: {colorError};
             --width: {width}px;
             --width-input: {inputWidth}px;">
-        <input type="text" bind:this={input} {id} bind:value={value} {required} {pattern} disabled={disable} placeholder="." 
+        <input type="text" bind:this={input} {id} bind:value={value} {required} {pattern} {readonly} disabled={disable} placeholder="." 
                 on:change={onChange} 
                 on:input={onInput}
                 on:focus={onFocus}
+                on:focusout={onFocusOut}
                 on:blur={onBlur}
                 on:keydown={onKeyDown}
                 on:keyup={onKeyUp}/>
@@ -167,6 +181,9 @@
         }
         input::placeholder {
                 opacity: 0;
+        }
+        input:read-only{
+                pointer-events: none;
         }
         .textfield-main.disable input {
                 pointer-events: none;

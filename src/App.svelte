@@ -6,6 +6,7 @@
 	import Switch from './Components/Switch.svelte';
 	import Textfield from './Components/Textfield.svelte';
 	import DatePicker from './Components/DatePicker.svelte';
+import Droplist from './Components/Droplist.svelte';
 
 	function clickButton(){
 		alert('click');
@@ -51,6 +52,16 @@
 	function onChangeDate(evt){
 		alert(evt.detail.value)
 	}
+
+	let droplistItems =  [
+				{ value: '',   label: '' },
+                { value: 'H',  label: 'Homme' },
+                { value: 'F',  label: 'Femme' },
+				{ value: 'T',  label: 'Transgenre' },
+				{ value: 'NB', label: 'Non binaire' },
+				{ value: 'NG', label: 'Non genré' },
+                { value: 'A',  label: 'Autre' },
+        ];
 </script>
 
 <main>
@@ -143,12 +154,19 @@
 			minDate="10/11/2021"
 			on:change={onChangeDate}
 			required={true}
+			calendarOnly={true}
 			colorPicker="#222222"
 			colorPickerBackground="#444444"
 			colorPickerFont="#FFFFFF"
 			colorPickerFontSelected="#FFFFFF"
 			colorPickerHover="#666666"
 			colorPickerFontOut="#888888"
+		/>
+
+		<h3>Droplists</h3>
+		<Droplist 
+			label="Sexe"
+			items={droplistItems}
 		/>
 	</section>
 </main>
