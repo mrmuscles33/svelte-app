@@ -4,12 +4,12 @@
 
     // PUBLIC ATTRIBUTES
     export let text = '';
-    export let color = "#CCCCCC";
-    export let colorHover = "#AAAAAA";
+    export let color = "#444444";
+    export let colorHover = "#111111";
     export let colorChecked = "#0d31a6";
     export let colorCheckedHover ="#4e6ac7";
-    export let colorText = "#333333";
-    export let colorTextHover = "#111111";
+    export let colorText = "white";
+    export let colorTextHover = "white";
     export let colorTextChecked = "white";
     export let colorTextCheckedHover ="white";
     export let colorBackground = "white";
@@ -139,6 +139,7 @@
         line-height: 32px;
         vertical-align: top;
         color: var(--color-text);
+        font-size: inherit;
     }
     .counter-left i ~ .counter-text {
         margin-left: 5px;

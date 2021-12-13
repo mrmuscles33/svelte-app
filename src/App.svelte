@@ -54,15 +54,21 @@
 		alert(evt.detail.value)
 	}
 
+	let droplistValue = 'fr';
 	let droplistItems =  [
-				{ value: '',   label: '' },
-                { value: 'H',  label: 'Homme' },
-                { value: 'F',  label: 'Femme' },
-				{ value: 'T',  label: 'Transgenre' },
-				{ value: 'NB', label: 'Non binaire' },
-				{ value: 'NG', label: 'Non genré' },
-                { value: 'A',  label: 'Autre' },
-        ];
+		{ value: '',   label: '' },
+		{ value: 'fr',  label: 'Français', template: '<span class="flag-icon flag-icon-fr"></span> Français' },
+		{ value: 'en',  label: 'English', template: '<span class="flag-icon flag-icon-gb"></span> English' },
+		{ value: 'es',  label: 'Espanol', template: '<span class="flag-icon flag-icon-es"></span> Espanol' },
+		{ value: 'de', label: 'Deutsch', template: '<span class="flag-icon flag-icon-de"></span> Deutsch' },
+		{ value: 'it', label: 'Italiano', template: '<span class="flag-icon flag-icon-it"></span> Italiano' },
+		{ value: 'ru',  label: 'русский', template: '<span class="flag-icon flag-icon-ru"></span> русский'}
+	];
+	let droplistItems2 =  [
+		{ value: '',   label: '' },
+		{ value: 'H',  label: 'Homme', template: '<span class="material-icons-round" style="vertical-align:middle">male</span> <span style="vertical-align:middle">Homme</span>' },
+		{ value: 'F',  label: 'Femme', template: '<span class="material-icons-round" style="vertical-align:middle">female</span> <span style="vertical-align:middle">Femme</span>' }
+	];
 </script>
 
 <main>
@@ -173,8 +179,14 @@
 
 		<h3>Droplists</h3>
 		<Droplist 
-			label="Sexe"
+			label="Langue"
+			value={droplistValue}
 			items={droplistItems}
+		/>
+		<Droplist 
+			label="Sexe"
+			items={droplistItems2}
+			selectOnly={true}
 		/>
 	</section>
 </main>

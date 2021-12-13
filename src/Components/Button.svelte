@@ -5,8 +5,8 @@
         // PUBLIC ATTRIBUTES
         export let text = "";
         export let icon = "";
-        export let color = "#333333";
-        export let colorFont = "#333333";
+        export let color = "#444444";
+        export let colorFont = "#444444";
         export let colorHover = "#EEEEEE";
         export let primary = false;
         export let border = true;

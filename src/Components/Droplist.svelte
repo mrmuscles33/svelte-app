@@ -18,14 +18,15 @@
         export let required = false;
         export let readonly = false;
 
-        export let input;
-        export let displayedValue = "";
         export let items = [];
-
+        export let selectOnly = false;
+        
         // PRIVATE ATTRIBUTES
+        let input;
         let visible = false;
-        let selectOnly = false;
         let position = "bottom";
+        let displayedItems = items;
+        $: displayedValue = getLabel(value);
 
         // EVENTS
         const dispatch = createEventDispatcher();
@@ -35,18 +36,30 @@
         export function onFocus(evt) {
                 position = (window.innerHeight - input.getInput().getBoundingClientRect().top) < 250 ? 'top' : 'bottom';
                 visible = true;
+                displayedItems = items;
         }
         export function onFocusOut(evt) {
                 setTimeout(() => {
                         visible = false;
                 }, 100); // pour laisser le temps du onClickItem
         }
-        export function onClickItem(evt){
-                value = evt.currentTarget.getAttribute('value');
-                displayedValue = evt.currentTarget.getAttribute('label');
+        export function onClickItem(evt) {
+                let pValue = evt.currentTarget.getAttribute('code');
+                if(pValue == value) {
+                        displayedValue = getLabel(value);
+                } else {
+                        value = pValue;
+                }
+        }
+        export function onKeyUp(evt) {
+                displayedItems = items.filter(i => i.label.toLowerCase().includes(displayedValue.toLowerCase()));
         }
 
         // METHODS
+        function getLabel(pValue){
+                var i = items.find(i => i.value == pValue);
+                return i ? i.label : "";
+        }
 </script>
 
 <div class="droplist-main">
@@ -72,7 +85,7 @@
                 on:focusout={onFocusOut}
                 on:input
                 on:keydown
-                on:keyup
+                on:keyup={onKeyUp}
                 bind:this={input}
         />
 
@@ -84,8 +97,14 @@
                 --color-focus: {colorFocus};
                 --color-error: {colorError};
                 --width: {width}px;">
-                {#each items as item}
-                        <li on:click={onClickItem} value={item.value} label={item.label}>{item.label}</li>
+                {#each displayedItems as item}
+                        <li on:click={onClickItem} code={item.value}>
+                                {#if item.template}
+                                        {@html item.template}
+                                {:else}
+                                        {item.label}
+                                {/if}
+                        </li>
                 {/each}
         </ul>
 </div>
