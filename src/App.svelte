@@ -8,6 +8,7 @@
 	import DatePicker from './Components/DatePicker.svelte';
 	import Droplist from './Components/Droplist.svelte';
 	import CounterButton from './Components/CounterButton.svelte';
+	import TimePicker from './Components/TimePicker.svelte';
 
 	function clickButton(){
 		alert('click');
@@ -162,7 +163,7 @@
 			errorMessage="Le champ est vide"
 		/>
 
-		<h3>Date Pickers</h3>
+		<h3>Date & Time Pickers</h3>
 		<DatePicker
 			label="Date"
 			minDate="10/11/2021"
@@ -175,6 +176,11 @@
 			colorPickerFontSelected="#FFFFFF"
 			colorPickerHover="#666666"
 			colorPickerFontOut="#888888"
+		/>
+		<TimePicker 
+			label="Heure"
+			minTime="07:00"
+			maxTime="20:00"
 		/>
 
 		<h3>Droplists</h3>

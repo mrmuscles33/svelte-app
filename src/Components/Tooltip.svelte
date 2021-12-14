@@ -13,11 +13,9 @@
 	
 </script>
 
-<span class="tooltip-main tooltip-position-{position}"
-      style="--color-background: {colorBackground};
-             --color-font: {colorFont}">
+<span class="tooltip-main tooltip-position-{position}">
         <slot></slot>
-        <div class="tooltip-text">{text}</div>
+        <div class="tooltip-text" style="--color-background: {colorBackground};--color-font: {colorFont}">{text}</div>
 </span>
 
 <style>
@@ -40,6 +38,7 @@
                 visibility: hidden;
                 opacity: 0;
                 transition: opacity 0.2s ease-in;
+                z-index: 2;
         }
         .tooltip-main:hover .tooltip-text {
                 visibility: visible;
