@@ -14,7 +14,7 @@
         export let colorCheckedHover = "#4e6ac7";
         
         // PRIVATE ATTRIBUTES
-        let id = '_' + Math.random().toString(36).substr(2, 12);
+        let id = '_' + Math.random().toString(36).substring(2, 12);
 
         // METHODS
         const dispatch = createEventDispatcher();

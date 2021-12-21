@@ -16,14 +16,16 @@
         export let iconRight = "";
         export let label = "";
         export let errorMessage = "";
-        export let pattern = "";
+        export let pattern = null;
         export let required = false;
         export let readonly = false;
+        export let type = "text";
+        export let format = null;
         
         // PRIVATE ATTRIBUTES
         $: inputWidth = width - (iconLeft != "" ? 40 : 12) - (iconRight != "" ? 32 : 0) - (hasError != "" ? 32 : 0) - 12;
         $: hasError = errorMessage != "";
-        let id = '_' + Math.random().toString(36).substr(2, 12);
+        let id = '_' + Math.random().toString(36).substring(2, 12);
         let input;
         let oldValue = "";
 
@@ -42,8 +44,12 @@
         export function onChange() {
                 if(disable) return;
                 errorMessage = required && (value == null || value.trim().length == 0) ? "La donnée " + label + " est obligatoire" : "";
-                if(pattern != "" && errorMessage == ""){
-                        errorMessage = new RegExp(pattern).test(value) || value == "" || value == null ? "" : "Erreur dans le format de la donnée " + label;
+                if(pattern != null && errorMessage == ""){
+                        errorMessage = new RegExp(pattern).test(value) || value == "" || value == null ? 
+                                                "" : 
+                                                format ? 
+                                                        "La donnée " + label  + " doit être au format " + format : 
+                                                        "Erreur dans le format de la donnée " + label;
                 }
                 dispatch('change', {
                         value: value,
@@ -102,6 +108,9 @@
         export function getInput(){
                 return input;
         }
+        function typeAction(node) {
+		node.type = type;
+	}
 </script>
 
 <div class="textfield-main"
@@ -117,7 +126,7 @@
             --color-error: {colorError};
             --width: {width}px;
             --width-input: {inputWidth}px;">
-        <input type="text" bind:this={input} {id} bind:value={value} {required} {pattern} {readonly} disabled={disable} placeholder="." 
+        <input use:typeAction bind:this={input} {id} bind:value={value} {required} pattern={pattern || undefined} {readonly} disabled={disable} placeholder="." 
                 on:change={onChange} 
                 on:input={onInput}
                 on:focus={onFocus}
@@ -178,6 +187,11 @@
                 border: none;
                 outline: none;
                 background: none;
+                -moz-appearance: textfield;
+        }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+                -webkit-appearance: none;
         }
         input::placeholder {
                 opacity: 0;
@@ -198,6 +212,10 @@
                 transition: .2s ease-out;
                 pointer-events: none;
                 user-select: none;
+        }
+        input:required ~ label::after {
+                content: " *";
+                color: var(--color-error)
         }
         .textfield-main:focus-within label {
                 color: var(--color-focus);

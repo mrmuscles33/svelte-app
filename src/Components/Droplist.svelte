@@ -17,11 +17,13 @@
         export let errorMessage = "";
         export let required = false;
         export let readonly = false;
-
+        export let format = null;
+        
         export let items = [];
         export let selectOnly = false;
         
         // PRIVATE ATTRIBUTES
+        let type = "text";
         let input;
         let visible = false;
         let position = "bottom";
@@ -73,6 +75,8 @@
                 {width}
                 {iconLeft}
                 {required}
+                {type}
+                {format}
                 readonly={readonly || selectOnly}
                 iconRight={readonly ? "" : "expand_more"}
                 {label}

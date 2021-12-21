@@ -19,7 +19,7 @@
         export let errorMessage = "";
         export let required = false;
         export let readonly = false;
-
+        
         export let minDate = '01/01/1900';
         export let maxDate = '31/12/2099';
         export let startWeek = 1;
@@ -32,6 +32,7 @@
         export let calendarOnly = false;
         
         // PRIVATE ATTRIBUTES
+        let type = "text";
         let days = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
         let months = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
         let visible = false;
@@ -207,6 +208,8 @@
         {width}
         {iconLeft}
         {required}
+        {type}
+        format="DD/MM/YYYY"
         readonly={readonly || calendarOnly}
         iconRight={readonly ? "" : "today"}
         pattern="((([0-2][0-9])|(3[0-1]))(\/|-|\.)((0[13578])|10|12)(\/|-|\.)(19|20)[0-9][0-9])|((([0-2][0-9])|30)(\/|-|\.)((0[469])|11)(\/|-|\.)(19|20)[0-9][0-9])|(([0-2][0-9])(\/|-|\.)02(\/|-|\.)(19|20)[0-9][0-9])"
@@ -287,7 +290,7 @@
                         {:else}
                                 <div class="datepicker-days">
                                         {#each sortedDays as day}
-                                                <span class="datepicker-day">{day.substr(0,3)}</span>
+                                                <span class="datepicker-day">{day.substring(0,3)}</span>
                                         {/each}
                                         {#each displayedDays as day}
                                                 <!-- svelte-ignore a11y-invalid-attribute -->

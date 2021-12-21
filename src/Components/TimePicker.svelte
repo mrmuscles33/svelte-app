@@ -4,7 +4,6 @@
         import Textfield from './Textfield.svelte';
         import Button from './Button.svelte';
         import Tooltip from './Tooltip.svelte';
-import { get } from 'svelte/store';
         
         // PUBLIC ATTRIBUTES
         export let value = "";
@@ -33,6 +32,7 @@ import { get } from 'svelte/store';
         export let clockOnly = false;
         
         // PRIVATE ATTRIBUTES
+        let type = "text";
         let tmpValue = isValidTime(value) ? value : new Date().getHours().toString().padStart(2,'0') + ':' + new Date().getMinutes().toString().padStart(2,'0');
         let visible = false;
         let input;
@@ -127,6 +127,8 @@ import { get } from 'svelte/store';
         {width}
         {iconLeft}
         {required}
+        {type}
+        format="hh:mm"
         readonly={readonly || clockOnly}
         iconRight={readonly ? "" : "schedule"}
         pattern="([0-1][0-9]|2[0-3]):[0-5][0-9]"

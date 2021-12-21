@@ -14,7 +14,7 @@
         export let selectedValue;
         
         // PRIVATE ATTRIBUTES
-        let id = '_' + Math.random().toString(36).substr(2, 12);
+        let id = '_' + Math.random().toString(36).substring(2, 12);
 
         // METHODS
 </script>
