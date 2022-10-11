@@ -138,7 +138,9 @@
                 on:blur={onBlur}
                 on:keydown={onKeyDown}
                 on:keyup={onKeyUp}/>
-        <label for={id}>{label}</label>
+        {#if label != ""}
+                <label for={id}>{label}</label>
+        {/if}
         {#if iconLeft != ""}
                 <span class="textfield-icon textfield-icon-left material-icons-round">{iconLeft}</span>
         {/if}

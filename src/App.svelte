@@ -149,9 +149,7 @@
 			label="Label"
 		/>
 		<Textfield 
-			errorMessage="toto"
-			iconLeft="search"
-			iconRight="highlight_off"
+			filled={false}
 		/>
 		<Textfield 
 			label="Icons"
