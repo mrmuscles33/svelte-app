@@ -1,0 +1,106 @@
+/* SUMMARY */
+
+/* Button.svelte */
+/* CounterButton.svelte */
+/* Checkbox.svelte */
+/* Radio.svelte */
+/* Switch.svelte */
+/* Textfield.svelte */
+
+
+/* Button.svelte */
+.btn-main {
+    /* Border color */
+    --color-primary: #1D2B83;
+    /* Background hover color */
+    --color-hover: #cfd4f1;
+    /* Font color */
+    --color-font: #1D2B83;
+}
+.btn-main.primary {
+    /* Background & border color */
+    --color-primary: #1D2B83;
+    /* Background & border hover color */
+    --color-hover: #5a6ad1;
+    /* Font color */
+    --color-font: #FFFFFF;
+}
+
+
+/* CounterButton.svelte */
+.counter-main {
+    /* Background, border & count color */
+    --color: #2739af; 
+    /* Background, border & count hover color */
+    --color-hover: #717fd7; 
+    /* Background, border & count checked color */
+    --color-checked: #141d58; 
+    /* Background, border & count checked hover color */
+    --color-checked-hover: #2739af;
+    /* Text & icon color */
+    --color-text: #FFFFFF;
+    /* Text & icon checked color */
+    --color-text-checked: #FFFFFF; 
+    /* Background color */
+    --color-background: #FFFFFF;
+}
+
+
+/* Checkbox.svelte */
+.checkbox-main {
+    /* Icon color */
+    --color-primary: #666; 
+    /* Icon color hover */
+    --color-hover: #111; 
+    /* Icon checked color */
+    --color-checked: #1D2B83; 
+    /* Icon checked hover color */
+    --color-checked-hover: #5a6ad1;
+    /* Font color */
+    --color-font: #333;
+}
+
+
+/* Radio.svelte */
+.radio-main {
+    /* Icon color */
+    --color-primary: #666; 
+    /* Icon color hover */
+    --color-hover: #111; 
+    /* Icon checked color */
+    --color-checked: #1D2B83; 
+    /* Icon checked hover color */
+    --color-checked-hover: #5a6ad1;
+    /* Font color */
+    --color-font: #333;
+}
+
+
+/* Switch.svelte */
+.switch-main {
+    /* Background color */
+    --color-primary: #666;
+    /* Background hover color */ 
+    --color-hover: #111; 
+    /* Background checked color */ 
+    --color-checked: #1D2B83; 
+    /* Background checked hover color */ 
+    --color-checked-hover: #5a6ad1; 
+    /* Foreground color */ 
+    --color-button: #FFFFFF;
+}
+
+
+/* Textfield.svelte */
+.textfield-main {
+    /* Background color */
+    --color-backgroud: #EEEEEE; 
+    /* Background hover color */
+    --color-backgroud-hover: #DDDDDD;
+    /* Label color */
+    --color: #666666;
+    /* Label, Border focus color */
+    --color-focus: #1D2B83;
+    /* Label, Border error color */
+    --color-error: #cc4141;
+}

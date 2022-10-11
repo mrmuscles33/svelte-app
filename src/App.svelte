@@ -44,7 +44,7 @@
 	},{
 		label: 'Checkbox 3',
 		value: 3
-	}];
+	},];
 	let checkboxValues = [1,2];
 	function onChangeCheckboxes(event){
 		alert(event.detail.selectedValues);
@@ -82,8 +82,7 @@
 			icon="search"
 			text="Primary"
 			primary={true}
-			colorHover="#111111"
-			colorFont="#FFFFFF"
+			cls="test"
 		/>
 		<Button
 			icon="search"
@@ -127,7 +126,7 @@
 			name="radiogroup"
 			bind:selectedValue={radioValue}
 			on:change={onChangeRadio}
-			inline={false}
+			inline={true}
 		/>
 
 		<h3>Switches</h3>

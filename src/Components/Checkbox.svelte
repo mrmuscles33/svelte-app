@@ -8,91 +8,86 @@
         export let name = "";
         export let value = "";
         export let disable = false;
-        export let color = "#444";
-        export let colorHover = "#000000";
-        export let colorChecked = "#0d31a6";
-        export let colorCheckedHover = "#4e6ac7";
+        export let cls = "";
+        export let style = "";
         
         // PRIVATE ATTRIBUTES
-        let id = '_' + Math.random().toString(36).substr(2, 12);
+        let id = '_' + Math.random().toString(36).substring(2, 12);
 
         // METHODS
         const dispatch = createEventDispatcher();
-        function onChange(){
-                if(disable) return;
-                dispatch('change', {
-                        check: check,
-                        value: value
-                });
+        let onChange = () =>{
+                if(!disable) {
+                        dispatch('change', {
+                                check: check,
+                                value: value
+                        });
+                }
         }
 </script>
 
-<div class="checkbox-main"
-     class:disable
-     style="--color-primary: {color}; 
-            --color-hover: {colorHover}; 
-            --color-checked: {colorChecked}; 
-            --color-checked-hover: {colorCheckedHover}">
-        <input type="checkbox" {id} bind:checked={check} {name} {value} disabled={disable} on:change={onChange}/>
-        <label for={id} class="material-icons-round uncheck">check_box_outline_blank</label>
-        <label for={id} class="material-icons-round check">check_box</label>
-        <label for={id}>{label}</label>
-</div>
+<input type="checkbox" {id} bind:checked={check} {name} {value} disabled={disable} on:change={onChange}/>
+<label 
+     class="checkbox-main {cls}"
+     for={id}
+     {style}
+>
+        {#if check}
+                <span class="material-icons-round" role="presentation">check_box</span>
+        {:else}
+                <span class="material-icons-round" role="presentation">check_box_outline_blank</span>
+        {/if}
+        <span>{label}</span>
+</label>
 
 <style>
-        .checkbox-main {
-               margin: 10px 5px;
-               user-select: none;
-               display: inline-block;
-        }
-        .checkbox-main.disable{
-                opacity: .5;
-        }
-        input{
+        input {
                 opacity: 0;
                 width: 0px;
                 height: 0px;
                 padding: 0px;
                 margin: 0px;
         }
-        input ~  .uncheck {
+        .checkbox-main {
+                margin:         10px 5px;
+                padding:        0;
+                cursor:         pointer;
+                user-select:    none;
+                display:        inline-flex;
+                vertical-align: middle;
+                white-space:    nowrap;
+                color:          var(--color-font);
+        }
+        input:disabled + .checkbox-main {
+                cursor: not-allowed;
+                opacity: .5;
+        }
+        .checkbox-main span {
+                vertical-align: middle;
+        }
+        .checkbox-main .material-icons-round {
                 color: var(--color-primary);
+                margin-right: 5px;
         }
-        input:focus ~ .uncheck,
-        input ~  .uncheck:hover {
-                color: var(--color-hover);
-        }
-        input ~  .check {
-                display: none;
-        }
-        input:checked ~  .check {
-                display: inline-block;
+        input:checked + .checkbox-main .material-icons-round {
                 color: var(--color-checked);
         }
-        input:focus ~ .check,
-        input ~ .check:hover {
+        input:focus + .checkbox-main .material-icons-round,
+        .checkbox-main:hover .material-icons-round {
+                color: var(--color-hover);
+        }
+        input:checked:focus + .checkbox-main .material-icons-round,
+        input:checked + .checkbox-main:hover .material-icons-round {
                 color: var(--color-checked-hover);
         }
-        input:checked ~  .uncheck {
-                display: none;
-        }
-        input:focus ~ .uncheck {
-                box-shadow: inset 0px 0px 0 1px var(--color-hover), 0px 0px 0px 1px var(--color-hover);
-                padding-right: 1px;
-                border-radius: 3px;
-        }
-        input:focus ~ .check {
+        input:checked:focus + .checkbox-main .material-icons-round {
                 box-shadow: inset 0px 0px 0 1px var(--color-checked-hover), 0px 0px 0px 1px var(--color-checked-hover);
                 padding-right: 1px;
                 border-radius: 3px;
         }
-        label{
-                vertical-align: middle;
-        }
-        .check, .uncheck, label {
-                cursor: pointer;
-        }
-        .disable .check, .disable .uncheck, .disable label {
-                cursor: not-allowed;
+        input:focus + .checkbox-main .material-icons-round {
+                box-shadow: inset 0px 0px 0 1px var(--color-hover), 0px 0px 0px 1px var(--color-hover);
+                padding-right: 1px;
+                border-radius: 3px;
         }
 </style>

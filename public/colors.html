@@ -1,0 +1,95 @@
+<html>
+    <head>
+        <title>Test couleurs</title>
+        <style>
+            .color-box{
+                width: 75px;
+                height: 75px;
+                display: inline-block;
+                padding: 0;
+                margin: 0;
+            }
+        </style>
+        <script>
+            function onLoad(){
+                var baseColor = "#2b40c4";
+                // var baseColor = "#4e4eff";
+                var nbTeintes = 10;
+                for(var i = 0; i < 10; i++){
+                    var div = document.createElement('div');
+                    div.classList.add('color-box');
+                    div.style.backgroundColor = lighter(baseColor,i * 100/(nbTeintes - 1));
+                    div.style.color = "#000";
+                    div.innerHTML = lighter(baseColor,i * 100/(nbTeintes - 1));
+                    document.getElementById('container-light').appendChild(div);
+                }
+
+                for(var j = 0; j < nbTeintes; j++){
+                    var div = document.createElement('div');
+                    div.classList.add('color-box');
+                    div.style.backgroundColor = darker(baseColor,j * 100/(nbTeintes - 1));
+                    div.style.color = "#FFF";
+                    div.innerHTML = darker(baseColor,j * 100/(nbTeintes - 1));
+                    document.getElementById('container-dark').appendChild(div);
+                }
+            }
+
+            function lighter(color, light) {
+                return lighterOrDarker(color, light);
+            }
+
+            function darker(color, dark) {
+                return lighterOrDarker(color, -dark);
+            }
+
+            function lighterOrDarker(color, value) {
+                if(value == 0) return color;
+                var hashtag = false;
+                if (color[0] == "#") {
+                    color = color.substring(1,7);
+                    hashtag = true;
+                }
+                var red =   parseInt(color.substring(0,2), 16) + (value > 0 ? 
+                                parseInt((255 - parseInt(color.substring(0,2), 16)) * value/100) : 
+                                parseInt(parseInt(color.substring(0,2), 16) * value/100)
+                            );
+                if (red > 255)
+                    red = 255;
+                else if (red < 0)
+                    red = 0;
+
+                var green = parseInt(color.substring(2,4), 16) + (value > 0 ? 
+                                parseInt((255 - parseInt(color.substring(2,4), 16)) * value/100) : 
+                                parseInt(parseInt(color.substring(2,4), 16) * value/100)
+                            );
+                if (green > 255)
+                    green = 255;
+                else if (green < 0)
+                    green = 0;
+
+                var blue = parseInt(color.substring(4,6), 16) + (value > 0 ? 
+                                parseInt((255 - parseInt(color.substring(4,6), 16)) * value/100) : 
+                                parseInt(parseInt(color.substring(4,6), 16) * value/100)
+                            );
+                if (blue > 255)
+                    blue = 255;
+                else if (blue < 0)
+                    blue = 0;
+                
+                red   = red.toString(16);
+                green = green.toString(16);
+                blue  = blue.toString(16);
+
+                red   = red.length   == 1 ? "0" + red   : red;
+                green = green.length == 1 ? "0" + green : green;
+                blue  = blue.length  == 1 ? "0" + blue  : blue;
+
+                return (hashtag ? "#" : "") + red + green + blue;
+            }
+        </script>
+    </head>
+    <body onload="onLoad()">
+        <div id="container-light"></div>
+        <div id="container-dark"></div>
+    </body>
+</html>

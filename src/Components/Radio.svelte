@@ -3,88 +3,80 @@
         
         // PUBLIC ATTRIBUTES
         export let label = "";
-        export let check = false;
         export let name = "";
         export let value = "";
         export let disable = false;
-        export let color = "#444";
-        export let colorHover = "#000000";
-        export let colorChecked = "#0d31a6";
-        export let colorCheckedHover = "#4e6ac7";
         export let selectedValue;
+        export let style = "";
         
         // PRIVATE ATTRIBUTES
-        let id = '_' + Math.random().toString(36).substr(2, 12);
+        let id = '_' + Math.random().toString(36).substring(2, 12);
 
         // METHODS
 </script>
 
-<div class="radio-main"
-     class:disable
-     style="--color-primary: {color}; 
-            --color-hover: {colorHover}; 
-            --color-checked: {colorChecked}; 
-            --color-checked-hover: {colorCheckedHover}">
-        <input type="radio" {id} bind:group={selectedValue} checked={check} {name} {value} disabled={disable}/>
-        <label for={id} class="material-icons-round uncheck">radio_button_unchecked</label>
-        <label for={id} class="material-icons-round check">radio_button_checked</label>
-        <label for={id}>{label}</label>
-</div>
+<input type="radio" {id} bind:group={selectedValue} {name} {value} disabled={disable}/>
+<label 
+     class="radio-main"
+     for={id}
+     {style}
+>
+        {#if selectedValue == value}
+                <span class="material-icons-round" role="presentation">radio_button_checked</span>
+        {:else}
+                <span class="material-icons-round" role="presentation">radio_button_unchecked</span>
+        {/if}
+        <span>{label}</span>
+</label>
 
 <style>
-        .radio-main {
-               margin: 10px 5px;
-               user-select: none;
-               display: inline-block;
-        }
-        .radio-main.disable{
-                opacity: .5;
-        }
-        input{
+        input {
                 opacity: 0;
                 width: 0px;
                 height: 0px;
                 padding: 0px;
                 margin: 0px;
         }
-        input ~  .uncheck {
+        .radio-main {
+                margin:         10px 5px;
+                padding:        0;
+                cursor:         pointer;
+                user-select:    none;
+                display:        inline-flex;
+                vertical-align: middle;
+                white-space:    nowrap;
+                color:          var(--color-font);
+        }
+        input:disabled + .radio-main {
+                cursor: not-allowed;
+                opacity: .5;
+        }
+        .radio-main span {
+                vertical-align: middle;
+        }
+        .radio-main .material-icons-round {
                 color: var(--color-primary);
+                margin-right: 5px;
         }
-        input:focus ~ .uncheck,
-        input ~  .uncheck:hover {
-                color: var(--color-hover);
-        }
-        input ~  .check {
-                display: none;
-        }
-        input:checked ~  .check {
-                display: inline-block;
+        input:checked + .radio-main .material-icons-round {
                 color: var(--color-checked);
         }
-        input:focus ~ .check,
-        input ~ .check:hover {
+        input:focus + .radio-main .material-icons-round,
+        .radio-main:hover .material-icons-round {
+                color: var(--color-hover);
+        }
+        input:checked:focus + .radio-main .material-icons-round,
+        input:checked + .radio-main:hover .material-icons-round {
                 color: var(--color-checked-hover);
         }
-        input:checked ~  .uncheck {
-                display: none;
-        }
-        input:focus ~ .uncheck {
-                box-shadow: inset 0px 0px 0 1px var(--color-hover), 0px 0px 0px 1px var(--color-hover);
-                padding-right: 1px;
-                border-radius: 50px;
-        }
-        input:focus ~ .check {
+        input:checked:focus + .radio-main .material-icons-round {
                 box-shadow: inset 0px 0px 0 1px var(--color-checked-hover), 0px 0px 0px 1px var(--color-checked-hover);
                 padding-right: 1px;
                 border-radius: 50px;
         }
-        label{
-                vertical-align: middle;
-        }
-        .check, .uncheck, label {
-                cursor: pointer;
-        }
-        .disable .check, .disable .uncheck, .disable label {
-                cursor: not-allowed;
+        input:focus + .radio-main .material-icons-round {
+                box-shadow: inset 0px 0px 0 1px var(--color-hover), 0px 0px 0px 1px var(--color-hover);
+                padding-right: 1px;
+                border-radius: 50px;
         }
 </style>

@@ -17,6 +17,7 @@
         export let errorMessage = "";
         export let required = false;
         export let readonly = false;
+        export let cls = "";
 
         export let items = [];
         export let selectOnly = false;
@@ -29,34 +30,33 @@
         $: displayedValue = getLabel(value);
 
         // EVENTS
-        const dispatch = createEventDispatcher();
-	export function onClickIcon() {
+	export let onClickIcon = () => {
                 input.getInput().focus();
-        }
-        export function onFocus(evt) {
+        };
+        export let onFocus = (evt) => {
                 position = (window.innerHeight - input.getInput().getBoundingClientRect().top) < 250 ? 'top' : 'bottom';
                 visible = true;
                 displayedItems = items;
-        }
-        export function onFocusOut(evt) {
+        };
+        export let onFocusOut = (evt) => {
                 setTimeout(() => {
                         visible = false;
                 }, 100); // pour laisser le temps du onClickItem
-        }
-        export function onClickItem(evt) {
+        };
+        export let onClickItem = (evt) => {
                 let pValue = evt.currentTarget.getAttribute('code');
                 if(pValue == value) {
                         displayedValue = getLabel(value);
                 } else {
                         value = pValue;
                 }
-        }
-        export function onKeyUp(evt) {
+        };
+        export let onKeyUp = (evt) => {
                 displayedItems = items.filter(i => i.label.toLowerCase().includes(displayedValue.toLowerCase()));
-        }
+        };
 
         // METHODS
-        function getLabel(pValue){
+        let getLabel = (pValue) => {
                 var i = items.find(i => i.value == pValue);
                 return i ? i.label : "";
         }
@@ -66,18 +66,14 @@
         <Textfield 
                 bind:value={displayedValue}
                 {disable}
-                {color}
-                {colorFocus}
-                {colorBackground}
-                {colorBackgroundHover}
                 {width}
                 {iconLeft}
                 {required}
                 readonly={readonly || selectOnly}
                 iconRight={readonly ? "" : "expand_more"}
                 {label}
+                {cls}
                 bind:errorMessage={errorMessage}
-                {colorError}
                 on:change
                 on:blur
                 on:clickIcon={onClickIcon}

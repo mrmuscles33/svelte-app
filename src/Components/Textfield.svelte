@@ -6,11 +6,6 @@
         // PUBLIC ATTRIBUTES
         export let value = "";
         export let disable = false;
-        export let color = "#666666";
-        export let colorFocus = "#0d31a6";
-        export let colorBackground = "#EEEEEE";
-        export let colorBackgroundHover = "#DDDDDD";
-        export let colorError = "#cc4141";
         export let width = 290;
         export let iconLeft = "";
         export let iconRight = "";
@@ -19,27 +14,30 @@
         export let pattern = "";
         export let required = false;
         export let readonly = false;
+        export let type = "text";
+        export let cls = "";
+        export let style = "";
         
         // PRIVATE ATTRIBUTES
         $: inputWidth = width - (iconLeft != "" ? 40 : 12) - (iconRight != "" ? 32 : 0) - (hasError != "" ? 32 : 0) - 12;
         $: hasError = errorMessage != "";
-        let id = '_' + Math.random().toString(36).substr(2, 12);
+        let id = '_' + Math.random().toString(36).substring(2, 12);
         let input;
         let oldValue = "";
 
         // EVENTS
 	const dispatch = createEventDispatcher();
-        export function onClick() {
+        export let onClick = () => {
                 if(readonly) return;
                 input.focus();
-        }
-        export function onClickIcon() {
+        };
+        export let onClickIcon = () => {
                 if(disable) return;
                 dispatch('clickIcon', {
                         value: value
                 });
-        }
-        export function onChange() {
+        };
+        export let onChange = () => {
                 if(disable) return;
                 errorMessage = required && (value == null || value.trim().length == 0) ? "La donnée " + label + " est obligatoire" : "";
                 if(pattern != "" && errorMessage == ""){
@@ -50,32 +48,32 @@
                         oldValue: oldValue
                 });
                 oldValue = value;
-        }
-        export function onInput(){
+        };
+        export let onInput = () => {
                 if(disable) return;
                 dispatch('input', {
                         value: value
                 });
-        }
-        export function onFocus(){
+        };
+        export let onFocus = () => {
                 if(disable) return;
                 dispatch('focus', {
                         value: value
                 });
-        }
-        export function onFocusOut(){
+        };
+        export let onFocusOut = () => {
                 if(disable) return;
                 dispatch('focusout', {
                         value: value
                 });
-        }
-        export function onBlur(){
+        };
+        export let onBlur = () => {
                 if(disable) return;
                 dispatch('blur', {
                         value: value
                 });
-        }
-        export function onKeyDown(event){
+        };
+        export let onKeyDown = (event) => {
                 if(disable) return;
                 dispatch('keydown', {
                         value: value,
@@ -85,8 +83,8 @@
                         shiftKey: event.shiftKey,
                         altKey: event.altKey
                 });
-        }
-        export function onKeyUp(event){
+        };
+        export let onKeyUp = (event) => {
                 if(disable) return;
                 dispatch('keyup', {
                         value: value,
@@ -96,28 +94,27 @@
                         shiftKey: event.shiftKey,
                         altKey: event.altKey
                 });
-        }
+        };
 
         // METHODS
-        export function getInput(){
+        export const getInput = () => {
                 return input;
-        }
+        };
+        let typeAction = (node) => {
+		node.type = type;
+	};
 </script>
 
-<div class="textfield-main"
+<div class="textfield-main {cls}"
      class:textfield-icon-left={iconLeft != ""}
      class:textfield-icon-right={iconRight != ""}
      class:disable
      class:textfield-error={hasError}
      on:click={onClick}
-     style="--color-backgroud: {colorBackground}; 
-            --color-backgroud-hover: {colorBackgroundHover};
-            --color: {color};
-            --color-focus: {colorFocus};
-            --color-error: {colorError};
-            --width: {width}px;
-            --width-input: {inputWidth}px;">
-        <input type="text" bind:this={input} {id} bind:value={value} {required} {pattern} {readonly} disabled={disable} placeholder="." 
+     style="--width: {width}px;
+            --width-input: {inputWidth}px;
+            {style}">
+        <input use:typeAction bind:this={input} {id} bind:value={value} {required} pattern={pattern || null} {readonly} disabled={disable} placeholder="." 
                 on:change={onChange} 
                 on:input={onInput}
                 on:focus={onFocus}
@@ -126,18 +123,23 @@
                 on:keydown={onKeyDown}
                 on:keyup={onKeyUp}/>
         <label for={id}>{label}</label>
-        <!-- svelte-ignore a11y-missing-attribute -->
-        <span class="textfield-icon textfield-icon-left material-icons-round">{iconLeft}</span>
+        {#if iconLeft != ""}
+                <span class="textfield-icon textfield-icon-left material-icons-round">{iconLeft}</span>
+        {/if}
         {#if hasError}
                 <span class="textfield-icon textfield-icon-right textfield-icon-error">
                         <Tooltip text={errorMessage}>
-                                <!-- svelte-ignore a11y-missing-attribute -->
-                                <a class="material-icons-round">error</a>
+                                <span class="material-icons-round" tabindex="0">error</span>
                         </Tooltip>
                 </span>
         {/if}
-        <!-- svelte-ignore a11y-missing-attribute -->
-        <a class="textfield-icon textfield-icon-right material-icons-round" on:click|stopPropagation={onClickIcon}>{iconRight}</a>
+        {#if iconRight != ""}
+                <span 
+                        class="textfield-icon textfield-icon-right material-icons-round" 
+                        role="button"
+                        tabindex="0"
+                        on:click|stopPropagation={onClickIcon}>{iconRight}</span>
+        {/if}
 </div>
 
 <style>

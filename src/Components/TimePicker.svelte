@@ -9,11 +9,6 @@ import { get } from 'svelte/store';
         // PUBLIC ATTRIBUTES
         export let value = "";
         export let disable = false;
-        export let color = "#666666";
-        export let colorFocus = "#0d31a6";
-        export let colorBackground = "#EEEEEE";
-        export let colorBackgroundHover = "#DDDDDD";
-        export let colorError = "#cc4141";
         export let width = 290;
         export let iconLeft = "";
         export let label = "";
@@ -120,10 +115,6 @@ import { get } from 'svelte/store';
 <Textfield 
         bind:value={value}
         {disable}
-        {color}
-        {colorFocus}
-        {colorBackground}
-        {colorBackgroundHover}
         {width}
         {iconLeft}
         {required}
@@ -132,7 +123,6 @@ import { get } from 'svelte/store';
         pattern="([0-1][0-9]|2[0-3]):[0-5][0-9]"
         {label}
         bind:errorMessage={errorMessage}
-        {colorError}
         on:change={onChange}
         on:blur
         on:clickIcon={onClickIcon}
@@ -240,16 +230,10 @@ import { get } from 'svelte/store';
                                         text="Fermer"
                                         border={false}
                                         on:click={onClickFermer}
-                                        color={colorPickerFont}
-                                        colorFont={colorPickerFont}
-                                        colorHover={colorPickerHover}
                                 />
                                 <Button
                                         text="Valider"
                                         primary={true}
-                                        color={colorPicker}
-                                        colorFont={colorPickerFontSelected}
-                                        colorHover={colorPicker}
                                         on:click={onClickValider}
                                 />
                         </div>

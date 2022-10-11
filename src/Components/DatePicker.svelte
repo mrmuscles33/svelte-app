@@ -8,17 +8,13 @@
         // PUBLIC ATTRIBUTES
         export let value = "";
         export let disable = false;
-        export let color = "#666666";
-        export let colorFocus = "#0d31a6";
-        export let colorBackground = "#EEEEEE";
-        export let colorBackgroundHover = "#DDDDDD";
-        export let colorError = "#cc4141";
         export let width = 290;
         export let iconLeft = "";
         export let label = "";
         export let errorMessage = "";
         export let required = false;
         export let readonly = false;
+        export let cls = "";
 
         export let minDate = '01/01/1900';
         export let maxDate = '31/12/2099';
@@ -200,10 +196,6 @@
 <Textfield 
         bind:value={value}
         {disable}
-        {color}
-        {colorFocus}
-        {colorBackground}
-        {colorBackgroundHover}
         {width}
         {iconLeft}
         {required}
@@ -211,8 +203,8 @@
         iconRight={readonly ? "" : "today"}
         pattern="((([0-2][0-9])|(3[0-1]))(\/|-|\.)((0[13578])|10|12)(\/|-|\.)(19|20)[0-9][0-9])|((([0-2][0-9])|30)(\/|-|\.)((0[469])|11)(\/|-|\.)(19|20)[0-9][0-9])|(([0-2][0-9])(\/|-|\.)02(\/|-|\.)(19|20)[0-9][0-9])"
         {label}
+        {cls}
         bind:errorMessage={errorMessage}
-        {colorError}
         on:change={onChange}
         on:blur
         on:clickIcon={onClickIcon}
@@ -244,9 +236,6 @@
                                 border={false}
                                 on:click={onClickYearButton}
                                 style="margin-left: 8px"
-                                color={colorPickerFont}
-                                colorFont={colorPickerFont}
-                                colorHover={colorPickerHover}
                         />
                         <div class="datepicker-buttons">
                                 <Tooltip text={showYears ? "Années précédentes" : "Mois précedent"}>
@@ -256,9 +245,6 @@
                                                 border={false}
                                                 disable={(showYears && yearsPage == 0) || (!showYears && displayedDays.some(d => dateToText(d,'DD/MM/YYYY') == minDate))}
                                                 on:click={onClickPrevious}
-                                                color={colorPickerFont}
-                                                colorFont={colorPickerFont}
-                                                colorHover={colorPickerHover}
                                         />
                                 </Tooltip>
                                 <Tooltip text={showYears ? "Années suivantes" : "Mois suivant"}>
@@ -268,9 +254,6 @@
                                                 border={false}
                                                 disable={(showYears && displayedYears.length < 12) || (!showYears && displayedDays.some(d => dateToText(d,'DD/MM/YYYY') == maxDate))}
                                                 on:click={onClickNext}
-                                                color={colorPickerFont}
-                                                colorFont={colorPickerFont}
-                                                colorHover={colorPickerHover}
                                         />
                                 </Tooltip>
                         </div>
@@ -305,16 +288,10 @@
                                         text="Fermer"
                                         border={false}
                                         on:click={onClickFermer}
-                                        color={colorPickerFont}
-                                        colorFont={colorPickerFont}
-                                        colorHover={colorPickerHover}
                                 />
                                 <Button
                                         text="Valider"
                                         primary={true}
-                                        color={colorPicker}
-                                        colorFont={colorPickerFontSelected}
-                                        colorHover={colorPicker}
                                         on:click={onClickValider}
                                 />
                         </div>

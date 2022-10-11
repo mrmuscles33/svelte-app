@@ -6,32 +6,26 @@
         export let name = "";
         export let disable = false;
         export let check = false;
-        export let color = "#CCCCCC";
-        export let colorHover = "#AAAAAA";
-        export let colorChecked = "#0d31a6";
-        export let colorCheckedHover ="#4e6ac7";
-        export let colorButton = "#FFFFFF";
+        export let style = "";
         
         // PRIVATE ATTRIBUTES
-        let id = '_' + Math.random().toString(36).substr(2, 12);
+        let id = '_' + Math.random().toString(36).substring(2, 12);
         
         // METHODS
         const dispatch = createEventDispatcher();
-        function onChange(){
-                if(disable) return;
-                dispatch('change', {
-                        check: check
-                });
+        let onChange = () => {
+                if(!disable) {
+                        dispatch('change', {
+                                check: check
+                        });
+                }
         }
 </script>
 
 <div class="switch-main"
      class:disable
-     style="--color-primary: {color}; 
-            --color-hover: {colorHover}; 
-            --color-checked: {colorChecked}; 
-            --color-checked-hover: {colorCheckedHover}; 
-            --color-button: {colorButton}">
+     {style}
+>
         <input type="checkbox" {id} {name} bind:checked={check} disabled={disable} on:change={onChange}/>
         <label for={id} class="switch-background">
                 <div class="switch-button"></div>

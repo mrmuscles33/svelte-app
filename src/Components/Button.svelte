@@ -5,37 +5,41 @@
         // PUBLIC ATTRIBUTES
         export let text = "";
         export let icon = "";
-        export let color = "#444444";
-        export let colorFont = "#444444";
-        export let colorHover = "#EEEEEE";
         export let primary = false;
         export let border = true;
         export let disable = false;
         export let style = "";
+        export let cls = "";
         
         // PRIVATE ATTRIBUTES
         let iconPadding = text == "" ? '0 12px' : '0 16px 0 12px';
 
         // METHODS
 	const dispatch = createEventDispatcher();
-        function onClick(){
-                if(disable) return;
-                dispatch('click', {});
+        let onClick = () => {
+                if(!disable) dispatch('click', {});
+        }
+
+        let onKeyUp = (event) => {
+                if(event.keyCode === 13 || event.code === 'Enter' || event.key === 'Enter') {
+                        onClick();
+                }
         }
 </script>
 
-<!-- svelte-ignore a11y-invalid-attribute -->
-<a class="btn-main" 
+<span class="btn-main {cls}" 
      class:btn-with-icon="{icon != ''}"
      class:primary
      class:border
      class:disable
-     href="#"
+     role="button"
+     tabindex={disable ? "-1" : "0"}
      on:click|stopPropagation|preventDefault={onClick}
-     style="--color-primary: {color};--color-hover: {colorHover};--color-font: {colorFont};--icon-padding: {iconPadding}; {style}">
-        <span class="btn-icon material-icons-round">{icon}</span>
+     on:keyup|stopPropagation|preventDefault={onKeyUp}
+     style="--icon-padding: {iconPadding}; {style}">
+        <span class="btn-icon material-icons-round" role="presentation">{icon}</span>
         <span class="btn-text">{text}</span>
-</a>
+</span>
 
 <style>
         .btn-main {
@@ -66,6 +70,10 @@
         .btn-main:hover,
         .btn-main:focus {
                 background-color: var(--color-hover);
+        }
+        .btn-main.primary:hover,
+        .btn-main.primary:focus {
+                border-color: var(--color-hover);
         }
         .btn-with-icon {
                 padding: var(--icon-padding);

@@ -40,7 +40,8 @@
                 transition: opacity 0.2s ease-in;
                 z-index: 2;
         }
-        .tooltip-main:hover .tooltip-text {
+        .tooltip-main:hover .tooltip-text,
+        .tooltip-main:focus-within .tooltip-text {
                 visibility: visible;
                 opacity: 1;
         }
