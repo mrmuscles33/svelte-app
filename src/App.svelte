@@ -149,6 +149,11 @@
 			label="Label"
 		/>
 		<Textfield 
+			errorMessage="toto"
+			iconLeft="search"
+			iconRight="highlight_off"
+		/>
+		<Textfield 
 			label="Icons"
 			iconLeft="search"
 			iconRight="highlight_off"
