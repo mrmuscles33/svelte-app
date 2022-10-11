@@ -47,12 +47,12 @@
         }
         var parts = base.toString().split(".");
         if(parts[1]) {
-            parts[1] = parts[1].substr(0,3-parts[0].length);
+            parts[1] = parts[1].substring(0,3-parts[0].length);
         }
         parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, " ");
         base = parts.join(".").replaceAll('.',',');
         if(base.endsWith(',')) {
-            base = base.substr(0,base.length - 1);
+            base = base.substring(0,base.length - 1);
         }
         return base + unit;
     }

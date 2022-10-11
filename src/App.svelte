@@ -9,6 +9,8 @@
 	import Droplist from './Components/Droplist.svelte';
 	import CounterButton from './Components/CounterButton.svelte';
 	import TimePicker from './Components/TimePicker.svelte';
+	import Password from './Components/Password.svelte';
+	import Numberfield from './Components/Numberfield.svelte';
 
 	function clickButton(){
 		alert('click');
@@ -160,6 +162,19 @@
 			label="Error"
 			iconRight="home"
 			errorMessage="Le champ est vide"
+		/>
+
+		<h3>Passwords</h3>
+		<Password 
+			label="Password"
+			iconLeft="fingerprint"
+		/>
+
+		<h3>Numberfields</h3>
+		<Numberfield 
+			label="Number"
+			decimal=2
+			precision=0
 		/>
 
 		<h3>Date & Time Pickers</h3>
