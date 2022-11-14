@@ -29,17 +29,17 @@
 
         // EVENTS
 	const dispatch = createEventDispatcher();
-        export let onClick = () => {
+        export function onClick () {
                 if(readonly) return;
                 input.focus();
-        };
-        export let onClickIcon = () => {
+        }
+        export function onClickIcon() {
                 if(disable) return;
                 dispatch('clickIcon', {
                         value: value
                 });
-        };
-        export let onChange = () => {
+        }
+        export function onChange () {
                 if(disable) return;
                 errorMessage = required && (value == null || value.trim().length == 0) ? "La donnée " + label + " est obligatoire" : "";
                 if(pattern != null && errorMessage == ""){
@@ -54,32 +54,32 @@
                         oldValue: oldValue
                 });
                 oldValue = value;
-        };
-        export let onInput = () => {
+        }
+        export function onInput() {
                 if(disable) return;
                 dispatch('input', {
                         value: value
                 });
-        };
-        export let onFocus = () => {
+        }
+        export function onFocus() {
                 if(disable) return;
                 dispatch('focus', {
                         value: value
                 });
-        };
-        export let onFocusOut = () => {
+        }
+        export function onFocusOut(){
                 if(disable) return;
                 dispatch('focusout', {
                         value: value
                 });
-        };
-        export let onBlur = () => {
+        }
+        export function onBlur(){
                 if(disable) return;
                 dispatch('blur', {
                         value: value
                 });
-        };
-        export let onKeyDown = (event) => {
+        }
+        export function onKeyDown(event){
                 if(disable) return;
                 dispatch('keydown', {
                         value: value,
@@ -89,8 +89,8 @@
                         shiftKey: event.shiftKey,
                         altKey: event.altKey
                 });
-        };
-        export let onKeyUp = (event) => {
+        }
+        export function onKeyUp(event){
                 if(disable) return;
                 dispatch('keyup', {
                         value: value,
@@ -100,18 +100,18 @@
                         shiftKey: event.shiftKey,
                         altKey: event.altKey
                 });
-        };
+        }
 
         // METHODS
-        export const getInput = () => {
+        export function getInput() {
                 return input;
-        };
-        let typeAction = (node) => {
+        }
+        function typeAction(node){
 		node.type = type;
-	};
-        let onKeyDownIcon = (event) => {
+	}
+        function onKeyDownIcon(event){
                 if(disable) return;
-                if(event.key == "Enter" || event.keyCode == 13){
+                if(Utils.Event.isEnter(event)){
                         dispatch('clickIcon', {
                                 value: value
                         }); 
@@ -173,6 +173,7 @@
                 border: 1px solid var(--color);
                 box-sizing: border-box;
                 cursor: text;
+                margin: 0 5px 5px 0;
         }
         .textfield-main.labelled {
                 height: 48px;
@@ -238,8 +239,9 @@
         }
         label {
                 position: absolute;
-                top: 16px;
+                top: 50%;
                 left: 12px;
+                transform: translateY(-50%);
                 font-size: 16px;
                 line-height: 20px;
                 color: var(--color);
@@ -254,6 +256,7 @@
         .textfield-main:focus-within label {
                 color: var(--color-focus);
                 top: 2px;
+                transform: translateY(0%);
                 font-weight: 500;
                 font-size: 12px;
         }
@@ -266,6 +269,7 @@
         }
         input:not(:placeholder-shown) ~ label {
                 top: 2px;
+                transform: translateY(0%);
                 font-size: 12px; 
                 font-weight: 500;
         }
@@ -276,6 +280,10 @@
                 transform: translateY(-50%);
                 text-decoration: none;
                 user-select: none;
+                color: var(--color);
+        }
+        .textfield-main:focus-within .textfield-icon {
+                color: var(--color-focus);
         }
         .textfield-icon .material-icons-round {
                 font-size: 21px;
@@ -291,7 +299,8 @@
                 cursor: pointer;
                 right: 12px;
         }
-        .textfield-icon-error {
+        .textfield-icon-error,
+        .textfield-main:focus-within .textfield-icon-error {
                 color: var(--color-error);
                 display: flex;
         }

@@ -4,6 +4,8 @@
         import Textfield from './Textfield.svelte';
         import Button from './Button.svelte';
         import Tooltip from './Tooltip.svelte';
+        import Dates from '../Utils/Dates';
+        import Events from '../Utils/Events';
         
         // PUBLIC ATTRIBUTES
         export let value = "";
@@ -17,13 +19,8 @@
         export let cls = "";
         export let minDate = '01/01/1900';
         export let maxDate = '31/12/2099';
-        export let startWeek = 1;
-        export let colorPicker = "#0d31a6";
-        export let colorPickerBackground = "#FFFFFF";
-        export let colorPickerFont = "#333333";
-        export let colorPickerFontSelected = "#FFFFFF";
-        export let colorPickerHover = "#EEEEEE";
-        export let colorPickerFontOut = "#AAAAAA";
+        export let startWeek = Dates.MONDAY;
+        export let filled = true;
         export let calendarOnly = false;
         
         // PRIVATE ATTRIBUTES
@@ -31,13 +28,14 @@
         let days = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
         let months = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
         let visible = false;
-        let tmpValue = value || dateToText(new Date(), 'DD/MM/YYYY');
-        let currentMonth = dateToText(textToDate(tmpValue,'DD/MM/YYYY'),'MM/YYYY');
+        let tmpValue = value || Dates.toText(new Date(), 'DD/MM/YYYY');
+        let currentMonth = Dates.toText(Dates.toDate(tmpValue,'DD/MM/YYYY'),'MM/YYYY');
         let input;
         let showYears = false;
         let displayedYears = [];
         let yearsPage = 0;
         let endWeek = startWeek == 0 ? 6 : startWeek - 1;
+        let id = '_' + Math.random().toString(36).substring(2, 12);
         $: allYear = getDisplayedYears(minDate,maxDate);
         $: displayedDays = getDisplayedDays(currentMonth);
         $: sortedDays = days.slice(startWeek,7).concat(days.slice(0,startWeek));
@@ -46,7 +44,7 @@
         const dispatch = createEventDispatcher();
         export function onChange(evt){
                 if(errorMessage == "" && value != ""){
-                        errorMessage = textToDate(value,'DD/MM/YYYY') < textToDate(minDate,'DD/MM/YYYY') || textToDate(value,'DD/MM/YYYY') > textToDate(maxDate,'DD/MM/YYYY') ? "La date doit etre comprise entre " + minDate + " et " + maxDate : "";
+                        errorMessage = Dates.toDate(value,'DD/MM/YYYY') < Dates.toDate(minDate,'DD/MM/YYYY') || Dates.toDate(value,'DD/MM/YYYY') > Dates.toDate(maxDate,'DD/MM/YYYY') ? "La date doit etre comprise entre " + minDate + " et " + maxDate : "";
                 }
                 dispatch('change', {
                         value: value,
@@ -55,8 +53,8 @@
         }
 	export function onClickIcon() {
                 visible = true;
-                tmpValue = isValidDate(value,'DD/MM/YYYY') ? value : dateToText(new Date(), 'DD/MM/YYYY');
-                currentMonth = dateToText(textToDate(tmpValue,'DD/MM/YYYY'),'MM/YYYY');
+                tmpValue = Dates.isValid(value,'DD/MM/YYYY') ? value : Dates.toText(new Date(), 'DD/MM/YYYY');
+                currentMonth = Dates.toText(Dates.toDate(tmpValue,'DD/MM/YYYY'),'MM/YYYY');
                 showYears = false;
         }
         export function onClickMask(evt) {
@@ -76,13 +74,18 @@
         }
         export function onClickDay(evt) {
                 var clickedDate = evt.currentTarget.getAttribute('value');
-                if(textToDate(clickedDate,"DD/MM/YYYY") < textToDate(minDate,"DD/MM/YYYY") || textToDate(clickedDate,"DD/MM/YYYY") > textToDate(maxDate,"DD/MM/YYYY")) return false;
+                if(Dates.toDate(clickedDate,"DD/MM/YYYY") < Dates.toDate(minDate,"DD/MM/YYYY") || Dates.toDate(clickedDate,"DD/MM/YYYY") > Dates.toDate(maxDate,"DD/MM/YYYY")) return false;
                 tmpValue = clickedDate;
+        }
+        export function onEnterDay(event){
+                if(Events.isEnter(event)) {
+                        onClickDay(event);
+                }
         }
         export function onClickYearButton(){
                 showYears = !showYears;
                 if(showYears) {
-                        var currentYear = textToDate(tmpValue,"DD/MM/YYYY").getFullYear();
+                        var currentYear = Dates.toDate(tmpValue,"DD/MM/YYYY").getFullYear();
                         for(yearsPage = 0; yearsPage * 18 < allYear.length; yearsPage++){
                                 var tmpArray = allYear.slice(yearsPage * 18, yearsPage * 18 + 18);
                                 if(tmpArray.includes(currentYear)){
@@ -90,6 +93,19 @@
                                         break;
                                 }
                         }
+                        setTimeout(() => {
+                                var toFocus = document.getElementById(id).querySelector('.datepicker-year.datepicker-selected');
+                                if(toFocus) {
+                                        toFocus.focus();
+                                }
+                        }, 100);
+                } else {
+                        setTimeout(() => {
+                                var toFocus = document.getElementById(id).querySelector('.datepicker-day.datepicker-selected');
+                                if(toFocus) {
+                                        toFocus.focus();
+                                }
+                        }, 100);
                 }
         }
         export function onClickPrevious(){
@@ -97,9 +113,9 @@
                         yearsPage--;
                         displayedYears = allYear.slice(yearsPage * 18, yearsPage * 18 + 18);
                 } else {
-                        var date = textToDate("01/" + currentMonth,"DD/MM/YYYY");
+                        var date = Dates.toDate("01/" + currentMonth,"DD/MM/YYYY");
                         date.setMonth(date.getMonth() - 1);
-                        currentMonth = dateToText(date,"MM/YYYY");
+                        currentMonth = Dates.toText(date,"MM/YYYY");
                 }
         }
         export function onClickNext(){
@@ -107,44 +123,33 @@
                         yearsPage++;
                         displayedYears = allYear.slice(yearsPage * 18, yearsPage * 18 + 18);
                 } else {
-                        var date = textToDate("01/" + currentMonth,"DD/MM/YYYY");
+                        var date = Dates.toDate("01/" + currentMonth,"DD/MM/YYYY");
                         date.setMonth(date.getMonth() + 1);
-                        currentMonth = dateToText(date,"MM/YYYY");
+                        currentMonth = Dates.toText(date,"MM/YYYY");
                 }
         }
         export function onClickYear(evt){
                 var year = evt.currentTarget.getAttribute('value');
-                var newDate = textToDate(tmpValue,"DD/MM/YYYY");
+                var newDate = Dates.toDate(tmpValue,"DD/MM/YYYY");
                 newDate.setFullYear(year);
-                tmpValue = dateToText(newDate,"DD/MM/YYYY");
-                currentMonth = dateToText(textToDate(tmpValue,'DD/MM/YYYY'),'MM/YYYY');
+                tmpValue = Dates.toText(newDate,"DD/MM/YYYY");
+                currentMonth = Dates.toText(Dates.toDate(tmpValue,'DD/MM/YYYY'),'MM/YYYY');
+                onClickYearButton();
+        }
+        export function onEnterYear(event){
+                if(Events.isEnter(event)) {
+                        onClickYear(event);
+                }
         }
 
         // METHODS
         function getDisplayedDate(strDate,format) {
-                var date = textToDate(strDate,format);
+                var date = Dates.toDate(strDate,format);
                 return days[date.getDay()] + ' ' + date.getDate() + ' ' + months[date.getMonth()] + ' ' + date.getFullYear();
         }
-        function textToDate(strDate,format) {
-                var regexp = format.trim().replaceAll('D', '[0-9]').replaceAll('M', '[0-9]').replaceAll('Y', '[0-9]').replaceAll('/','\\/').replaceAll('.','\\.');
-                if(strDate.length == format.length && new RegExp(regexp).test(strDate)) {
-                        var separator = strDate.trim().replaceAll(/[0-9]/g, '').charAt(0);
-                        var splitFormat = format.split(separator);
-                        var splitDate = strDate.split(separator);
-                        return new Date(
-                                parseInt(splitDate[splitFormat.indexOf('YYYY')]), 
-                                parseInt(splitDate[splitFormat.indexOf('MM')]) - 1, 
-                                parseInt(splitDate[splitFormat.indexOf('DD')])
-                        );
-                }
-        }
-        function dateToText(date,format) {
-                return format   .replace('DD',date.getDate().toString().padStart(2,'0'))
-                                .replace('MM',(date.getMonth() + 1).toString().padStart(2,'0'))
-                                .replace('YYYY',date.getFullYear())
-        }
         function getDisplayedDays(monthYear){
-                var initFirstDay = textToDate('01/' + monthYear,'DD/MM/YYYY');
+                // If the first day of month is not the beginning of the week, replace by first day of week
+                var initFirstDay = Dates.toDate('01/' + monthYear,'DD/MM/YYYY');
                 var firstDay = new Date(initFirstDay);
                 if(firstDay.getDay() != startWeek) {
                         if(firstDay.getDay() > startWeek) {
@@ -154,6 +159,7 @@
                         }
                 }
                 
+                // If the last day of month is not the end of the week, replace by last day of week
                 var initLastDay = new Date(initFirstDay.getFullYear(),initFirstDay.getMonth() + 1, 0);
                 var lastDay = new Date(initLastDay);
                 if(lastDay.getDay() != endWeek) {
@@ -174,19 +180,12 @@
                 return days;
         }
         function getDisplayedMonth(currentMonth){
-               var date =  textToDate('01/' + currentMonth,'DD/MM/YYYY');
+               var date =  Dates.toDate('01/' + currentMonth,'DD/MM/YYYY');
                return months[date.getMonth()] + ' ' + date.getFullYear();
-        }
-        function isValidDate(strDate,format){
-                try {
-                        return textToDate(strDate,format) ? true : false;
-                } catch (error) {
-                        return false;
-                }
         }
         function getDisplayedYears(minDate,maxDate){
                 var years = [];
-                for(var i = textToDate(minDate,'DD/MM/YYYY').getFullYear(); i <= textToDate(maxDate,'DD/MM/YYYY').getFullYear(); i++){
+                for(var i = Dates.toDate(minDate,'DD/MM/YYYY').getFullYear(); i <= Dates.toDate(maxDate,'DD/MM/YYYY').getFullYear(); i++){
                         years.push(i);
                 }
                 return years;
@@ -206,6 +205,7 @@
         pattern="((([0-2][0-9])|(3[0-1]))(\/|-|\.)((0[13578])|10|12)(\/|-|\.)(19|20)[0-9][0-9])|((([0-2][0-9])|30)(\/|-|\.)((0[469])|11)(\/|-|\.)(19|20)[0-9][0-9])|(([0-2][0-9])(\/|-|\.)02(\/|-|\.)(19|20)[0-9][0-9])"
         {label}
         {cls}
+        {filled}
         bind:errorMessage={errorMessage}
         on:change={onChange}
         on:blur
@@ -218,14 +218,8 @@
         bind:this={input}
 />
 
-<div class="datepicker-mask"
+<div class="datepicker-mask" {id}
      class:datepicker-visible={visible}
-     style="--color-primary:{colorPicker}; 
-            --color-background: {colorPickerBackground}; 
-            --color-font: {colorPickerFont}; 
-            --color-font-selected: {colorPickerFontSelected};
-            --color-hover: {colorPickerHover};
-            --color-font-other: {colorPickerFontOut}"
      on:click={onClickMask}>
         <div class="datepicker-main">
                 <div class="datepicker-info">
@@ -233,19 +227,21 @@
                         <h1>{getDisplayedDate(tmpValue,'DD/MM/YYYY')}</h1>
                 </div><!--
              --><div class="datepicker-calendar">
-                        <Button
-                                text={getDisplayedMonth(currentMonth)}
-                                border={false}
-                                on:click={onClickYearButton}
-                                style="margin-left: 8px"
-                        />
+                        <Tooltip text={showYears ? "Choisir le jour" : "Choisir l'année"}>
+                                <Button
+                                        text={getDisplayedMonth(currentMonth)}
+                                        border={false}
+                                        on:click={onClickYearButton}
+                                        style="margin-left: 8px"
+                                />
+                        </Tooltip>
                         <div class="datepicker-buttons">
                                 <Tooltip text={showYears ? "Années précédentes" : "Mois précedent"}>
                                         <Button
                                                 text=""
                                                 icon="arrow_back_ios"
                                                 border={false}
-                                                disable={(showYears && yearsPage == 0) || (!showYears && displayedDays.some(d => dateToText(d,'DD/MM/YYYY') == minDate))}
+                                                disable={(showYears && yearsPage == 0) || (!showYears && displayedDays.some(d => Dates.toText(d,'DD/MM/YYYY') == minDate))}
                                                 on:click={onClickPrevious}
                                         />
                                 </Tooltip>
@@ -254,7 +250,7 @@
                                                 text=""
                                                 icon="arrow_forward_ios"
                                                 border={false}
-                                                disable={(showYears && displayedYears.length < 12) || (!showYears && displayedDays.some(d => dateToText(d,'DD/MM/YYYY') == maxDate))}
+                                                disable={(showYears && displayedYears.length < 12) || (!showYears && displayedDays.some(d => Dates.toText(d,'DD/MM/YYYY') == maxDate))}
                                                 on:click={onClickNext}
                                         />
                                 </Tooltip>
@@ -262,11 +258,12 @@
                         {#if showYears}
                                 <div class="datepicker-years">
                                         {#each displayedYears as year}
-                                                <!-- svelte-ignore a11y-invalid-attribute -->
-                                                <a href="#" class="datepicker-year" 
+                                                <span role="button" tabindex="0" class="datepicker-year" 
                                                 class:datepicker-today={year == new Date().getFullYear()}
-                                                class:datepicker-selected={year == textToDate(tmpValue,'DD/MM/YYYY').getFullYear()}
-                                                on:click|stopPropagation|preventDefault={onClickYear} value={year}>{year}</a>
+                                                class:datepicker-selected={year == Dates.toDate(tmpValue,'DD/MM/YYYY').getFullYear()}
+                                                on:click|stopPropagation|preventDefault={onClickYear} 
+                                                on:keypress|stopPropagation|preventDefault={onEnterYear} 
+                                                value={year}>{year}</span>
                                         {/each}
                                 </div>
                         {:else}
@@ -275,13 +272,15 @@
                                                 <span class="datepicker-day">{day.substring(0,3)}</span>
                                         {/each}
                                         {#each displayedDays as day}
-                                                <!-- svelte-ignore a11y-invalid-attribute -->
-                                                <a href="#" class="datepicker-day" 
-                                                class:datepicker-today={dateToText(day,'DD/MM/YYYY') == dateToText(new Date(),'DD/MM/YYYY')}
-                                                class:datepicker-selected={dateToText(day,'DD/MM/YYYY') == tmpValue}
-                                                class:datepicker-other-month={day.getMonth() != textToDate('01/' + currentMonth,'DD/MM/YYYY').getMonth()}
-                                                class:datepicker-day-disable={(day < textToDate(minDate,'DD/MM/YYYY')) || (day > textToDate(maxDate,'DD/MM/YYYY'))}
-                                                on:click|stopPropagation|preventDefault={onClickDay} value={dateToText(day,'DD/MM/YYYY')}>{day.getDate()}</a>
+                                                <span role="button" class="datepicker-day" 
+                                                class:datepicker-today={Dates.toText(day,'DD/MM/YYYY') == Dates.toText(new Date(),'DD/MM/YYYY')}
+                                                class:datepicker-selected={Dates.toText(day,'DD/MM/YYYY') == tmpValue}
+                                                class:datepicker-other-month={day.getMonth() != Dates.toDate('01/' + currentMonth,'DD/MM/YYYY').getMonth()}
+                                                class:datepicker-day-disable={(day < Dates.toDate(minDate,'DD/MM/YYYY')) || (day > Dates.toDate(maxDate,'DD/MM/YYYY'))}
+                                                tabindex={(day < Dates.toDate(minDate,'DD/MM/YYYY')) || (day > Dates.toDate(maxDate,'DD/MM/YYYY')) ? "-1" : "0"}
+                                                on:click|stopPropagation|preventDefault={onClickDay} 
+                                                on:keypress|stopPropagation|preventDefault={onEnterDay} 
+                                                value={Dates.toText(day,'DD/MM/YYYY')}>{day.getDate()}</span>
                                         {/each}
                                 </div>
                         {/if}
@@ -399,29 +398,35 @@
         .datepicker-year {
                 width: 105px;
         }
-        a.datepicker-day,
-        a.datepicker-year {
+        span.datepicker-day,
+        span.datepicker-year {
                 cursor: pointer;
                 border-radius: 50px;
                 text-decoration: none;
                 font-weight: 500;
         }
-        a.datepicker-day:hover,
-        a.datepicker-year:hover {
+        span.datepicker-day:hover,
+        span.datepicker-year:hover,
+        span.datepicker-day:focus-visible,
+        span.datepicker-year:focus-visible {
                 background-color: var(--color-hover);
+                color: var(--color-font);
         }
-        a.datepicker-today {
+        span.datepicker-today,
+        span.datepicker-day:focus-visible,
+        span.datepicker-year:focus-visible {
                 border: 2px solid var(--color-font);
+                outline: none;
         }
-        a.datepicker-other-month,
-        a.datepicker-day-disable {
+        span.datepicker-other-month,
+        span.datepicker-day-disable {
                 color: var(--color-font-other);
         }
-        a.datepicker-day-disable {
+        span.datepicker-day-disable {
                 cursor: not-allowed;
         }
-        a.datepicker-selected,
-        a.datepicker-selected:hover {
+        span.datepicker-selected,
+        span.datepicker-selected:hover {
                 background-color: var(--color-primary);
                 color: var(--color-font-selected);
         }

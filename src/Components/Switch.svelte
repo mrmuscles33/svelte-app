@@ -13,7 +13,7 @@
         
         // METHODS
         const dispatch = createEventDispatcher();
-        let onChange = () => {
+        function onChange () {
                 if(!disable) {
                         dispatch('change', {
                                 check: check

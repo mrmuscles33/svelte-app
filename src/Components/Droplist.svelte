@@ -31,33 +31,33 @@
         $: displayedValue = getLabel(value);
 
         // EVENTS
-	export let onClickIcon = () => {
+	export function onClickIcon (){
                 input.getInput().focus();
-        };
-        export let onFocus = (evt) => {
+        }
+        export function onFocus(evt) {
                 position = (window.innerHeight - input.getInput().getBoundingClientRect().top) < 250 ? 'top' : 'bottom';
                 visible = true;
                 displayedItems = items;
-        };
-        export let onFocusOut = (evt) => {
+        }
+        export function onFocusOut(evt) {
                 setTimeout(() => {
                         visible = false;
                 }, 100); // pour laisser le temps du onClickItem
-        };
-        export let onClickItem = (evt) => {
+        }
+        export function onClickItem (evt){
                 let pValue = evt.currentTarget.getAttribute('code');
                 if(pValue == value) {
                         displayedValue = getLabel(value);
                 } else {
                         value = pValue;
                 }
-        };
+        }
         export let onKeyUp = (evt) => {
                 displayedItems = items.filter(i => i.label.toLowerCase().includes(displayedValue.toLowerCase()));
         };
 
         // METHODS
-        let getLabel = (pValue) => {
+        function getLabel(pValue){
                 var i = items.find(i => i.value == pValue);
                 return i ? i.label : "";
         }

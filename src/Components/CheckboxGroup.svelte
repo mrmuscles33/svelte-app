@@ -19,7 +19,7 @@
         
         // METHODS
         const dispatch = createEventDispatcher();
-        let onChange = (event) => {
+        function onChange (event) {
                 if(event.detail.check) {
                         selectedValues = [...selectedValues, event.detail.value]
                 } else {

@@ -16,7 +16,7 @@
 
         // METHODS
         const dispatch = createEventDispatcher();
-        let onChange = () =>{
+        function onChange (){
                 if(!disable) {
                         dispatch('change', {
                                 check: check,
@@ -72,20 +72,20 @@
         input:checked + .checkbox-main .material-icons-round {
                 color: var(--color-checked);
         }
-        input:focus + .checkbox-main .material-icons-round,
+        input:focus-visible + .checkbox-main .material-icons-round,
         .checkbox-main:hover .material-icons-round {
                 color: var(--color-hover);
         }
-        input:checked:focus + .checkbox-main .material-icons-round,
+        input:checked:focus-visible + .checkbox-main .material-icons-round,
         input:checked + .checkbox-main:hover .material-icons-round {
                 color: var(--color-checked-hover);
         }
-        input:checked:focus + .checkbox-main .material-icons-round {
+        input:checked:focus-visible + .checkbox-main .material-icons-round {
                 box-shadow: inset 0px 0px 0 1px var(--color-checked-hover), 0px 0px 0px 1px var(--color-checked-hover);
                 padding-right: 1px;
                 border-radius: 3px;
         }
-        input:focus + .checkbox-main .material-icons-round {
+        input:focus-visible + .checkbox-main .material-icons-round {
                 box-shadow: inset 0px 0px 0 1px var(--color-hover), 0px 0px 0px 1px var(--color-hover);
                 padding-right: 1px;
                 border-radius: 3px;

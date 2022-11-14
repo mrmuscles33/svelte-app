@@ -18,7 +18,7 @@
     let id = '_' + Math.random().toString(36).substring(2, 12);
 
     // EVENTS
-    let onChange = () => {
+    function onChange() {
         if(!disable){
             check ? value++ : value--;
             setTimeout(() => dispatch('click',{
@@ -29,7 +29,7 @@
     }
     
     // METHODS
-    let formatCount = (count) => {
+    function formatCount(count){
         let unit, base, precision = 3;
         if(count < 10000) {
             unit = '';
@@ -59,7 +59,7 @@
 </script>
 
 
-<input type="checkbox" {id} bind:checked={check} {name} {value} disabled={disable} on:change={onChange}/>
+<input type="checkbox" {id} bind:checked={check} {name} {value} disabled={disable} tabindex={disable ? "-1" : "0"} on:change={onChange}/>
 <label 
     for={id}
     class="counter-main {cls}"
@@ -105,11 +105,11 @@
     input:checked + .counter-main {
         border: 1px solid var(--color-checked);
     }
-    input:focus + .counter-main,
+    input:focus-visible + .counter-main,
     .counter-main:hover {
         border: 1px solid var(--color-hover);
     }
-    input:checked:focus + .counter-main,
+    input:checked:focus-visible + .counter-main,
     input:checked + .counter-main:hover {
         border: 1px solid var(--color-checked-hover);
     }
@@ -136,7 +136,7 @@
     .counter-left i + .counter-text {
         margin-left: 5px;
     }
-    input:focus + .counter-main .counter-left,
+    input:focus-visible + .counter-main .counter-left,
     .counter-main:hover .counter-left {
         background-color:   var(--color-hover);
     }
@@ -148,7 +148,7 @@
     .check .counter-left i {
         color:              var(--color-text-checked);
     }
-    input:checked:focus + .counter-main .counter-left,
+    input:checked:focus-visible + .counter-main .counter-left,
     input:checked + .counter-main:hover .counter-left {
         background-color:   var(--color-checked-hover);
     }
@@ -159,14 +159,14 @@
         padding:            0px 16px;
         position:           relative;
     }
-    input:focus + .counter-main .counter-right,
+    input:focus-visible + .counter-main .counter-right,
     .counter-main:hover .counter-right {
         color:              var(--color-hover);
     }
     input:checked + .counter-main .counter-right {
         color:  var(--color-checked);
     }
-    input:checked:focus + .counter-main .counter-right,
+    input:checked:focus-visible + .counter-main .counter-right,
     input:checked + .counter-main:hover .counter-right {
         color:  var(--color-checked-hover);
     }

@@ -1,6 +1,7 @@
 <script>
         // IMPORTS
         import { createEventDispatcher } from 'svelte';
+        import Events from '../Utils/Events';
         
         // PUBLIC ATTRIBUTES
         export let text = "";
@@ -16,12 +17,12 @@
 
         // METHODS
 	const dispatch = createEventDispatcher();
-        let onClick = () => {
+        function onClick(){
                 if(!disable) dispatch('click', {});
         }
 
-        let onKeyUp = (event) => {
-                if(event.keyCode === 13 || event.code === 'Enter' || event.key === 'Enter') {
+        function onKeyUp(event){
+                if(Events.isEnter(event)) {
                         onClick();
                 }
         }
@@ -44,7 +45,7 @@
 <style>
         .btn-main {
                 padding: 0 16px;
-                margin: 0 5px 0 0;
+                margin: 0 5px 5px 0;
                 height: 36px;
                 color: var(--color-font);
                 border: 1px solid transparent;
@@ -68,11 +69,11 @@
                 border-color: var(--color-primary);
         }
         .btn-main:hover,
-        .btn-main:focus {
+        .btn-main:focus-visible {
                 background-color: var(--color-hover);
         }
         .btn-main.primary:hover,
-        .btn-main.primary:focus {
+        .btn-main.primary:focus-visible {
                 border-color: var(--color-hover);
         }
         .btn-with-icon {

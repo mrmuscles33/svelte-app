@@ -4,6 +4,7 @@
         import Textfield from './Textfield.svelte';
         import Button from './Button.svelte';
         import Tooltip from './Tooltip.svelte';
+        import Events from '../Utils/Events';
         
         // PUBLIC ATTRIBUTES
         export let value = "";
@@ -14,16 +15,10 @@
         export let errorMessage = "";
         export let required = false;
         export let readonly = false;
+        export let filled = true;
 
         export let minTime = '00:00';
         export let maxTime = '23:59';
-        export let colorPicker = "#0d31a6";
-        export let colorPickerBackground = "#FFFFFF";
-        export let colorPickerClockBackground = "#DDDDDD";
-        export let colorPickerFont = "#333333";
-        export let colorPickerFontSelected = "#FFFFFF";
-        export let colorPickerHover = "#EEEEEE";
-        export let colorPickerFontOut = "#AAAAAA";
         export let clockOnly = false;
         
         // PRIVATE ATTRIBUTES
@@ -74,22 +69,52 @@
                 tmpValue = timeToText(parseInt(hour) * 60 + getMinute(tmpValue));
                 selectHour = false;
         }
+        export function onEnterHour(event){
+                if(Events.isEnter(event)) {
+                        onClickHour(event);
+                }
+        }
         export function onClickMinute(evt){
                 var minute = evt.currentTarget.getAttribute('minute');
                 if(textToTime(minTime) > (getHour(tmpValue) * 60 + parseInt(minute)) || textToTime(maxTime) < (getHour(tmpValue) * 60 + parseInt(minute))) return false;
                 tmpValue = timeToText(60 * getHour(tmpValue) + parseInt(minute));
         }
+        export function onEnterMinute(event){
+                if(Events.isEnter(event)) {
+                        onClickMinute(event);
+                }
+        }
         export function onClickSelectHour(){
                 selectHour = true;
+        }
+        export function onEnterSelectHour(event) {
+                if(Events.isEnter(event)) {
+                        onClickSelectHour();
+                }
         }
         export function onClickSelectMinute(){
                 selectHour = false;
         }
+        export function onEnterSelectMinute(event){
+                if(Events.isEnter(event)) {
+                        onClickSelectMinute();
+                }
+        }
         export function onClickAM(){
                 morning = true;
         }
+        export function onEnterAM(event){
+                if(Events.isEnter(event)) {
+                        onClickAM();
+                }
+        }
         export function onClickPM(){
                 morning = false;
+        }
+        export function onEnterkPM(event){
+                if(Events.isEnter(event)) {
+                        onClickPM();
+                }
         }
 
         // METHODS
@@ -124,6 +149,7 @@
         iconRight={readonly ? "" : "schedule"}
         pattern="([0-1][0-9]|2[0-3]):[0-5][0-9]"
         {label}
+        {filled}
         bind:errorMessage={errorMessage}
         on:change={onChange}
         on:blur
@@ -138,53 +164,47 @@
 
 <div class="timepicker-mask"
      class:timepicker-visible={visible}
-     style="--color-primary:{colorPicker}; 
-            --color-background: {colorPickerBackground}; 
-            --color-clock-background: {colorPickerClockBackground}; 
-            --color-font: {colorPickerFont}; 
-            --color-font-selected: {colorPickerFontSelected};
-            --color-hover: {colorPickerHover};
-            --color-font-other: {colorPickerFontOut};
-            --rotate-hour : {(30 * getHour(tmpValue)) + (0.5 * getMinute(tmpValue))}deg;
+     style="--rotate-hour : {(30 * getHour(tmpValue)) + (0.5 * getMinute(tmpValue))}deg;
             --rotate-minute : {6 * getMinute(tmpValue)}deg;"
      on:click={onClickMask}>
         <div class="timepicker-main">
                 <div class="timepicker-info">
                         <h4>{label}</h4>
                         <div class="timepicker-time">
-                                <!-- svelte-ignore a11y-invalid-attribute -->
                                 <Tooltip text="Sélectionner l'heure">
-                                        <a href="#" 
+                                        <span role="button" tabindex="0"
                                            on:click|stopPropagation|preventDefault={onClickSelectHour} 
+                                           on:keypress|stopPropagation|preventDefault={onEnterSelectHour} 
                                            class:timepicker-selected={selectHour}>
                                                 {getHour(tmpValue).toString().padStart(2,'0')}
-                                        </a>
+                                        </span>
                                 </Tooltip>
                                 :
-                                <!-- svelte-ignore a11y-invalid-attribute -->
                                 <Tooltip text="Sélectionner les minutes">
-                                        <a href="#" 
+                                        <span role="button" tabindex="0"
                                            on:click|stopPropagation|preventDefault={onClickSelectMinute} 
+                                           on:keypress|stopPropagation|preventDefault={onEnterSelectMinute} 
                                            class:timepicker-selected={!selectHour}>
                                                 {getMinute(tmpValue).toString().padStart(2,'0')}
-                                        </a>
+                                        </span>
                                 </Tooltip>
                                 {#if selectHour}
                                         <div class="timepicker-morning">
                                                 <Tooltip text="Matin">
-                                                        <!-- svelte-ignore a11y-invalid-attribute -->
-                                                        <a href="#" on:click|stopPropagation|preventDefault={onClickAM} 
+                                                        <span role="button" tabindex="0" 
+                                                           on:click|stopPropagation|preventDefault={onClickAM} 
+                                                           on:keypress|stopPropagation|preventDefault={onEnterAM} 
                                                            class:timepicker-selected={morning}>
                                                                 AM
-                                                        </a>
+                                                        </span>
                                                 </Tooltip>
                                                 <Tooltip text="Après-midi">
-                                                <!-- svelte-ignore a11y-invalid-attribute -->
-                                                        <a href="#" 
+                                                        <span role="button" tabindex="0" 
                                                            on:click|stopPropagation|preventDefault={onClickPM} 
+                                                           on:keypress|stopPropagation|preventDefault={onEnterkPM} 
                                                            class:timepicker-selected={!morning}>
                                                                 PM
-                                                        </a>
+                                                        </span>
                                                 </Tooltip>     
                                         </div>
                                 {/if}
@@ -195,27 +215,29 @@
                                 {#if selectHour}
                                         {#each displayedHours as hour}
                                                 <div class="timepicker-hour">
-                                                        <!-- svelte-ignore a11y-invalid-attribute -->
-                                                        <a href="#" 
+                                                        <span role="button" 
+                                                           tabindex={(getHour(minTime) > hour || getHour(maxTime) < hour) ? "-1" : "0"} 
                                                            on:click|stopPropagation|preventDefault={onClickHour}
+                                                           on:keypress|stopPropagation|preventDefault={onEnterHour}
                                                            class:timepicker-hour-selected={getHour(tmpValue) == hour}
                                                            class:timepicker-hour-disable={getHour(minTime) > hour || getHour(maxTime) < hour}
                                                            hour={hour}>
                                                                 {hour}
-                                                        </a>
+                                                        </span>
                                                 </div>
                                         {/each}
                                 {:else}
                                         {#each minutes as minute}
                                                 <div class="timepicker-hour">
-                                                        <!-- svelte-ignore a11y-invalid-attribute -->
-                                                        <a href="#" 
+                                                        <span role="button" 
+                                                           tabindex={(textToTime(minTime) > (getHour(tmpValue) * 60 + minute) || textToTime(maxTime) < (getHour(tmpValue) * 60 + minute)) ? "-1" : "0"} 
                                                            on:click|stopPropagation|preventDefault={onClickMinute} 
+                                                           on:keypress|stopPropagation|preventDefault={onEnterMinute}
                                                            class:timepicker-hour-selected={Math.abs(getMinute(tmpValue) - minute) < 3}
                                                            class:timepicker-hour-disable={textToTime(minTime) > (getHour(tmpValue) * 60 + minute) || textToTime(maxTime) < (getHour(tmpValue) * 60 + minute)}
                                                            minute={minute}>
                                                                 {minute}
-                                                        </a>
+                                                        </span>
                                                 </div>
                                         {/each}
                                 {/if}
@@ -310,21 +332,26 @@
                 width: 100%;
                 text-align: center;
         }
-        .timepicker-time a {
+        .timepicker-time span {
                 text-decoration: none;
                 color: var(--color-font-selected);
                 padding: 0 8px;
                 border-radius: 5px;
+                cursor: pointer;
+                outline: none;
         }
-        .timepicker-time a:hover,
-        .timepicker-time a:focus {
+        .timepicker-time span:hover,
+        .timepicker-time span:focus-visible {
                 color: var(--color-font);
-                background-color: var(--color-hover);
+                background-color: var(--color-left-background);
         }
-        .timepicker-time a.timepicker-selected:hover,
-        .timepicker-time a.timepicker-selected:focus,
-        .timepicker-time a.timepicker-selected {
-                background-color: var(--color-clock-background);
+        .timepicker-time span:focus-visible {
+                border: 2px solid var(--color-font);
+        }
+        .timepicker-time span.timepicker-selected:hover,
+        .timepicker-time span.timepicker-selected:focus-visible,
+        .timepicker-time span.timepicker-selected {
+                background-color: var(--color-left-background);
                 color: var(--color-font);
         }
         .timepicker-morning {
@@ -386,7 +413,7 @@
         .timepicker-hour:nth-child(12) {
                 transform: translateX(-50%) rotate(330deg);
         }
-        .timepicker-hour a {
+        .timepicker-hour span {
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -399,52 +426,52 @@
                 transform: translateY(-100%);
                 color: var(--color-font);
         }
-        .timepicker-hour a:hover,
-        .timepicker-hour a:focus {
+        .timepicker-hour span:hover,
+        .timepicker-hour span:focus-visible {
                 background-color: var(--color-hover);
                 color: var(--color-font);
         }
-        .timepicker-hour a.timepicker-hour-disable {
+        .timepicker-hour span.timepicker-hour-disable {
                 color: var(--color-font-other);
                 cursor: not-allowed;
         }
-        .timepicker-hour a.timepicker-hour-selected,
-        .timepicker-hour a.timepicker-hour-selected:hover,
-        .timepicker-hour a.timepicker-hour-selected:focus {
+        .timepicker-hour span.timepicker-hour-selected,
+        .timepicker-hour span.timepicker-hour-selected:hover,
+        .timepicker-hour span.timepicker-hour-selected:focus-visible {
                 background-color: var(--color-primary);
                 color: var(--color-font-selected);
         }
-        .timepicker-hour:nth-child(2) a {
+        .timepicker-hour:nth-child(2) span {
                 transform: translateY(-100%) rotate(-30deg);
         }
-        .timepicker-hour:nth-child(3) a {
+        .timepicker-hour:nth-child(3) span {
                 transform: translateY(-100%) rotate(-60deg);
         }
-        .timepicker-hour:nth-child(4) a {
+        .timepicker-hour:nth-child(4) span {
                 transform: translateY(-100%) rotate(-90deg);
         }
-        .timepicker-hour:nth-child(5) a {
+        .timepicker-hour:nth-child(5) span {
                 transform: translateY(-100%) rotate(-120deg);
         }
-        .timepicker-hour:nth-child(6) a {
+        .timepicker-hour:nth-child(6) span {
                 transform: translateY(-100%) rotate(-150deg);
         }
-        .timepicker-hour:nth-child(7) a {
+        .timepicker-hour:nth-child(7) span {
                 transform: translateY(-100%) rotate(-180deg);
         }
-        .timepicker-hour:nth-child(8) a {
+        .timepicker-hour:nth-child(8) span {
                 transform: translateY(-100%) rotate(-210deg);
         }
-        .timepicker-hour:nth-child(9) a {
+        .timepicker-hour:nth-child(9) span {
                 transform: translateY(-100%) rotate(-240deg);
         }
-        .timepicker-hour:nth-child(10) a {
+        .timepicker-hour:nth-child(10) span {
                 transform: translateY(-100%) rotate(-270deg);
         }
-        .timepicker-hour:nth-child(11) a {
+        .timepicker-hour:nth-child(11) span {
                 transform: translateY(-100%) rotate(-300deg);
         }
-        .timepicker-hour:nth-child(12) a {
+        .timepicker-hour:nth-child(12) span {
                 transform: translateY(-100%) rotate(-330deg);
         }
         .timepicker-aiguille,

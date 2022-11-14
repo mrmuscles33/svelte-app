@@ -6,7 +6,8 @@
 /* Radio.svelte */
 /* Switch.svelte */
 /* Textfield.svelte */
-
+/* DatePicker.svelte */
+/* TimePicker.svelte */
 
 /* Button.svelte */
 .btn-main {
@@ -30,13 +31,13 @@
 /* CounterButton.svelte */
 .counter-main {
     /* Background, border & count color */
-    --color: #2739af; 
+    --color: #666; 
     /* Background, border & count hover color */
-    --color-hover: #717fd7; 
+    --color-hover: #111; 
     /* Background, border & count checked color */
-    --color-checked: #141d58; 
+    --color-checked: #1D2B83; 
     /* Background, border & count checked hover color */
-    --color-checked-hover: #2739af;
+    --color-checked-hover: #5a6ad1;
     /* Text & icon color */
     --color-text: #FFFFFF;
     /* Text & icon checked color */
@@ -103,4 +104,26 @@
     --color-focus: #1D2B83;
     /* Label, Border error color */
     --color-error: #cc4141;
+}
+
+/* DatePicker.svelte */
+.datepicker-mask {
+    --color-primary:#5a6ad1; 
+    --color-background: #FFFFFF; 
+    --color-font: #333333; 
+    --color-font-selected: #FFFFFF;
+    --color-hover: #EEEEEE;
+    --color-font-other: #AAAAAA;
+}
+
+/* TimePicker.svelte */
+.timepicker-mask {
+    --color-primary:#5a6ad1; 
+    --color-background: #FFFFFF;
+    --color-left-background: #a0aae4; 
+    --color-clock-background: #DDDDDD; 
+    --color-font: #333333; 
+    --color-font-selected: #FFFFFF;
+    --color-hover: #EEEEEE;
+    --color-font-other: #AAAAAA;
 }

@@ -20,7 +20,7 @@
         
         // METHODS
         const dispatch = createEventDispatcher();
-        let onChange = (pSelectedValue) => {
+        function onChange (pSelectedValue) {
                 if(!disable){
                         dispatch('change', {
                                 selectedValue: pSelectedValue

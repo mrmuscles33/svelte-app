@@ -176,23 +176,19 @@
 		<h3>Numberfields</h3>
 		<Numberfield 
 			label="Number"
-			decimal=2
-			precision=0
+			integer=2
+			decimal=1
+			min=-1
 		/>
 
 		<h3>Date & Time Pickers</h3>
 		<DatePicker
 			label="Date"
-			minDate="10/11/2021"
+			minDate="01/10/2021"
+			maxDate="31/12/2023"
 			on:change={onChangeDate}
 			required={true}
-			calendarOnly={true}
-			colorPicker="#222222"
-			colorPickerBackground="#444444"
-			colorPickerFont="#FFFFFF"
-			colorPickerFontSelected="#FFFFFF"
-			colorPickerHover="#666666"
-			colorPickerFontOut="#888888"
+			filled={false}
 		/>
 		<TimePicker 
 			label="Heure"
