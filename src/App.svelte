@@ -11,6 +11,7 @@
 	import TimePicker from './Components/TimePicker.svelte';
 	import Password from './Components/Password.svelte';
 	import Numberfield from './Components/Numberfield.svelte';
+	import Dates from './Utils/Dates';
 
 	function clickButton(){
 		alert('click');
@@ -184,8 +185,9 @@
 		<h3>Date & Time Pickers</h3>
 		<DatePicker
 			label="Date"
-			minDate="01/10/2021"
-			maxDate="31/12/2023"
+			minDate="2021/10/01"
+			maxDate="2023/12/31"
+			format={Dates.Y_M_D}
 			on:change={onChangeDate}
 			required={true}
 			filled={false}

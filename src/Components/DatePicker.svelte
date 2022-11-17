@@ -8,6 +8,7 @@
         import Events from '../Utils/Events';
         
         // PUBLIC ATTRIBUTES
+        export let format = Dates.D_M_Y;
         export let value = "";
         export let disable = false;
         export let width = 290;
@@ -17,26 +18,29 @@
         export let required = false;
         export let readonly = false;
         export let cls = "";
-        export let minDate = '01/01/1900';
-        export let maxDate = '31/12/2099';
+        export let minDate = Dates.format('01/01/1900', Dates.D_M_Y, format);
+        export let maxDate = Dates.format('31/12/2099', Dates.D_M_Y, format);
         export let startWeek = Dates.MONDAY;
         export let filled = true;
         export let calendarOnly = false;
         
         // PRIVATE ATTRIBUTES
+        let pattern = Dates.getPattern(format);
+        let realMinDate = Dates.toDate(minDate, format);
+        let realMaxDate = Dates.toDate(maxDate, format);
         let type = "text";
         let days = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
         let months = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
         let visible = false;
-        let tmpValue = value || Dates.toText(new Date(), 'DD/MM/YYYY');
-        let currentMonth = Dates.toText(Dates.toDate(tmpValue,'DD/MM/YYYY'),'MM/YYYY');
+        let tmpValue = Dates.isValid(value, format) ? Dates.format(value, format, Dates.D_M_Y) : Dates.toText(Dates.today(), Dates.D_M_Y);
+        let currentMonth = Dates.format(tmpValue, Dates.D_M_Y, Dates.M_Y);
         let input;
         let showYears = false;
         let displayedYears = [];
         let yearsPage = 0;
         let endWeek = startWeek == 0 ? 6 : startWeek - 1;
         let id = '_' + Math.random().toString(36).substring(2, 12);
-        $: allYear = getDisplayedYears(minDate,maxDate);
+        $: allYear = getDisplayedYears(realMinDate,realMaxDate);
         $: displayedDays = getDisplayedDays(currentMonth);
         $: sortedDays = days.slice(startWeek,7).concat(days.slice(0,startWeek));
 
@@ -44,7 +48,7 @@
         const dispatch = createEventDispatcher();
         export function onChange(evt){
                 if(errorMessage == "" && value != ""){
-                        errorMessage = Dates.toDate(value,'DD/MM/YYYY') < Dates.toDate(minDate,'DD/MM/YYYY') || Dates.toDate(value,'DD/MM/YYYY') > Dates.toDate(maxDate,'DD/MM/YYYY') ? "La date doit etre comprise entre " + minDate + " et " + maxDate : "";
+                        errorMessage = Dates.toDate(value, format) < realMinDate || Dates.toDate(value, format) > realMaxDate ? "La date doit etre comprise entre " + minDate + " et " + maxDate : "";
                 }
                 dispatch('change', {
                         value: value,
@@ -53,8 +57,8 @@
         }
 	export function onClickIcon() {
                 visible = true;
-                tmpValue = Dates.isValid(value,'DD/MM/YYYY') ? value : Dates.toText(new Date(), 'DD/MM/YYYY');
-                currentMonth = Dates.toText(Dates.toDate(tmpValue,'DD/MM/YYYY'),'MM/YYYY');
+                tmpValue =Dates.isValid(value, format) ? Dates.format(value, format, Dates.D_M_Y) : Dates.toText(Dates.today(), Dates.D_M_Y);
+                currentMonth = Dates.format(tmpValue, Dates.D_M_Y, Dates.M_Y);
                 showYears = false;
         }
         export function onClickMask(evt) {
@@ -67,14 +71,14 @@
         }
         export function onClickValider(){
                 onClickFermer();
-                value = tmpValue;
+                value = Dates.format(tmpValue, Dates.D_M_Y, format);
                 setTimeout(() => {
                         input.onChange();
                 }, 200);
         }
         export function onClickDay(evt) {
                 var clickedDate = evt.currentTarget.getAttribute('value');
-                if(Dates.toDate(clickedDate,"DD/MM/YYYY") < Dates.toDate(minDate,"DD/MM/YYYY") || Dates.toDate(clickedDate,"DD/MM/YYYY") > Dates.toDate(maxDate,"DD/MM/YYYY")) return false;
+                if(Dates.toDate(clickedDate, Dates.D_M_Y) < realMinDate || Dates.toDate(clickedDate, Dates.D_M_Y) > realMaxDate) return false;
                 tmpValue = clickedDate;
         }
         export function onEnterDay(event){
@@ -85,7 +89,7 @@
         export function onClickYearButton(){
                 showYears = !showYears;
                 if(showYears) {
-                        var currentYear = Dates.toDate(tmpValue,"DD/MM/YYYY").getFullYear();
+                        var currentYear = Dates.toDate(tmpValue, Dates.D_M_Y).getFullYear();
                         for(yearsPage = 0; yearsPage * 18 < allYear.length; yearsPage++){
                                 var tmpArray = allYear.slice(yearsPage * 18, yearsPage * 18 + 18);
                                 if(tmpArray.includes(currentYear)){
@@ -113,9 +117,9 @@
                         yearsPage--;
                         displayedYears = allYear.slice(yearsPage * 18, yearsPage * 18 + 18);
                 } else {
-                        var date = Dates.toDate("01/" + currentMonth,"DD/MM/YYYY");
+                        var date = Dates.toDate(currentMonth, Dates.M_Y);
                         date.setMonth(date.getMonth() - 1);
-                        currentMonth = Dates.toText(date,"MM/YYYY");
+                        currentMonth = Dates.toText(date, Dates.M_Y);
                 }
         }
         export function onClickNext(){
@@ -123,17 +127,17 @@
                         yearsPage++;
                         displayedYears = allYear.slice(yearsPage * 18, yearsPage * 18 + 18);
                 } else {
-                        var date = Dates.toDate("01/" + currentMonth,"DD/MM/YYYY");
+                        var date = Dates.toDate(currentMonth, Dates.M_Y);
                         date.setMonth(date.getMonth() + 1);
-                        currentMonth = Dates.toText(date,"MM/YYYY");
+                        currentMonth = Dates.toText(date, Dates.M_Y);
                 }
         }
         export function onClickYear(evt){
                 var year = evt.currentTarget.getAttribute('value');
-                var newDate = Dates.toDate(tmpValue,"DD/MM/YYYY");
+                var newDate = Dates.toDate(tmpValue, Dates.D_M_Y);
                 newDate.setFullYear(year);
-                tmpValue = Dates.toText(newDate,"DD/MM/YYYY");
-                currentMonth = Dates.toText(Dates.toDate(tmpValue,'DD/MM/YYYY'),'MM/YYYY');
+                tmpValue = Dates.toText(newDate, Dates.D_M_Y);
+                currentMonth = Dates.format(tmpValue, Dates.D_M_Y, Dates.M_Y);
                 onClickYearButton();
         }
         export function onEnterYear(event){
@@ -149,8 +153,8 @@
         }
         function getDisplayedDays(monthYear){
                 // If the first day of month is not the beginning of the week, replace by first day of week
-                var initFirstDay = Dates.toDate('01/' + monthYear,'DD/MM/YYYY');
-                var firstDay = new Date(initFirstDay);
+                var initFirstDay = Dates.toDate(monthYear, Dates.M_Y);
+                var firstDay = Dates.copy(initFirstDay);
                 if(firstDay.getDay() != startWeek) {
                         if(firstDay.getDay() > startWeek) {
                                 firstDay.setDate(firstDay.getDate() - (firstDay.getDay() - startWeek));
@@ -160,8 +164,8 @@
                 }
                 
                 // If the last day of month is not the end of the week, replace by last day of week
-                var initLastDay = new Date(initFirstDay.getFullYear(),initFirstDay.getMonth() + 1, 0);
-                var lastDay = new Date(initLastDay);
+                var initLastDay = Dates.lastDay(initFirstDay);
+                var lastDay = Dates.copy(initLastDay);
                 if(lastDay.getDay() != endWeek) {
                         if(lastDay.getDay() < endWeek) {
                                 lastDay.setDate(lastDay.getDate() + (endWeek - lastDay.getDay()));
@@ -173,19 +177,19 @@
                 var days = [];
                 var oneDay = firstDay;
                 while(oneDay <= lastDay) {
-                        days.push(new Date(oneDay));
+                        days.push(Dates.copy(oneDay));
                         oneDay.setDate(oneDay.getDate() + 1);
                 }
 
                 return days;
         }
         function getDisplayedMonth(currentMonth){
-               var date =  Dates.toDate('01/' + currentMonth,'DD/MM/YYYY');
+               var date =  Dates.toDate(currentMonth, Dates.M_Y);
                return months[date.getMonth()] + ' ' + date.getFullYear();
         }
         function getDisplayedYears(minDate,maxDate){
                 var years = [];
-                for(var i = Dates.toDate(minDate,'DD/MM/YYYY').getFullYear(); i <= Dates.toDate(maxDate,'DD/MM/YYYY').getFullYear(); i++){
+                for(var i = minDate.getFullYear(); i <= maxDate.getFullYear(); i++){
                         years.push(i);
                 }
                 return years;
@@ -199,10 +203,10 @@
         {iconLeft}
         {required}
         {type}
-        format="DD/MM/YYYY"
+        {format}
         readonly={readonly || calendarOnly}
         iconRight={readonly ? "" : "today"}
-        pattern="((([0-2][0-9])|(3[0-1]))(\/|-|\.)((0[13578])|10|12)(\/|-|\.)(19|20)[0-9][0-9])|((([0-2][0-9])|30)(\/|-|\.)((0[469])|11)(\/|-|\.)(19|20)[0-9][0-9])|(([0-2][0-9])(\/|-|\.)02(\/|-|\.)(19|20)[0-9][0-9])"
+        {pattern}
         {label}
         {cls}
         {filled}
@@ -224,7 +228,7 @@
         <div class="datepicker-main">
                 <div class="datepicker-info">
                         <h4>{label}</h4>
-                        <h1>{getDisplayedDate(tmpValue,'DD/MM/YYYY')}</h1>
+                        <h1>{getDisplayedDate(tmpValue, Dates.D_M_Y)}</h1>
                 </div><!--
              --><div class="datepicker-calendar">
                         <Tooltip text={showYears ? "Choisir le jour" : "Choisir l'année"}>
@@ -241,7 +245,7 @@
                                                 text=""
                                                 icon="arrow_back_ios"
                                                 border={false}
-                                                disable={(showYears && yearsPage == 0) || (!showYears && displayedDays.some(d => Dates.toText(d,'DD/MM/YYYY') == minDate))}
+                                                disable={(showYears && yearsPage == 0) || (!showYears && displayedDays.some(d => Dates.toText(d, format) == minDate))}
                                                 on:click={onClickPrevious}
                                         />
                                 </Tooltip>
@@ -250,7 +254,7 @@
                                                 text=""
                                                 icon="arrow_forward_ios"
                                                 border={false}
-                                                disable={(showYears && displayedYears.length < 12) || (!showYears && displayedDays.some(d => Dates.toText(d,'DD/MM/YYYY') == maxDate))}
+                                                disable={(showYears && displayedYears.length < 12) || (!showYears && displayedDays.some(d => Dates.toText(d, format) == maxDate))}
                                                 on:click={onClickNext}
                                         />
                                 </Tooltip>
@@ -259,8 +263,8 @@
                                 <div class="datepicker-years">
                                         {#each displayedYears as year}
                                                 <span role="button" tabindex="0" class="datepicker-year" 
-                                                class:datepicker-today={year == new Date().getFullYear()}
-                                                class:datepicker-selected={year == Dates.toDate(tmpValue,'DD/MM/YYYY').getFullYear()}
+                                                class:datepicker-today={year == Dates.today().getFullYear()}
+                                                class:datepicker-selected={year == Dates.toDate(tmpValue, Dates.D_M_Y).getFullYear()}
                                                 on:click|stopPropagation|preventDefault={onClickYear} 
                                                 on:keypress|stopPropagation|preventDefault={onEnterYear} 
                                                 value={year}>{year}</span>
@@ -273,14 +277,14 @@
                                         {/each}
                                         {#each displayedDays as day}
                                                 <span role="button" class="datepicker-day" 
-                                                class:datepicker-today={Dates.toText(day,'DD/MM/YYYY') == Dates.toText(new Date(),'DD/MM/YYYY')}
-                                                class:datepicker-selected={Dates.toText(day,'DD/MM/YYYY') == tmpValue}
-                                                class:datepicker-other-month={day.getMonth() != Dates.toDate('01/' + currentMonth,'DD/MM/YYYY').getMonth()}
-                                                class:datepicker-day-disable={(day < Dates.toDate(minDate,'DD/MM/YYYY')) || (day > Dates.toDate(maxDate,'DD/MM/YYYY'))}
-                                                tabindex={(day < Dates.toDate(minDate,'DD/MM/YYYY')) || (day > Dates.toDate(maxDate,'DD/MM/YYYY')) ? "-1" : "0"}
+                                                class:datepicker-today={Dates.toText(day, Dates.D_M_Y) == Dates.toText(Dates.today(), Dates.D_M_Y)}
+                                                class:datepicker-selected={Dates.toText(day, Dates.D_M_Y) == tmpValue}
+                                                class:datepicker-other-month={day.getMonth() != Dates.toDate(currentMonth, Dates.M_Y).getMonth()}
+                                                class:datepicker-day-disable={(day < realMinDate) || (day > realMaxDate)}
+                                                tabindex={(day < realMinDate) || (day > realMaxDate) ? "-1" : "0"}
                                                 on:click|stopPropagation|preventDefault={onClickDay} 
                                                 on:keypress|stopPropagation|preventDefault={onEnterDay} 
-                                                value={Dates.toText(day,'DD/MM/YYYY')}>{day.getDate()}</span>
+                                                value={Dates.toText(day, Dates.D_M_Y)}>{day.getDate()}</span>
                                         {/each}
                                 </div>
                         {/if}

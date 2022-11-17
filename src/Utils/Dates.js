@@ -3,8 +3,15 @@ const Dates = {
     SUNDAY : 0, MONDAY : 1, TUESDAY : 2, WEDNESDAY : 3, THURSDAY : 4, FRIDAY : 5, SATURDAY : 6,
     // MONTHS
     JANUARY : 0, FEBRUARY : 1, MARCH : 2, APRIL : 3, MAY : 4, JUNE : 5, JULY : 6, AUGUST : 7, SEPTEMBER : 8, OCTOBER : 9, NOVMEBER : 10, DECEMBER : 11,
+    // FORMATS
+    D_M_Y : 'DD/MM/YYYY', M_D_Y : 'MM/DD/YYYY', Y_M_D : 'YYYY/MM/DD', Y_D_M : 'YYYY/DD/MM',
+    DMY : 'DDMMYYYY', MDY : 'MMDDYYYY', YMD : 'YYYYMMDD', YDM : 'YYYYDDMM',
+    M_Y : 'MM/YYYY', Y_M : 'YYYY/MM', MY : 'MMYYYY', YM : 'YYYYMM',
     today : () => {
         return new Date();
+    },
+    copy : (pDate) => {
+        return new Date(pDate);
     },
     yesterday : () => {
         return Dates.addDays(Dates.today(), -1);
@@ -82,20 +89,34 @@ const Dates = {
         }
         return retour;
     },
-    getFormat : (pStrDate) => {
-        let formats = [];
+    format : (pStrDate, pInFormat, pOutFormat) => {
+        let inFormat = (pInFormat || Dates.getFormat(pStrDate)).toUpperCase();
+        let outFormat = pOutFormat.toUpperCase();
+        return Dates.toText(Dates.toDate(pStrDate, inFormat), outFormat);
+    },
+    getPatterns : () => {
         // Defined formats
-        formats['DD/MM/YYYY'] = '^(([0][1-9])|([1-2]\\d)|([3][0-1]))(\/|-|\.)(([0]\\d)|([1][0-2]))(\/|-|\.)\\d{4}$';
-        formats['MM/DD/YYYY'] = '^(([0]\\d)|([1][0-2]))(\/|-|\.)(([0][1-9])|([1-2]\\d)|([3][0-1]))(\/|-|\.)\\d{4}$';
-        formats['YYYY/MM/DD'] = '^\\d{4}(\/|-|\.)(([0]\\d)|([1][0-2]))(\/|-|\.)(([0][1-9])|([1-2]\\d)|([3][0-1]))$';
-        formats['DDMMYYYY'] = '^(([0][1-9])|([1-2]\\d)|([3][0-1]))(([0]\\d)|([1][0-2]))\\d{4}$';
-        formats['MMDDYYYY'] = '^(([0]\\d)|([1][0-2]))(([0][1-9])|([1-2]\\d)|([3][0-1]))\\d{4}$';
-        formats['YYYYMMDD'] = '^\\d{4}(([0]\\d)|([1][0-2]))(([0][1-9])|([1-2]\\d)|([3][0-1]))$';
-        formats['YYYYDDMM'] = '^\\d{4}(([0][1-9])|([1-2]\\d)|([3][0-1]))(([0]\\d)|([1][0-2]))$';
-        formats['MM/YYYY'] = '^(([0]\\d)|([1][0-2]))(\/|-|\.)\\d{4}$';
-        formats['YYYY/MM'] = '^\\d{4}(\/|-|\.)(([0]\\d)|([1][0-2]))$';
-        formats['MMYYYY'] = '^(([0]\\d)|([1][0-2]))\\d{4}$';
-        formats['YYYYMM'] = '^\\d{4}(([0]\\d)|([1][0-2]))$';
+        let formats = [];
+        formats[Dates.D_M_Y] = '^(([0][1-9])|([1-2]\\d)|([3][0-1]))(\/|-|\.)(([0]\\d)|([1][0-2]))(\/|-|\.)\\d{4}$';
+        formats[Dates.M_D_Y] = '^(([0]\\d)|([1][0-2]))(\/|-|\.)(([0][1-9])|([1-2]\\d)|([3][0-1]))(\/|-|\.)\\d{4}$';
+        formats[Dates.Y_M_D] = '^\\d{4}(\/|-|\.)(([0]\\d)|([1][0-2]))(\/|-|\.)(([0][1-9])|([1-2]\\d)|([3][0-1]))$';
+        formats[Dates.Y_D_M] = '^\\d{4}(\/|-|\.)(([0][1-9])|([1-2]\\d)|([3][0-1]))(\/|-|\.)(([0]\\d)|([1][0-2]))$';
+        formats[Dates.DMY] = '^(([0][1-9])|([1-2]\\d)|([3][0-1]))(([0]\\d)|([1][0-2]))\\d{4}$';
+        formats[Dates.MDY] = '^(([0]\\d)|([1][0-2]))(([0][1-9])|([1-2]\\d)|([3][0-1]))\\d{4}$';
+        formats[Dates.YMD] = '^\\d{4}(([0]\\d)|([1][0-2]))(([0][1-9])|([1-2]\\d)|([3][0-1]))$';
+        formats[Dates.YDM] = '^\\d{4}(([0][1-9])|([1-2]\\d)|([3][0-1]))(([0]\\d)|([1][0-2]))$';
+        formats[Dates.M_Y] = '^(([0]\\d)|([1][0-2]))(\/|-|\.)\\d{4}$';
+        formats[Dates.Y_M] = '^\\d{4}(\/|-|\.)(([0]\\d)|([1][0-2]))$';
+        formats[Dates.MY] = '^(([0]\\d)|([1][0-2]))\\d{4}$';
+        formats[Dates.YM] = '^\\d{4}(([0]\\d)|([1][0-2]))$';
+        return formats;
+    },
+    getPattern : (pFormat) => {
+        return Dates.getPatterns()[pFormat];
+    },
+    getFormat : (pStrDate) => {
+        // Defined formats
+        let formats = Dates.getPatterns();
         for (let f in formats) {
             // Reconized format
             if(new RegExp(formats[f]).test(pStrDate)){
