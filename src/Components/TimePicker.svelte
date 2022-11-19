@@ -5,8 +5,10 @@
         import Button from './Button.svelte';
         import Tooltip from './Tooltip.svelte';
         import Events from '../Utils/Events';
+        import Times from '../Utils/Times';
         
         // PUBLIC ATTRIBUTES
+        export let format = Times.H_M;
         export let value = "";
         export let disable = false;
         export let width = 290;
@@ -17,13 +19,14 @@
         export let readonly = false;
         export let filled = true;
 
-        export let minTime = '00:00';
-        export let maxTime = '23:59';
+        export let minTime = Times.format('00:00', format);
+        export let maxTime = Times.format('23:59', format);
         export let clockOnly = false;
         
         // PRIVATE ATTRIBUTES
+        let pattern = Times.getPattern(format);
         let type = "text";
-        let tmpValue = isValidTime(value) ? value : new Date().getHours().toString().padStart(2,'0') + ':' + new Date().getMinutes().toString().padStart(2,'0');
+        let tmpValue = Times.isValid(value) ? Times.format(value, Times.H_M_S) : Times.toText(Times.now(), Times.H_M_S);
         let visible = false;
         let input;
         let selectHour = true;
@@ -35,7 +38,7 @@
         const dispatch = createEventDispatcher();
         export function onChange(evt){
                 if(errorMessage == "" && value != ""){
-                        errorMessage = textToTime(value) < textToTime(minTime) || textToTime(value) > textToTime(maxTime,'DD/MM/YYYY') ? "L'heure doit etre comprise entre " + minTime + " et " + maxTime : "";
+                        errorMessage = Times.toTime(value) < Times.toTime(minTime) || Times.toTime(value) > Times.toTime(maxTime,'DD/MM/YYYY') ? "L'heure doit etre comprise entre " + minTime + " et " + maxTime : "";
                 }
                 dispatch('change', {
                         value: value,
@@ -45,8 +48,8 @@
 	export function onClickIcon() {
                 visible = true;
                 selectHour = true;
-                tmpValue = isValidTime(value) ? value : new Date().getHours().toString().padStart(2,'0') + ':' + new Date().getMinutes().toString().padStart(2,'0');
-                morning = getHour(tmpValue) < 13 && getHour(tmpValue) > 0;
+                tmpValue = Times.isValid(value) ? value : Times.toText(Times.now(), Times.H_M_S);
+                morning = Times.getHours(tmpValue) < 13 && Times.getHours(tmpValue) > 0;
         }
         export function onClickMask(evt) {
                 if(evt.target == this){
@@ -58,15 +61,15 @@
         }
         export function onClickValider(){
                 onClickFermer();
-                value = tmpValue;
+                value = Times.format(tmpValue, format);
                 setTimeout(() => {
                         input.onChange();
                 }, 200);
         }
         export function onClickHour(evt){
                 var hour = evt.currentTarget.getAttribute('hour');
-                if(getHour(minTime) > parseInt(hour) || getHour(maxTime) < parseInt(hour)) return false;
-                tmpValue = timeToText(parseInt(hour) * 60 + getMinute(tmpValue));
+                if(Times.getHours(minTime) > parseInt(hour) || Times.getHours(maxTime) < parseInt(hour)) return false;
+                tmpValue = Times.toText((parseInt(hour) * 60 * 60) + (Times.getMinutes(tmpValue) * 60), Times.H_M_S);
                 selectHour = false;
         }
         export function onEnterHour(event){
@@ -76,8 +79,9 @@
         }
         export function onClickMinute(evt){
                 var minute = evt.currentTarget.getAttribute('minute');
-                if(textToTime(minTime) > (getHour(tmpValue) * 60 + parseInt(minute)) || textToTime(maxTime) < (getHour(tmpValue) * 60 + parseInt(minute))) return false;
-                tmpValue = timeToText(60 * getHour(tmpValue) + parseInt(minute));
+                var time = (Times.getHours(tmpValue) * 60 * 60) + (parseInt(minute) * 60);
+                if(Times.toTime(minTime, format) > time || Times.toTime(maxTime, format) < time) return false;
+                tmpValue = Times.toText(60 * 60 * Times.getHours(tmpValue) + (60 * parseInt(minute)), Times.H_M_S);
         }
         export function onEnterMinute(event){
                 if(Events.isEnter(event)) {
@@ -116,25 +120,6 @@
                         onClickPM();
                 }
         }
-
-        // METHODS
-        function isValidTime(time) {
-                return new RegExp("([0-1][0-9]|2[0-3]):[0-5][0-9]").test(time);
-        }
-        function textToTime(strTime) {
-                return 60*getHour(strTime) + getMinute(strTime);
-        }
-        function timeToText(time) {
-                var hour = Math.floor(time/60);
-                var minute = time - (hour * 60);
-                return hour.toString().padStart(2,'0') + ':' + minute.toString().padStart(2,'0');
-        }
-        function getHour(time){
-                return isValidTime(time) ? parseInt(time.substring(0,2)) : 0;
-        }
-        function getMinute(time){
-                return isValidTime(time) ? parseInt(time.substring(3,5)) : 0;
-        }
 </script>
 
 <Textfield 
@@ -144,10 +129,10 @@
         {iconLeft}
         {required}
         {type}
-        format="hh:mm"
+        {format}
         readonly={readonly || clockOnly}
         iconRight={readonly ? "" : "schedule"}
-        pattern="([0-1][0-9]|2[0-3]):[0-5][0-9]"
+        {pattern}
         {label}
         {filled}
         bind:errorMessage={errorMessage}
@@ -164,8 +149,8 @@
 
 <div class="timepicker-mask"
      class:timepicker-visible={visible}
-     style="--rotate-hour : {(30 * getHour(tmpValue)) + (0.5 * getMinute(tmpValue))}deg;
-            --rotate-minute : {6 * getMinute(tmpValue)}deg;"
+     style="--rotate-hour : {(30 * Times.getHours(tmpValue)) + (0.5 * Times.getMinutes(tmpValue))}deg;
+            --rotate-minute : {6 * Times.getMinutes(tmpValue)}deg;"
      on:click={onClickMask}>
         <div class="timepicker-main">
                 <div class="timepicker-info">
@@ -176,7 +161,7 @@
                                            on:click|stopPropagation|preventDefault={onClickSelectHour} 
                                            on:keypress|stopPropagation|preventDefault={onEnterSelectHour} 
                                            class:timepicker-selected={selectHour}>
-                                                {getHour(tmpValue).toString().padStart(2,'0')}
+                                                {Times.getHours(tmpValue).toString().padStart(2,'0')}
                                         </span>
                                 </Tooltip>
                                 :
@@ -185,7 +170,7 @@
                                            on:click|stopPropagation|preventDefault={onClickSelectMinute} 
                                            on:keypress|stopPropagation|preventDefault={onEnterSelectMinute} 
                                            class:timepicker-selected={!selectHour}>
-                                                {getMinute(tmpValue).toString().padStart(2,'0')}
+                                                {Times.getMinutes(tmpValue).toString().padStart(2,'0')}
                                         </span>
                                 </Tooltip>
                                 {#if selectHour}
@@ -216,11 +201,11 @@
                                         {#each displayedHours as hour}
                                                 <div class="timepicker-hour">
                                                         <span role="button" 
-                                                           tabindex={(getHour(minTime) > hour || getHour(maxTime) < hour) ? "-1" : "0"} 
+                                                           tabindex={(Times.getHours(minTime) > hour || Times.getHours(maxTime) < hour) ? "-1" : "0"} 
                                                            on:click|stopPropagation|preventDefault={onClickHour}
                                                            on:keypress|stopPropagation|preventDefault={onEnterHour}
-                                                           class:timepicker-hour-selected={getHour(tmpValue) == hour}
-                                                           class:timepicker-hour-disable={getHour(minTime) > hour || getHour(maxTime) < hour}
+                                                           class:timepicker-hour-selected={Times.getHours(tmpValue) == hour}
+                                                           class:timepicker-hour-disable={Times.getHours(minTime) > hour || Times.getHours(maxTime) < hour}
                                                            hour={hour}>
                                                                 {hour}
                                                         </span>
@@ -230,11 +215,11 @@
                                         {#each minutes as minute}
                                                 <div class="timepicker-hour">
                                                         <span role="button" 
-                                                           tabindex={(textToTime(minTime) > (getHour(tmpValue) * 60 + minute) || textToTime(maxTime) < (getHour(tmpValue) * 60 + minute)) ? "-1" : "0"} 
+                                                           tabindex={(Times.toTime(minTime) > (Times.getHours(tmpValue) * 60 * 60 + minute * 60) || Times.toTime(maxTime) < (Times.getHours(tmpValue) * 60 * 60 + minute * 60)) ? "-1" : "0"} 
                                                            on:click|stopPropagation|preventDefault={onClickMinute} 
                                                            on:keypress|stopPropagation|preventDefault={onEnterMinute}
-                                                           class:timepicker-hour-selected={Math.abs(getMinute(tmpValue) - minute) < 3}
-                                                           class:timepicker-hour-disable={textToTime(minTime) > (getHour(tmpValue) * 60 + minute) || textToTime(maxTime) < (getHour(tmpValue) * 60 + minute)}
+                                                           class:timepicker-hour-selected={Math.abs(Times.getMinutes(tmpValue) - minute) < 3}
+                                                           class:timepicker-hour-disable={Times.toTime(minTime) > (Times.getHours(tmpValue) * 60 * 60 + minute * 60) || Times.toTime(maxTime) < (Times.getHours(tmpValue) * 60 * 60 + minute * 60)}
                                                            minute={minute}>
                                                                 {minute}
                                                         </span>

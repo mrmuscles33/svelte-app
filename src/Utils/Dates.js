@@ -32,14 +32,13 @@ const Dates = {
         }
     },
     toText : (pDate,pFormat) => {
-        pFormat = pFormat.toUpperCase();
-        return pFormat.replace('DD',pDate.getDate().toString().padStart(2,'0'))
+        return pFormat.toUpperCase().replace('DD',pDate.getDate().toString().padStart(2,'0'))
                       .replace('MM',(pDate.getMonth() + 1).toString().padStart(2,'0'))
                       .replace('YYYY',pDate.getFullYear())
     },
     isValid(pStrDate,pFormat){
-        let format = (pFormat || Dates.getFormat(pStrDate)).toUpperCase();
         try {
+            let format = (pFormat || Dates.getFormat(pStrDate)).toUpperCase();
             // Undefined format
             if(Dates.getFormat(pStrDate) == null) {
                 return false;
@@ -91,8 +90,7 @@ const Dates = {
     },
     format : (pStrDate, pInFormat, pOutFormat) => {
         let inFormat = (pInFormat || Dates.getFormat(pStrDate)).toUpperCase();
-        let outFormat = pOutFormat.toUpperCase();
-        return Dates.toText(Dates.toDate(pStrDate, inFormat), outFormat);
+        return Dates.toText(Dates.toDate(pStrDate, inFormat), pOutFormat.toUpperCase());
     },
     getPatterns : () => {
         // Defined formats

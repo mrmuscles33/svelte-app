@@ -12,6 +12,7 @@
 	import Password from './Components/Password.svelte';
 	import Numberfield from './Components/Numberfield.svelte';
 	import Dates from './Utils/Dates';
+	import Times from './Utils/Times';
 
 	function clickButton(){
 		alert('click');
@@ -193,9 +194,10 @@
 			filled={false}
 		/>
 		<TimePicker 
+			format={Times.H_M_S}
 			label="Heure"
-			minTime="07:00"
-			maxTime="20:00"
+			minTime="07:00:00"
+			maxTime="20:00:00"
 		/>
 
 		<h3>Droplists</h3>
