@@ -17,6 +17,9 @@ const Events = {
     isArrowRight : (event) => {
         return event.keyCode === 39 || event.wich === 39 || event.code === 'ArrowRight' || event.key === 'ArrowRight';
     },
+    isArrow : (event) => {
+        return Events.isArrowUp(event) || Events.isArrowDown(event) || Events.isArrowLeft(event) || Events.isArrowRight(event);
+    }, 
     isEsc : (event) => {
         return event.keyCode === 27 || event.wich === 27 || event.code === 'Escape' || event.key === 'Escape';
     },

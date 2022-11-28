@@ -2,6 +2,7 @@
         // IMPORTS
         import { createEventDispatcher } from 'svelte';
         import Tooltip from './Tooltip.svelte';
+        import Events from '../Utils/Events';
         
         // PUBLIC ATTRIBUTES
         export let value = "";
@@ -111,7 +112,7 @@
 	}
         function onKeyDownIcon(event){
                 if(disable) return;
-                if(Utils.Event.isEnter(event)){
+                if(Events.isEnter(event)){
                         dispatch('clickIcon', {
                                 value: value
                         }); 

@@ -34,6 +34,8 @@
         let visible = false;
         let tmpValue = Dates.isValid(value, format) ? Dates.format(value, format, Dates.D_M_Y) : Dates.toText(Dates.today(), Dates.D_M_Y);
         let currentMonth = Dates.format(tmpValue, Dates.D_M_Y, Dates.M_Y);
+        let focusedDate = tmpValue;
+        let focusedYear = Dates.toDate(tmpValue, Dates.D_M_Y).getFullYear();
         let input;
         let showYears = false;
         let displayedYears = [];
@@ -194,6 +196,48 @@
                 }
                 return years;
         }
+        function onNavigateDay(event){
+                if(Events.isArrow(event)) {
+                        var clickedDate = event.currentTarget.getAttribute('value');
+                        var nextDate = null;
+                        if (Events.isArrowLeft(event)) {
+                                nextDate = Dates.addDays(Dates.toDate(clickedDate, Dates.D_M_Y), -1);
+                        } else if (Events.isArrowRight(event)) {
+                                nextDate = Dates.addDays(Dates.toDate(clickedDate, Dates.D_M_Y), 1);
+                        } else if (Events.isArrowUp(event)) {
+                                nextDate = Dates.addDays(Dates.toDate(clickedDate, Dates.D_M_Y), -7);
+                        } else if (Events.isArrowDown(event)) {
+                                nextDate = Dates.addDays(Dates.toDate(clickedDate, Dates.D_M_Y), 7);
+                        }
+                        if(displayedDays.some(d => Dates.toText(d, Dates.D_M_Y) == Dates.toText(nextDate, Dates.D_M_Y)) && realMinDate <= nextDate  && nextDate <= realMaxDate) {
+                                event.currentTarget.parentElement.querySelector('[value="' + Dates.toText(nextDate, Dates.D_M_Y) + '"]').focus();
+                                focusedDate = Dates.toText(nextDate, Dates.D_M_Y);
+                        }
+                        event.preventDefault();
+                        event.stopPropagation()
+                }
+        }
+        function onNavigateYear(event){
+                if(Events.isArrow(event)) {
+                        var clickedYear = parseInt(event.currentTarget.getAttribute('value'));
+                        var nextYear = clickedYear;
+                        if (Events.isArrowLeft(event)) {
+                                nextYear--;
+                        } else if (Events.isArrowRight(event)) {
+                                nextYear++;
+                        } else if (Events.isArrowUp(event)) {
+                                nextYear -= 3;
+                        } else if (Events.isArrowDown(event)) {
+                                nextYear += 3;
+                        }
+                        if(displayedYears.some(y => y == nextYear)) {
+                                event.currentTarget.parentElement.querySelector('[value="' + nextYear + '"]').focus();
+                                focusedYear = nextYear;
+                        }
+                        event.preventDefault();
+                        event.stopPropagation()
+                }
+        }
 </script>
 
 <Textfield 
@@ -262,11 +306,17 @@
                         {#if showYears}
                                 <div class="datepicker-years">
                                         {#each displayedYears as year}
-                                                <span role="button" tabindex="0" class="datepicker-year" 
+                                                <span role="button" class="datepicker-year" 
                                                 class:datepicker-today={year == Dates.today().getFullYear()}
                                                 class:datepicker-selected={year == Dates.toDate(tmpValue, Dates.D_M_Y).getFullYear()}
+                                                tabindex= {
+                                                        (displayedYears.some(y => y == focusedYear) && focusedYear == year) ||
+                                                        (!displayedYears.some(y => y == focusedYear) && displayedYears[0] == year)
+                                                        ? "0" : "-1"
+                                                }
                                                 on:click|stopPropagation|preventDefault={onClickYear} 
                                                 on:keypress|stopPropagation|preventDefault={onEnterYear} 
+                                                on:keydown={onNavigateYear} 
                                                 value={year}>{year}</span>
                                         {/each}
                                 </div>
@@ -281,9 +331,14 @@
                                                 class:datepicker-selected={Dates.toText(day, Dates.D_M_Y) == tmpValue}
                                                 class:datepicker-other-month={day.getMonth() != Dates.toDate(currentMonth, Dates.M_Y).getMonth()}
                                                 class:datepicker-day-disable={(day < realMinDate) || (day > realMaxDate)}
-                                                tabindex={(day < realMinDate) || (day > realMaxDate) ? "-1" : "0"}
+                                                tabindex= {
+                                                        (displayedDays.some(d => focusedDate == Dates.toText(d, Dates.D_M_Y)) && focusedDate == Dates.toText(day, Dates.D_M_Y)) ||
+                                                        (!displayedDays.some(d => focusedDate == Dates.toText(d, Dates.D_M_Y)) && displayedDays.find(d => realMinDate <= d  && d <= realMaxDate) == day)
+                                                        ? "0" : "-1"
+                                                }
                                                 on:click|stopPropagation|preventDefault={onClickDay} 
                                                 on:keypress|stopPropagation|preventDefault={onEnterDay} 
+                                                on:keydown={onNavigateDay} 
                                                 value={Dates.toText(day, Dates.D_M_Y)}>{day.getDate()}</span>
                                         {/each}
                                 </div>

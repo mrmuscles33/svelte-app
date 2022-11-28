@@ -187,7 +187,7 @@
 		<DatePicker
 			label="Date"
 			minDate="2021/10/01"
-			maxDate="2023/12/31"
+			maxDate="2024/12/31"
 			format={Dates.Y_M_D}
 			on:change={onChangeDate}
 			required={true}
