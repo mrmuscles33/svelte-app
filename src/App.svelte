@@ -196,8 +196,8 @@
 		<TimePicker 
 			format={Times.H_M_S}
 			label="Heure"
-			minTime="07:00:00"
-			maxTime="20:00:00"
+			minTime="21:28:00"
+			maxTime="21:50:00"
 		/>
 
 		<h3>Droplists</h3>

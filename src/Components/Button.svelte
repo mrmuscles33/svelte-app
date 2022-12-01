@@ -26,6 +26,14 @@
                         onClick();
                 }
         }
+
+        export function onKeyDown(event){
+                if(!disable) {
+                        dispatch('keydown', {
+                                event: event
+                        });
+                }
+        }
 </script>
 
 <span class="btn-main {cls}" 
@@ -37,6 +45,7 @@
      tabindex={disable ? "-1" : "0"}
      on:click|stopPropagation|preventDefault={onClick}
      on:keyup|stopPropagation|preventDefault={onKeyUp}
+     on:keydown={onKeyDown}
      style="--icon-padding: {iconPadding}; {style}">
         <span class="btn-icon material-icons-round" role="presentation">{icon}</span>
         <span class="btn-text">{text}</span>

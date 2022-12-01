@@ -29,16 +29,19 @@
         let tmpValue = Times.isValid(value) ? Times.format(value, Times.H_M_S) : Times.toText(Times.now(), Times.H_M_S);
         let visible = false;
         let input;
+        let clock;
         let selectHour = true;
-        let morning = true;
+        let morning = Times.getHours(tmpValue) != 0 && Times.getHours(tmpValue) < 13;
         let minutes = [0,5,10,15,20,25,30,35,40,45,50,55];
+        let focusedHour = Times.getHours(tmpValue);
+        let focusedMinute = minutes.slice().sort((a,b) => Math.abs(a - Times.getMinutes(tmpValue)) <= Math.abs(b - Times.getMinutes(tmpValue)) ? -1 : 1)[0];
         $: displayedHours = morning ? [12,1,2,3,4,5,6,7,8,9,10,11] : [0,13,14,15,16,17,18,19,20,21,22,23];
 
         // EVENTS
         const dispatch = createEventDispatcher();
         export function onChange(evt){
                 if(errorMessage == "" && value != ""){
-                        errorMessage = Times.toTime(value) < Times.toTime(minTime) || Times.toTime(value) > Times.toTime(maxTime,'DD/MM/YYYY') ? "L'heure doit etre comprise entre " + minTime + " et " + maxTime : "";
+                        errorMessage = Times.toTime(value) < Times.toTime(minTime) || Times.toTime(value) > Times.toTime(maxTime) ? "L'heure doit etre comprise entre " + minTime + " et " + maxTime : "";
                 }
                 dispatch('change', {
                         value: value,
@@ -50,6 +53,11 @@
                 selectHour = true;
                 tmpValue = Times.isValid(value) ? value : Times.toText(Times.now(), Times.H_M_S);
                 morning = Times.getHours(tmpValue) < 13 && Times.getHours(tmpValue) > 0;
+                focusedHour = Times.getHours(tmpValue);
+                focusedMinute = minutes.slice().sort((a,b) => Math.abs(a - Times.getMinutes(tmpValue)) <= Math.abs(b - Times.getMinutes(tmpValue)) ? -1 : 1)[0];
+                setTimeout(() => {
+                        clock.querySelector('.timepicker-hour > span[tabindex="0"]').focus();
+                }, 100);
         }
         export function onClickMask(evt) {
                 if(evt.target == this){
@@ -58,6 +66,7 @@
         }
         export function onClickFermer(){
                 visible = false;
+                input.getInput().focus();
         }
         export function onClickValider(){
                 onClickFermer();
@@ -71,11 +80,11 @@
                 if(Times.getHours(minTime) > parseInt(hour) || Times.getHours(maxTime) < parseInt(hour)) return false;
                 tmpValue = Times.toText((parseInt(hour) * 60 * 60) + (Times.getMinutes(tmpValue) * 60), Times.H_M_S);
                 selectHour = false;
-        }
-        export function onEnterHour(event){
-                if(Events.isEnter(event)) {
-                        onClickHour(event);
-                }
+                var parent = evt.currentTarget.parentElement.parentElement;
+                // Waiting for minutes display
+                setTimeout(() => {
+                        parent.querySelector('[tabindex="0"]').focus();
+                }, 50);
         }
         export function onClickMinute(evt){
                 var minute = evt.currentTarget.getAttribute('minute');
@@ -83,41 +92,115 @@
                 if(Times.toTime(minTime, format) > time || Times.toTime(maxTime, format) < time) return false;
                 tmpValue = Times.toText(60 * 60 * Times.getHours(tmpValue) + (60 * parseInt(minute)), Times.H_M_S);
         }
-        export function onEnterMinute(event){
-                if(Events.isEnter(event)) {
-                        onClickMinute(event);
-                }
-        }
         export function onClickSelectHour(){
                 selectHour = true;
-        }
-        export function onEnterSelectHour(event) {
-                if(Events.isEnter(event)) {
-                        onClickSelectHour();
-                }
         }
         export function onClickSelectMinute(){
                 selectHour = false;
         }
-        export function onEnterSelectMinute(event){
-                if(Events.isEnter(event)) {
-                        onClickSelectMinute();
-                }
-        }
         export function onClickAM(){
                 morning = true;
-        }
-        export function onEnterAM(event){
-                if(Events.isEnter(event)) {
-                        onClickAM();
-                }
         }
         export function onClickPM(){
                 morning = false;
         }
-        export function onEnterkPM(event){
+
+        // METHODS
+        function onEscMask(evt){
+                if(Events.isEsc(evt)){
+                        onClickFermer();
+                }
+        }
+        function onEnterHour(event){
+                if(Events.isEnter(event)) {
+                        onClickHour(event);
+                }
+        }
+        function onNavigateHour(event) {
+                if(Events.isArrow(event)) {
+                        var clickedHour = parseInt(event.currentTarget.getAttribute('hour'));
+                        var nextHour = clickedHour;
+                        if (Events.isArrowLeft(event) || Events.isArrowDown(event)) {
+                                nextHour--;
+                        } else if (Events.isArrowRight(event) || Events.isArrowUp(event)) {
+                                nextHour++;
+                        }
+                        if(nextHour > Times.getHours(maxTime)) {
+                                nextHour = Times.getHours(minTime);
+                        } else if(nextHour < Times.getHours(minTime)) {
+                                nextHour = Times.getHours(maxTime);
+                        }
+                        morning = nextHour != 0 && nextHour < 13;
+                        var parent = event.currentTarget.parentElement.parentElement;
+                        // Waiting for the AM/PM changing
+                        setTimeout(() => {
+                                parent.querySelector('[hour="' + nextHour + '"]').focus();
+                        }, 10);
+                        focusedHour = nextHour;
+                        event.preventDefault();
+                        event.stopPropagation();
+                }
+        }
+        function onEnterMinute(event){
+                if(Events.isEnter(event)) {
+                        onClickMinute(event);
+                }
+        }
+        function onNavigateMinute(event) {
+                if(Events.isArrow(event)) {
+                        var clickedMinute = parseInt(event.currentTarget.getAttribute('minute'));
+                        var nextMinute = clickedMinute;
+                        if (Events.isArrowLeft(event) || Events.isArrowDown(event)) {
+                                nextMinute -= 5;
+                        } else if (Events.isArrowRight(event) || Events.isArrowUp(event)) {
+                                nextMinute += 5;
+                        }
+                        var enableMinutes = minutes.filter(m => 
+                                Times.toTime(minTime) <= (Times.getHours(tmpValue) * 60 * 60 + m * 60) && 
+                                (Times.getHours(tmpValue) * 60 * 60 + m * 60) <= Times.toTime(maxTime)
+                        );
+                        if(Times.getHours(tmpValue) * 60 * 60 + nextMinute * 60 > Times.toTime(maxTime) || nextMinute > 55) {
+                                nextMinute = enableMinutes[0];
+                        } else if(Times.getHours(tmpValue) * 60 * 60 + nextMinute * 60 < Times.toTime(minTime) || nextMinute < 0) {
+                                nextMinute = enableMinutes.reverse()[0];
+                        }
+                        event.currentTarget.parentElement.parentElement.querySelector('[minute="' + nextMinute + '"]').focus();
+                        focusedMinute = nextMinute;
+                        event.preventDefault();
+                        event.stopPropagation();
+                }
+        }
+        function onEnterSelectHour(event) {
+                if(Events.isEnter(event)) {
+                        onClickSelectHour();
+                }
+        }
+        function onKeyDownSelectHour(event){
+                if(Events.isTab(event) && Events.isShift(event)){
+                        event.preventDefault();
+                        event.stopPropagation();
+                }
+        }
+        function onEnterSelectMinute(event){
+                if(Events.isEnter(event)) {
+                        onClickSelectMinute();
+                }
+        }
+        function onEnterAM(event){
+                if(Events.isEnter(event)) {
+                        onClickAM();
+                }
+        }
+        function onEnterkPM(event){
                 if(Events.isEnter(event)) {
                         onClickPM();
+                }
+        }
+        function onKeyDownValider(evt){
+                evt = evt.detail.event;
+                if(Events.isTab(evt) && !Events.isShift(evt)){
+                        evt.preventDefault();
+                        evt.stopPropagation();
                 }
         }
 </script>
@@ -151,7 +234,8 @@
      class:timepicker-visible={visible}
      style="--rotate-hour : {(30 * Times.getHours(tmpValue)) + (0.5 * Times.getMinutes(tmpValue))}deg;
             --rotate-minute : {6 * Times.getMinutes(tmpValue)}deg;"
-     on:click={onClickMask}>
+     on:click={onClickMask}
+     on:keydown={onEscMask}>
         <div class="timepicker-main">
                 <div class="timepicker-info">
                         <h4>{label}</h4>
@@ -160,6 +244,7 @@
                                         <span role="button" tabindex="0"
                                            on:click|stopPropagation|preventDefault={onClickSelectHour} 
                                            on:keypress|stopPropagation|preventDefault={onEnterSelectHour} 
+                                           on:keydown={onKeyDownSelectHour}
                                            class:timepicker-selected={selectHour}>
                                                 {Times.getHours(tmpValue).toString().padStart(2,'0')}
                                         </span>
@@ -196,14 +281,25 @@
                         </div>
                 </div><!--
              --><div class="timepicker-select">
-                        <div class="timepicker-clock">
+                        <div class="timepicker-clock" bind:this={clock}>
                                 {#if selectHour}
                                         {#each displayedHours as hour}
                                                 <div class="timepicker-hour">
                                                         <span role="button" 
-                                                           tabindex={(Times.getHours(minTime) > hour || Times.getHours(maxTime) < hour) ? "-1" : "0"} 
+                                                        tabindex={
+                                                                (
+                                                                        // If focused hour is between min and max and contained in displayed hours
+                                                                        displayedHours.some(h => focusedHour == h && Times.getHours(minTime) <= h && h <= Times.getHours(maxTime)) && 
+                                                                        focusedHour == hour
+                                                                ) || (
+                                                                        // If focused hour isn't between min and max, take first available hour
+                                                                        !displayedHours.some(h => focusedHour == h && Times.getHours(minTime) <= h && h <= Times.getHours(maxTime)) 
+                                                                        && displayedHours.find(h => Times.getHours(minTime) <= h  && h <= Times.getHours(maxTime)) == hour
+                                                                ) ? "0" : "-1"
+                                                           } 
                                                            on:click|stopPropagation|preventDefault={onClickHour}
                                                            on:keypress|stopPropagation|preventDefault={onEnterHour}
+                                                           on:keydown={onNavigateHour}
                                                            class:timepicker-hour-selected={Times.getHours(tmpValue) == hour}
                                                            class:timepicker-hour-disable={Times.getHours(minTime) > hour || Times.getHours(maxTime) < hour}
                                                            hour={hour}>
@@ -215,9 +311,26 @@
                                         {#each minutes as minute}
                                                 <div class="timepicker-hour">
                                                         <span role="button" 
-                                                           tabindex={(Times.toTime(minTime) > (Times.getHours(tmpValue) * 60 * 60 + minute * 60) || Times.toTime(maxTime) < (Times.getHours(tmpValue) * 60 * 60 + minute * 60)) ? "-1" : "0"} 
+                                                           tabindex={
+                                                                (
+                                                                        // If focused minute with selected hour is between min and max
+                                                                        minute == focusedMinute && Times.toTime(minTime) <= (Times.getHours(tmpValue) * 60 * 60 + focusedMinute * 60) && 
+                                                                        (Times.getHours(tmpValue) * 60 * 60 + focusedMinute * 60) <= Times.toTime(maxTime)
+                                                                ) || (
+                                                                        // If focused minute with selected hour isn't between min and max
+                                                                        // take first available minute (using selected hour)
+                                                                        (
+                                                                                Times.toTime(minTime) > (Times.getHours(tmpValue) * 60 * 60 + focusedMinute * 60) || 
+                                                                                (Times.getHours(tmpValue) * 60 * 60 + focusedMinute * 60) > Times.toTime(maxTime)
+                                                                        ) && minutes.find(m => 
+                                                                                Times.toTime(minTime) <= (Times.getHours(tmpValue) * 60 * 60 + m * 60) && 
+                                                                                (Times.getHours(tmpValue) * 60 * 60 + m * 60) <= Times.toTime(maxTime)
+                                                                        ) == minute
+                                                                ) ? "0" : "-1"
+                                                           } 
                                                            on:click|stopPropagation|preventDefault={onClickMinute} 
                                                            on:keypress|stopPropagation|preventDefault={onEnterMinute}
+                                                           on:keydown={onNavigateMinute}
                                                            class:timepicker-hour-selected={Math.abs(Times.getMinutes(tmpValue) - minute) < 3}
                                                            class:timepicker-hour-disable={Times.toTime(minTime) > (Times.getHours(tmpValue) * 60 * 60 + minute * 60) || Times.toTime(maxTime) < (Times.getHours(tmpValue) * 60 * 60 + minute * 60)}
                                                            minute={minute}>
@@ -244,6 +357,7 @@
                                         text="Valider"
                                         primary={true}
                                         on:click={onClickValider}
+                                        on:keydown={onKeyDownValider}
                                 />
                         </div>
                 </div>

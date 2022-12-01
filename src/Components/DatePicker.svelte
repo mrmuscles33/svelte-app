@@ -37,6 +37,7 @@
         let focusedDate = tmpValue;
         let focusedYear = Dates.toDate(tmpValue, Dates.D_M_Y).getFullYear();
         let input;
+        let calendar;
         let showYears = false;
         let displayedYears = [];
         let yearsPage = 0;
@@ -59,9 +60,13 @@
         }
 	export function onClickIcon() {
                 visible = true;
-                tmpValue =Dates.isValid(value, format) ? Dates.format(value, format, Dates.D_M_Y) : Dates.toText(Dates.today(), Dates.D_M_Y);
+                tmpValue = Dates.isValid(value, format) ? Dates.format(value, format, Dates.D_M_Y) : Dates.toText(Dates.today(), Dates.D_M_Y);
                 currentMonth = Dates.format(tmpValue, Dates.D_M_Y, Dates.M_Y);
                 showYears = false;
+                focusedDate = tmpValue;
+                setTimeout(() => {
+                        calendar.querySelector('.datepicker-day[tabindex="0"]').focus();
+                }, 100);
         }
         export function onClickMask(evt) {
                 if(evt.target == this){
@@ -70,6 +75,7 @@
         }
         export function onClickFermer(){
                 visible = false;
+                input.getInput().focus();
         }
         export function onClickValider(){
                 onClickFermer();
@@ -82,11 +88,6 @@
                 var clickedDate = evt.currentTarget.getAttribute('value');
                 if(Dates.toDate(clickedDate, Dates.D_M_Y) < realMinDate || Dates.toDate(clickedDate, Dates.D_M_Y) > realMaxDate) return false;
                 tmpValue = clickedDate;
-        }
-        export function onEnterDay(event){
-                if(Events.isEnter(event)) {
-                        onClickDay(event);
-                }
         }
         export function onClickYearButton(){
                 showYears = !showYears;
@@ -142,11 +143,6 @@
                 currentMonth = Dates.format(tmpValue, Dates.D_M_Y, Dates.M_Y);
                 onClickYearButton();
         }
-        export function onEnterYear(event){
-                if(Events.isEnter(event)) {
-                        onClickYear(event);
-                }
-        }
 
         // METHODS
         function getDisplayedDate(strDate,format) {
@@ -196,6 +192,21 @@
                 }
                 return years;
         }
+        function onEscMask(evt){
+                if(Events.isEsc(evt)){
+                        onClickFermer();
+                }
+        }
+        function onEnterDay(event){
+                if(Events.isEnter(event)) {
+                        onClickDay(event);
+                }
+        }
+        function onEnterYear(event){
+                if(Events.isEnter(event)) {
+                        onClickYear(event);
+                }
+        }
         function onNavigateDay(event){
                 if(Events.isArrow(event)) {
                         var clickedDate = event.currentTarget.getAttribute('value');
@@ -214,7 +225,7 @@
                                 focusedDate = Dates.toText(nextDate, Dates.D_M_Y);
                         }
                         event.preventDefault();
-                        event.stopPropagation()
+                        event.stopPropagation();
                 }
         }
         function onNavigateYear(event){
@@ -235,7 +246,21 @@
                                 focusedYear = nextYear;
                         }
                         event.preventDefault();
-                        event.stopPropagation()
+                        event.stopPropagation();
+                }
+        }
+        function onKeyDownYearButton(evt){
+                evt = evt.detail.event;
+                if(Events.isTab(evt) && Events.isShift(evt)){
+                        evt.preventDefault();
+                        evt.stopPropagation();
+                }
+        }
+        function onKeyDownValider(evt){
+                evt = evt.detail.event;
+                if(Events.isTab(evt) && !Events.isShift(evt)){
+                        evt.preventDefault();
+                        evt.stopPropagation();
                 }
         }
 </script>
@@ -268,18 +293,20 @@
 
 <div class="datepicker-mask" {id}
      class:datepicker-visible={visible}
-     on:click={onClickMask}>
+     on:click={onClickMask}
+     on:keydown={onEscMask}>
         <div class="datepicker-main">
                 <div class="datepicker-info">
                         <h4>{label}</h4>
                         <h1>{getDisplayedDate(tmpValue, Dates.D_M_Y)}</h1>
                 </div><!--
-             --><div class="datepicker-calendar">
+             --><div class="datepicker-calendar" bind:this={calendar}>
                         <Tooltip text={showYears ? "Choisir le jour" : "Choisir l'année"}>
                                 <Button
                                         text={getDisplayedMonth(currentMonth)}
                                         border={false}
                                         on:click={onClickYearButton}
+                                        on:keydown={onKeyDownYearButton}
                                         style="margin-left: 8px"
                                 />
                         </Tooltip>
@@ -353,6 +380,7 @@
                                         text="Valider"
                                         primary={true}
                                         on:click={onClickValider}
+                                        on:keydown={onKeyDownValider}
                                 />
                         </div>
                 </div>
@@ -433,19 +461,19 @@
         .datepicker-days,
         .datepicker-years {
                 display: grid;
-                grid-template-columns: repeat(7, 45px);
+                grid-template-columns: repeat(7, 1fr);
                 margin: 0 0 5px 0;
                 padding: 0px 22px;
         }
         .datepicker-years {
-                grid-template-columns: repeat(3, 105px);
+                grid-template-columns: repeat(3, 1fr);
                 min-height: 270px;
                 grid-auto-rows: minmax(min-content, max-content);
         }
         .datepicker-day,
         .datepicker-year {
                 text-align: center;
-                width: 45px;
+                width: 100%;
                 height: 45px;
                 display: flex;
                 align-items: center;
@@ -453,9 +481,6 @@
                 box-sizing: border-box;
                 user-select: none;
                 color: var(--color-font);
-        }
-        .datepicker-year {
-                width: 105px;
         }
         span.datepicker-day,
         span.datepicker-year {
