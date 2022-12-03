@@ -111,12 +111,12 @@
 		node.type = type;
 	}
         function onKeyDownIcon(event){
-                if(disable) return;
                 if(Events.isEnter(event)){
-                        dispatch('clickIcon', {
-                                value: value
-                        }); 
+                        onClickIcon();
                 }
+        }
+        function nothing(){
+                return;
         }
 </script>
 
@@ -128,6 +128,7 @@
      class:labelled={label!=""}
      class:textfield-error={hasError}
      on:click={onClick}
+     on:keypress={nothing}
      style="--width: {width}px;
             --width-input: {inputWidth}px;
             {style}">
@@ -145,26 +146,24 @@
         {#if iconLeft != ""}
                 <span class="textfield-icon textfield-icon-left material-icons-round">{iconLeft}</span>
         {/if}
-        {#if hasError}
-                <span class="textfield-icon textfield-icon-right textfield-icon-error">
-                        <Tooltip text={errorMessage}>
-                                <span class="material-icons-round" tabindex="0">error</span>
-                        </Tooltip>
-                </span>
-        {/if}
         {#if iconRight != ""}
                 <span 
                         class="textfield-icon textfield-icon-right material-icons-round" 
                         role="button"
                         tabindex="0"
                         on:keydown={onKeyDownIcon}
-                        on:click|stopPropagation={onClickIcon}>{iconRight}</span>
+                        on:click|stopPropagation={onClickIcon}>
+                        {iconRight}
+                </span>
+        {/if}
+        {#if hasError}
+                <span class="textfield-error-msg">{errorMessage}</span>
         {/if}
 </div>
 
 <style>
         .textfield-main {
-                vertical-align: middle;
+                vertical-align: top;
                 background-color: transparent;
                 display: inline-block;
                 height: 36px;
@@ -200,6 +199,7 @@
         .textfield-main.textfield-error.filled,
         .textfield-main.textfield-error:not(.filled) {
                 border-color: var(--color-error);
+                margin-bottom: 22px;
         }
         .textfield-main.disable {
                 opacity: 0.5;
@@ -286,11 +286,13 @@
         .textfield-main:focus-within .textfield-icon {
                 color: var(--color-focus);
         }
+        .textfield-main.textfield-error .textfield-icon {
+                color: var(--color-error);
+        }
         .textfield-icon .material-icons-round {
                 font-size: 21px;
         }
-        .textfield-main.labelled .textfield-icon,
-        .textfield-main.labelled .textfield-icon .material-icons-round {
+        .textfield-main.labelled .textfield-icon {
                 font-size: 24px;
         }
         .textfield-icon.textfield-icon-left {
@@ -300,12 +302,11 @@
                 cursor: pointer;
                 right: 12px;
         }
-        .textfield-icon-error,
-        .textfield-main:focus-within .textfield-icon-error {
+        .textfield-error-msg {
+                position: absolute;
+                top: 100%;
+                transform: translateY(5px);
+                font-size: 12px;
                 color: var(--color-error);
-                display: flex;
-        }
-        .textfield-icon-error ~ .textfield-icon-right {
-                right: 44px;
         }
 </style>
