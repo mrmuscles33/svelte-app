@@ -13,6 +13,7 @@
 	import Numberfield from './Components/Numberfield.svelte';
 	import Dates from './Utils/Dates';
 	import Times from './Utils/Times';
+	import Ajax from './Utils/Ajax';
 
 	function clickButton(){
 		alert('click');
@@ -74,6 +75,20 @@
 		{ value: 'H',  label: 'Homme', template: '<span class="material-icons-round" style="vertical-align:middle">male</span> <span style="vertical-align:middle">Homme</span>' },
 		{ value: 'F',  label: 'Femme', template: '<span class="material-icons-round" style="vertical-align:middle">female</span> <span style="vertical-align:middle">Femme</span>' }
 	];
+
+	function sendRequest(){
+		Ajax.send(
+			'TestServlet',
+			'test',
+			{
+				toto: ['aaa','bbb']
+			},
+			(response) => {
+				alert(response.toto)
+			},
+			() => {}
+		);
+	}
 </script>
 
 <main>
@@ -87,6 +102,7 @@
 			text="Primary"
 			primary={true}
 			cls="test"
+			on:click={sendRequest}
 		/>
 		<Button
 			icon="search"
