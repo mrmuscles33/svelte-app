@@ -40,12 +40,14 @@
         // EVENTS
         const dispatch = createEventDispatcher();
         export function onChange(evt){
+                let event = evt.detail;
                 if(errorMessage == "" && value != ""){
                         errorMessage = Times.toTime(value) < Times.toTime(minTime) || Times.toTime(value) > Times.toTime(maxTime) ? "L'heure doit etre comprise entre " + minTime + " et " + maxTime : "";
                 }
+                let params = Events.copy(event);
+                params.value = value;
                 dispatch('change', {
-                        value: value,
-                        oldValue: evt.detail.oldValue
+                        ...params
                 });
         }
 	export function onClickIcon() {

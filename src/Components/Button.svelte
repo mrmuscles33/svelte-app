@@ -17,8 +17,13 @@
 
         // METHODS
 	const dispatch = createEventDispatcher();
-        function onClick(){
-                if(!disable) dispatch('click', {});
+        function onClick(event){
+                if(!disable) {
+                        let params = Events.copy(event);
+                        dispatch('click', {
+                                ...params
+                        })
+                };
         }
 
         function onKeyUp(event){
@@ -29,8 +34,9 @@
 
         export function onKeyDown(event){
                 if(!disable) {
+                        let params = Events.copy(event);
                         dispatch('keydown', {
-                                event: event
+                                ...params
                         });
                 }
         }

@@ -38,6 +38,15 @@ const Events = {
     isDelete : (event) => {
         return event.keyCode === 8 || event.wich === 8 || event.code === 'Backspace' || event.key === 'Backspace' ||
                event.keyCode === 46 || event.wich === 46 || event.code === 'Delete' || event.key === 'Delete';
+    },
+    copy : (event) => {
+        let newEvent = {};
+        for (const property in event) {
+                if(typeof event[property] != "function"){ 
+                    newEvent[property] = event[property];
+                }
+        }
+        return newEvent;
     }
 };
 export default Events;

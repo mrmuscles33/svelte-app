@@ -1,7 +1,6 @@
 <script>
         // IMPORTS
         import { createEventDispatcher } from 'svelte';
-        import Tooltip from './Tooltip.svelte';
         import Events from '../Utils/Events';
         
         // PUBLIC ATTRIBUTES
@@ -34,13 +33,15 @@
                 if(readonly) return;
                 input.focus();
         }
-        export function onClickIcon() {
+        export function onClickIcon(event) {
                 if(disable) return;
+                let params = Events.copy(event);
+                params.value = value;
                 dispatch('clickIcon', {
-                        value: value
+                        ...params
                 });
         }
-        export function onChange () {
+        export function onChange (event) {
                 if(disable) return;
                 errorMessage = required && (value == null || value.trim().length == 0) ? "La donnée " + label + " est obligatoire" : "";
                 if(pattern != null && errorMessage == ""){
@@ -50,56 +51,60 @@
                                                         "La donnée " + label  + " doit être au format " + format : 
                                                         "Erreur dans le format de la donnée " + label;
                 }
+                let params = Events.copy(event);
+                params.value = value;
+                params.oldValue = oldValue;
                 dispatch('change', {
-                        value: value,
-                        oldValue: oldValue
+                        ...params
                 });
                 oldValue = value;
         }
-        export function onInput() {
+        export function onInput(event) {
                 if(disable) return;
+                let params = Events.copy(event);
+                params.value = value;
                 dispatch('input', {
-                        value: value
+                        ...params
                 });
         }
-        export function onFocus() {
+        export function onFocus(event) {
                 if(disable) return;
+                let params = Events.copy(event);
+                params.value = value;
                 dispatch('focus', {
-                        value: value
+                        ...params
                 });
         }
-        export function onFocusOut(){
+        export function onFocusOut(event){
                 if(disable) return;
+                let params = Events.copy(event);
+                params.value = value;
                 dispatch('focusout', {
-                        value: value
+                        ...params
                 });
         }
-        export function onBlur(){
+        export function onBlur(event){
                 if(disable) return;
+                let params = Events.copy(event);
+                params.value = value;
                 dispatch('blur', {
-                        value: value
+                        ...params
                 });
         }
         export function onKeyDown(event){
                 if(disable) return;
+                let params = Events.copy(event);
+                params.value = value;
                 dispatch('keydown', {
-                        value: value,
-                        key: event.key,
-                        keyCode: event.keyCode,
-                        ctrlKey: event.ctrlKey,
-                        shiftKey: event.shiftKey,
-                        altKey: event.altKey
+                        ...params
                 });
         }
         export function onKeyUp(event){
                 if(disable) return;
+                let params = Events.copy(event);
+                params.value = value;
                 dispatch('keyup', {
-                        value: value,
-                        key: event.key,
-                        keyCode: event.keyCode,
-                        ctrlKey: event.ctrlKey,
-                        shiftKey: event.shiftKey,
-                        altKey: event.altKey
+                        ...params
                 });
         }
 
@@ -220,6 +225,7 @@
                 outline: none;
                 background: none;
                 -moz-appearance: textfield;
+                appearance: textfield;
         }
         .textfield-main.labelled input {
                 top: 22px;

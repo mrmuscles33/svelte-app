@@ -2,6 +2,7 @@
         // IMPORTS
         import { createEventDispatcher } from 'svelte';
         import Textfield from './Textfield.svelte';
+        import Events from '../Utils/Events';
         
         // PUBLIC ATTRIBUTES
         export let value = "";
@@ -20,10 +21,13 @@
 
         // EVENTS
         const dispatch = createEventDispatcher();
-        function clickIcon(){
+        function clickIcon(evt){
+                let event = evt.detail;
                 showPassword = !showPassword;
+                let params = Events.copy(event);
+                params.value = value;
                 dispatch('clickIcon', {
-                        value: value
+                        ...params
                 });
         }
 

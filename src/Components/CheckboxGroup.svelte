@@ -2,6 +2,7 @@
         // IMPORTS
         import { createEventDispatcher } from 'svelte';
         import Checkbox from './Checkbox.svelte';
+        import Events from '../Utils/Events';
 
         // PUBLIC ATTRIBUTES
         // Array of object
@@ -19,14 +20,17 @@
         
         // METHODS
         const dispatch = createEventDispatcher();
-        function onChange (event) {
-                if(event.detail.check) {
-                        selectedValues = [...selectedValues, event.detail.value]
+        function onChange (evt) {
+                let event = evt.detail;
+                if(event.check) {
+                        selectedValues = [...selectedValues, event.value]
                 } else {
-                        selectedValues = selectedValues.filter(v => v != event.detail.value);
+                        selectedValues = selectedValues.filter(v => v != event.value);
                 }
+                let params = Events.copy(event);
+                params.selectedValues = selectedValues;
                 dispatch('change', {
-                        selectedValues: selectedValues
+                        ...params
                 });
         }
 </script>

@@ -1,6 +1,7 @@
 <script>
     // IMPORT
     import { createEventDispatcher } from 'svelte';
+    import Events from '../Utils/Events';
 
     // PUBLIC ATTRIBUTES
     export let text = '';
@@ -18,12 +19,14 @@
     let id = '_' + Math.random().toString(36).substring(2, 12);
 
     // EVENTS
-    function onChange() {
+    function onChange(event) {
         if(!disable){
             check ? value++ : value--;
+            let params = Events.copy(event);
+            params.check = check;
+            params.value = value;
             setTimeout(() => dispatch('click',{
-                check: check,
-                value: value
+                ...params
             }), 100);
         }
     }

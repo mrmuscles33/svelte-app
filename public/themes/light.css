@@ -8,6 +8,7 @@
 /* Textfield.svelte */
 /* DatePicker.svelte */
 /* TimePicker.svelte */
+/* Droplist.svelte */
 
 /* Button.svelte */
 .btn-main {
@@ -126,4 +127,13 @@
     --color-font-selected: #FFFFFF;
     --color-hover: #EEEEEE;
     --color-font-other: #AAAAAA;
+}
+
+/* Droplist.svelte */
+.droplist-main {
+    --color-backgroud: #EEEEEE; 
+    --color-backgroud-hover: #DDDDDD;
+    --color: #666666;
+    --color-focus: #0d31a6;
+    --color-error: #cc4141;
 }

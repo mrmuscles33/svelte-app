@@ -1,16 +1,11 @@
 <script>
         // IMPORTS
-        import { createEventDispatcher } from 'svelte';
         import Textfield from './Textfield.svelte';
+        import Events from '../Utils/Events';
         
         // PUBLIC ATTRIBUTES
         export let value = "";
         export let disable = false;
-        export let color = "#666666";
-        export let colorFocus = "#0d31a6";
-        export let colorBackground = "#EEEEEE";
-        export let colorBackgroundHover = "#DDDDDD";
-        export let colorError = "#cc4141";
         export let width = 290;
         export let iconLeft = "";
         export let label = "";
@@ -28,21 +23,16 @@
         let visible = false;
         let position = "bottom";
         let displayedItems = items;
+        let droplist;
         $: displayedValue = getLabel(value);
 
         // EVENTS
 	export function onClickIcon (){
-                input.getInput().focus();
-        }
-        export function onFocus(evt) {
-                position = (window.innerHeight - input.getInput().getBoundingClientRect().top) < 250 ? 'top' : 'bottom';
-                visible = true;
-                displayedItems = items;
-        }
-        export function onFocusOut(evt) {
-                setTimeout(() => {
-                        visible = false;
-                }, 100); // pour laisser le temps du onClickItem
+                if(visible) {
+                        close();
+                } else {
+                        open();
+                }
         }
         export function onClickItem (evt){
                 let pValue = evt.currentTarget.getAttribute('code');
@@ -51,15 +41,71 @@
                 } else {
                         value = pValue;
                 }
+                close();
         }
-        export let onKeyUp = (evt) => {
-                displayedItems = items.filter(i => i.label.toLowerCase().includes(displayedValue.toLowerCase()));
-        };
+        export function onKeyUp(evt) {
+                let event = evt.detail;
+                if(Events.isArrowUp(event) || Events.isArrowDown(event)) {
+                        open();
+                } else if(Events.isEnter(event)) {
+                        displayedItems = items.filter(i => i.label.toLowerCase().includes(displayedValue.toLowerCase()));
+                        open();
+                }
+        }
 
         // METHODS
         function getLabel(pValue){
                 var i = items.find(i => i.value == pValue);
                 return i ? i.label : "";
+        }
+        function onKeyDownItem(event){
+                if(Events.isEnter(event)){
+                        onClickItem(event);
+                        setTimeout(() => {
+                                input.getInput().focus();
+                        }, 100);
+                        event.preventDefault();
+                        event.stopPropagation();
+                }
+        }
+        function onKeyUpItem(event){
+                let pValue = event.currentTarget.getAttribute('code');
+                let idx = displayedItems.findIndex(i => i.value == pValue);
+                if(Events.isArrowUp(event)) {
+                        idx = idx == 0 ? displayedItems.length - 1 : idx - 1;
+                } else if(Events.isArrowDown(event)) {
+                        idx = idx == displayedItems.length - 1 ? 0 : idx + 1;
+                }
+                let nextValue = displayedItems[idx].value;
+                droplist.querySelector('li[code="' + nextValue + '"]').focus();
+                event.preventDefault();
+                event.stopPropagation();
+        }
+        function open() {
+                position = (window.innerHeight - input.getInput().getBoundingClientRect().top) < 250 ? 'top' : 'bottom';
+                visible = true;
+                focusItem();
+        }
+        function close() {
+                visible = false;
+                displayedItems = items;
+        }
+        function onFocusOut(event){
+                if (!event.currentTarget.contains(event.relatedTarget)) {
+                        visible = false;
+                }
+        }
+        function focusItem() {
+                setTimeout(() => {
+                        let selectedItem = droplist.querySelector('li[code="' + value + '"]');
+                        if(!selectedItem) {
+                                // Unknown value, select first item
+                                selectedItem = droplist.querySelector('li');
+                        }
+                        if(selectedItem) {
+                                selectedItem.focus();
+                        }
+                }, 100); // Waiting for the list to open
         }
 </script>
 
@@ -80,24 +126,33 @@
                 on:change
                 on:blur
                 on:clickIcon={onClickIcon}
-                on:focus={onFocus}
-                on:focusout={onFocusOut}
+                on:focus
+                on:focusout
                 on:input
                 on:keydown
                 on:keyup={onKeyUp}
                 bind:this={input}
         />
 
-        <ul class="droplist-items droplist-{position}"
+        <ul 
+                bind:this={droplist}
+                role="listbox"
+                on:focusout={onFocusOut}
+                class="droplist-items droplist-{position}" 
                 class:droplist-visible={visible}
-                style="--color-backgroud: {colorBackground}; 
-                --color-backgroud-hover: {colorBackgroundHover};
-                --color: {color};
-                --color-focus: {colorFocus};
-                --color-error: {colorError};
-                --width: {width}px;">
+                style="--width: {width}px;">
                 {#each displayedItems as item}
-                        <li on:click={onClickItem} code={item.value}>
+                        <li 
+                                tabindex={
+                                        (item.value == value) || (!displayedItems.some(i => i.value == value) && displayedItems[0] == item)
+                                        ? "0" : "-1"
+                                }
+                                role="option" 
+                                aria-selected={item.value == value} 
+                                on:click={onClickItem} 
+                                on:keydown={onKeyDownItem} 
+                                on:keyup={onKeyUpItem}
+                                code={item.value}>
                                 {#if item.template}
                                         {@html item.template}
                                 {:else}

@@ -1,6 +1,7 @@
 <script>
         // IMPORTS
         import { createEventDispatcher } from 'svelte';
+        import Events from '../Utils/Events';
         
         // PUBLIC ATTRIBUTES
         export let name = "";
@@ -13,10 +14,12 @@
         
         // METHODS
         const dispatch = createEventDispatcher();
-        function onChange () {
+        function onChange (event) {
                 if(!disable) {
+                        let params = Events.copy(event);
+                        params.check = check;
                         dispatch('change', {
-                                check: check
+                                ...params
                         });
                 }
         }

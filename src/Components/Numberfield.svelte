@@ -2,6 +2,7 @@
         // IMPORTS
         import { createEventDispatcher } from 'svelte';
         import Textfield from './Textfield.svelte';
+        import Events from '../Utils/Events';
         
         // PUBLIC ATTRIBUTES
         export let value = "";
@@ -27,6 +28,7 @@
         // EVENTS
         const dispatch = createEventDispatcher();
         export function onChange(evt){
+                let event = evt.detail;
                 if(errorMessage == "" && value != ""){
                         if(min != null && max != null && (parseFloat(value.replace(",",".")) < parseFloat(min.replace(",",".")) || parseFloat(value.replace(",",".")) > parseFloat(max.replace(",",".")))){
                                 errorMessage = "La donnée " + label + " doit etre comprise entre " + min + " et " + max;
@@ -36,9 +38,10 @@
                                 errorMessage = "La donnée " + label + " doit etre inférieure à " + max;
                         }
                 }
+                let params = Events.copy(event);
+                params.value = parseFloat(value.replace(",","."));
                 dispatch('change', {
-                        value: parseFloat(value.replace(",",".")),
-                        oldValue: parseFloat(evt.detail.oldValue.replace(",",".") || "")
+                        ...params
                 });
         }
 

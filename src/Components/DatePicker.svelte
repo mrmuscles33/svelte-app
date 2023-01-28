@@ -50,12 +50,14 @@
         // EVENTS
         const dispatch = createEventDispatcher();
         export function onChange(evt){
+                let event = evt.detail;
                 if(errorMessage == "" && value != ""){
                         errorMessage = Dates.toDate(value, format) < realMinDate || Dates.toDate(value, format) > realMaxDate ? "La date doit etre comprise entre " + minDate + " et " + maxDate : "";
                 }
+                let params = Events.copy(event);
+                params.value = value;
                 dispatch('change', {
-                        value: value,
-                        oldValue: evt.detail.oldValue
+                        ...params
                 });
         }
 	export function onClickIcon() {
