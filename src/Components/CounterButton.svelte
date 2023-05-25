@@ -90,6 +90,9 @@
         height: 0px;
         padding: 0px;
         margin: 0px;
+        position: absolute;
+        top: 0;
+        left: 0;
     }
     .counter-main {
         padding:            0;

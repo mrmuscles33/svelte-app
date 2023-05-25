@@ -36,9 +36,12 @@
                 height: 0px;
                 padding: 0px;
                 margin: 0px;
+                position: absolute;
+                top: 0;
+                left: 0;
         }
         .radio-main {
-                margin:         10px 5px;
+                margin:         10px 5px 10px 0;
                 padding:        0;
                 cursor:         pointer;
                 user-select:    none;

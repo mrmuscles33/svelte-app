@@ -5,6 +5,8 @@ const Ajax = {
         xhttp.open("POST", Ajax.url, true);
         xhttp.setRequestHeader("Content-Type", "application/json");
         xhttp.setRequestHeader("Access-Control-Allow-Origin", "*");
+        xhttp.setRequestHeader("Access-Control-Allow-Headers", "*");
+        xhttp.setRequestHeader("Access-Control-Max-Age", "3600");
         xhttp.onreadystatechange = function () {
             if (this.readyState == 4 && this.status == 200) {
                 let response = JSON.parse(this.responseText);
