@@ -20,6 +20,7 @@
         function onClick(event){
                 if(!disable) {
                         let params = Events.copy(event);
+                        params.event = event;
                         dispatch('click', {
                                 ...params
                         })
@@ -35,6 +36,7 @@
         export function onKeyDown(event){
                 if(!disable) {
                         let params = Events.copy(event);
+                        params.event = event;
                         dispatch('keydown', {
                                 ...params
                         });

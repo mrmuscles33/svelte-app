@@ -16,6 +16,7 @@
         export let format = null;
         export let items = [];
         export let selectOnly = false;
+        export let render = null;
         
         // PRIVATE ATTRIBUTES
         let type = "text";
@@ -64,6 +65,9 @@
                         setTimeout(() => {
                                 input.getInput().focus();
                         }, 100);
+                        event.preventDefault();
+                        event.stopPropagation();
+                } else {
                         event.preventDefault();
                         event.stopPropagation();
                 }
@@ -153,8 +157,8 @@
                                 on:keydown={onKeyDownItem} 
                                 on:keyup={onKeyUpItem}
                                 code={item.value}>
-                                {#if item.template}
-                                        {@html item.template}
+                                {#if render}
+                                        {@html render ? render(item) : item.label}
                                 {:else}
                                         {item.label}
                                 {/if}

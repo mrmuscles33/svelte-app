@@ -37,8 +37,6 @@
                 padding: 0px;
                 margin: 0px;
                 position: absolute;
-                top: 0;
-                left: 0;
         }
         .radio-main {
                 margin:         10px 5px 10px 0;

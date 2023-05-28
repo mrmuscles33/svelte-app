@@ -11,6 +11,7 @@
 	import TimePicker from './Components/TimePicker.svelte';
 	import Password from './Components/Password.svelte';
 	import Numberfield from './Components/Numberfield.svelte';
+	import Grid from './Components/Grid.svelte';
 	import Dates from './Utils/Dates';
 	import Times from './Utils/Times';
 	import Ajax from './Utils/Ajax';
@@ -63,18 +64,21 @@
 	let droplistValue = 'fr';
 	let droplistItems =  [
 		{ value: '',   label: '' },
-		{ value: 'fr',  label: 'Français', template: '<span class="flag-icon flag-icon-fr"></span> Français' },
-		{ value: 'en',  label: 'English', template: '<span class="flag-icon flag-icon-gb"></span> English' },
-		{ value: 'es',  label: 'Espanol', template: '<span class="flag-icon flag-icon-es"></span> Espanol' },
-		{ value: 'de', label: 'Deutsch', template: '<span class="flag-icon flag-icon-de"></span> Deutsch' },
-		{ value: 'it', label: 'Italiano', template: '<span class="flag-icon flag-icon-it"></span> Italiano' },
-		{ value: 'ru',  label: 'русский', template: '<span class="flag-icon flag-icon-ru"></span> русский'}
+		{ value: 'fr',  label: 'Français'},
+		{ value: 'gb',  label: 'English'},
+		{ value: 'es',  label: 'Espanol'},
+		{ value: 'de', label: 'Deutsch'},
+		{ value: 'it', label: 'Italiano'},
+		{ value: 'ru',  label: 'русский'}
 	];
+	let droplistItemsRender = (record) => '<span class="flag-icon flag-icon-' + record.value + '"></span> ' + record.label;
+
 	let droplistItems2 =  [
 		{ value: '',   label: '' },
-		{ value: 'H',  label: 'Homme', template: '<span class="material-icons-round" style="vertical-align:middle">male</span> <span style="vertical-align:middle">Homme</span>' },
-		{ value: 'F',  label: 'Femme', template: '<span class="material-icons-round" style="vertical-align:middle">female</span> <span style="vertical-align:middle">Femme</span>' }
+		{ value: 'H',  label: 'Homme', sexe: 'male' },
+		{ value: 'F',  label: 'Femme', sexe: 'female'}
 	];
+	let droplistItems2Render = (record) => '<span class="material-icons-round" style="vertical-align:middle">' + record.sexe + '</span> <span style="vertical-align:middle">' + record.label + '</span>';
 
 	function sendRequest(){
 		Ajax.send(
@@ -89,6 +93,26 @@
 			() => {}
 		);
 	}
+
+	let gridColumn = [
+		{label: 'Colonne 1', property: 'prop1'},
+		{label: 'Colonne 2', property: 'prop2'},
+		{label: 'Colonne 3', property: 'prop3', render: (record) => record.prop3 || '<i>Vide</i>'}
+	];
+	let gridData = [
+		{prop1: 'Valeur A', prop2: 'Valeur 1', prop3: 'Valeur 1'},
+		{prop1: 'Valeur B', prop2: 'Valeur 2'},
+		{prop1: 'Valeur C', prop2: 'Valeur 3', prop3: 'Valeur 1', prop4: 'Valeur'},
+		{prop1: 'Valeur E', prop2: 'Valeur 1', prop3: 'Valeur 1'},
+		{prop1: 'Valeur F', prop2: 'Valeur 2'},
+		{prop1: 'Valeur G', prop2: 'Valeur 3', prop3: 'Valeur 1', prop4: 'Valeur'},
+		{prop1: 'Valeur H', prop2: 'Valeur 1', prop3: 'Valeur 1'},
+		{prop1: 'Valeur I', prop2: 'Valeur 2'},
+		{prop1: 'Valeur J', prop2: 'Valeur 3', prop3: 'Valeur 1', prop4: 'Valeur'},
+	];
+	let gridSelection = [
+		{prop1: 'Valeur B', prop2: 'Valeur 2'}
+	]
 </script>
 
 <main>
@@ -222,12 +246,36 @@
 			label="Langue"
 			value={droplistValue}
 			items={droplistItems}
+			render={droplistItemsRender}
 		/>
 		<Droplist 
 			label="Sexe"
 			items={droplistItems2}
+			render={droplistItems2Render}
 			selectOnly={true}
 		/>
+	</section>
+	<br/>
+	<section>
+		<h2>Grid</h2>
+
+		<Grid 
+			columns={gridColumn} 
+			datas={gridData}
+			selection={gridSelection}
+			pageSize=5
+			select="single">
+			<div slot="grid-toolbar">
+				<Button
+					text="Ajouter"
+					border={false}
+				/>
+				<Button
+					text="Exporter"
+					border={false}
+				/>
+			</div>
+		</Grid>
 	</section>
 </main>
 
