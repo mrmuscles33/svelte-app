@@ -265,7 +265,7 @@
 			selection={gridSelection}
 			pageSize=5
 			select="single">
-			<div slot="grid-toolbar">
+			<span slot="grid-toolbar">
 				<Button
 					text="Ajouter"
 					border={false}
@@ -274,7 +274,7 @@
 					text="Exporter"
 					border={false}
 				/>
-			</div>
+			</span>
 		</Grid>
 	</section>
 </main>

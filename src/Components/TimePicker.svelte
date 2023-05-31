@@ -39,6 +39,15 @@
 
         // EVENTS
         const dispatch = createEventDispatcher();
+        export function onBlur(evt) {
+                let event = evt.detail;
+                value = Times.isValid(value) ? Times.format(value, format) : value;
+                let params = Events.copy(event);
+                params.value = value;
+                dispatch('blur', {
+                        ...params
+                });
+        }
         export function onChange(evt){
                 let event = evt.detail;
                 if(errorMessage == "" && value != ""){
@@ -222,7 +231,7 @@
         {filled}
         bind:errorMessage={errorMessage}
         on:change={onChange}
-        on:blur
+        on:blur={onBlur}
         on:clickIcon={onClickIcon}
         on:focus
         on:focusout

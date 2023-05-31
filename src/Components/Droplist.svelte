@@ -53,6 +53,11 @@
                         open();
                 }
         }
+        export function onClick(evt) {
+                if(selectOnly && !readonly) {
+                        open();
+                }
+        }
 
         // METHODS
         function getLabel(pValue){
@@ -130,6 +135,7 @@
                 on:change
                 on:blur
                 on:clickIcon={onClickIcon}
+                on:click={onClick}
                 on:focus
                 on:focusout
                 on:input

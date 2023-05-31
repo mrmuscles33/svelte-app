@@ -29,12 +29,16 @@
 
         // EVENTS
 	const dispatch = createEventDispatcher();
-        export function onClick () {
-                if(readonly) return;
-                input.focus();
+        export function onClick (event) {
+                let params = Events.copy(event);
+                dispatch('click', {
+                        ...params
+                });
+                if(!readonly) {
+                        input.focus();
+                }
         }
         export function onClickIcon(event) {
-                if(disable) return;
                 let params = Events.copy(event);
                 params.value = value;
                 dispatch('clickIcon', {
@@ -42,25 +46,27 @@
                 });
         }
         export function onChange (event) {
-                if(disable) return;
-                errorMessage = required && (value == null || value.trim().length == 0) ? "La donnée " + label + " est obligatoire" : "";
-                if(pattern != null && errorMessage == ""){
-                        errorMessage = new RegExp(pattern).test(value) || value == "" || value == null ? 
-                                                "" : 
-                                                format ? 
-                                                        "La donnée " + label  + " doit être au format " + format : 
-                                                        "Erreur dans le format de la donnée " + label;
-                }
-                let params = Events.copy(event);
-                params.value = value;
-                params.oldValue = oldValue;
-                dispatch('change', {
-                        ...params
-                });
-                oldValue = value;
+                // Wait for blur event
+                setTimeout(() => {
+                        if(disable) return;
+                        errorMessage = required && (value == null || value.trim().length == 0) ? "La donnée " + label + " est obligatoire" : "";
+                        if(pattern != null && errorMessage == ""){
+                                errorMessage = new RegExp(pattern).test(value) || value == "" || value == null ? 
+                                                        "" : 
+                                                        format ? 
+                                                                "La donnée " + label  + " doit être au format " + format : 
+                                                                "Erreur dans le format de la donnée " + label;
+                        }
+                        let params = Events.copy(event);
+                        params.value = value;
+                        params.oldValue = oldValue;
+                        dispatch('change', {
+                                ...params
+                        });
+                        oldValue = value;
+                }, 100);
         }
         export function onInput(event) {
-                if(disable) return;
                 let params = Events.copy(event);
                 params.value = value;
                 dispatch('input', {
@@ -68,7 +74,6 @@
                 });
         }
         export function onFocus(event) {
-                if(disable) return;
                 let params = Events.copy(event);
                 params.value = value;
                 dispatch('focus', {
@@ -76,7 +81,6 @@
                 });
         }
         export function onFocusOut(event){
-                if(disable) return;
                 let params = Events.copy(event);
                 params.value = value;
                 dispatch('focusout', {
@@ -84,7 +88,6 @@
                 });
         }
         export function onBlur(event){
-                if(disable) return;
                 let params = Events.copy(event);
                 params.value = value;
                 dispatch('blur', {
@@ -92,7 +95,6 @@
                 });
         }
         export function onKeyDown(event){
-                if(disable) return;
                 let params = Events.copy(event);
                 params.value = value;
                 dispatch('keydown', {
@@ -100,9 +102,10 @@
                 });
         }
         export function onKeyUp(event){
-                if(disable) return;
                 let params = Events.copy(event);
                 params.value = value;
+                // Fire blur event before change
+                if(Events.isEnter(event)) onBlur(event);
                 dispatch('keyup', {
                         ...params
                 });

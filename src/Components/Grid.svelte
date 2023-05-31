@@ -93,7 +93,19 @@
 </script>
 
 <div class="grid-main" style="--page-size: {pageSize}">
-    <slot name="grid-toolbar"></slot>
+    <div class="grid-toolbar">
+        <span class="grid-toolbar-custom">
+            <slot name="grid-toolbar"></slot>
+        </span>
+        <span class="grid-toolbar-default">
+            <Button
+                text="Filtrer"
+                border={false}
+                icon="filter_list"
+                style="margin-right:0"
+            />
+        </span>
+    </div>
     <div class="grid-table">
         <table>
             <thead>
@@ -218,6 +230,11 @@
     }
     .grid-main .grid-paging {
         margin-top: 5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .grid-main .grid-toolbar {
         display: flex;
         justify-content: space-between;
         align-items: center;

@@ -40,7 +40,7 @@ const Dates = {
         try {
             let format = (pFormat || Dates.getFormat(pStrDate)).toUpperCase();
             // Undefined format
-            if(Dates.getFormat(pStrDate) == null) {
+            if(!Dates.getFormat(pStrDate)) {
                 return false;
             }
             return Dates.toText(Dates.toDate(pStrDate,format), format) == pStrDate;
@@ -94,7 +94,7 @@ const Dates = {
     },
     getPatterns : () => {
         // Defined formats
-        let formats = [];
+        let formats = {};
         formats[Dates.D_M_Y] = '^(([0][1-9])|([1-2]\\d)|([3][0-1]))(\/|-|\.)(([0]\\d)|([1][0-2]))(\/|-|\.)\\d{4}$';
         formats[Dates.M_D_Y] = '^(([0]\\d)|([1][0-2]))(\/|-|\.)(([0][1-9])|([1-2]\\d)|([3][0-1]))(\/|-|\.)\\d{4}$';
         formats[Dates.Y_M_D] = '^\\d{4}(\/|-|\.)(([0]\\d)|([1][0-2]))(\/|-|\.)(([0][1-9])|([1-2]\\d)|([3][0-1]))$';

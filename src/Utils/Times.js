@@ -1,13 +1,13 @@
 const Times = {
     // FORMATS
-    H_M : 'HH:MM', H_M_S : 'HH:MM:SS', HM : 'HHMM', HMS : 'HHMMSS',
+    H : 'HH', H_M : 'HH:MM', H_M_S : 'HH:MM:SS', HM : 'HHMM', HMS : 'HHMMSS',
     now : () => {
         let now = new Date();
         return (now.getHours() * 60 * 60) + (now.getMinutes() * 60) + now.getSeconds();
     },
     isValid : (pStrTime) => {
         try {
-            let regexp = '^([0-1]\\d|2[0-3])(:)?[0-5]\\d((:)?[0-5]\\d)?$';
+            let regexp = '^([0-1]\\d|2[0-3])((:)?[0-5]\\d)?((:)?[0-5]\\d)?$';
             return new RegExp(regexp).test(pStrTime);
         } catch (error) {
             return false;
@@ -31,7 +31,7 @@ const Times = {
     },
     getMinutes : (pStrTime) => {
         let format = Times.getFormat(pStrTime);
-        return Times.isValid(pStrTime) ? parseInt(pStrTime.substring(format.indexOf('MM'), 'MM'.length + format.indexOf('MM'))) : 0;
+        return Times.isValid(pStrTime) && format.includes('MM') ? parseInt(pStrTime.substring(format.indexOf('MM'), 'MM'.length + format.indexOf('MM'))) : 0;
     },
     getSeconds : (pStrTime) => {
         let format = Times.getFormat(pStrTime);
@@ -42,11 +42,12 @@ const Times = {
     },
     getPatterns : () => {
         // Defined formats
-        let formats = [];
+        let formats = {};
         formats[Times.H_M_S] = '^([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\d$';
         formats[Times.HMS] = '^([0-1]\\d|2[0-3])[0-5]\\d[0-5]\\d$';
         formats[Times.H_M] = '^([0-1]\\d|2[0-3]):[0-5]\\d$';
         formats[Times.HM] = '^([0-1]\\d|2[0-3])[0-5]\\d$';
+        formats[Times.H] = '^([0-1]\\d|2[0-3])$';
         return formats;
     },
     getPattern : (pFormat) => {
