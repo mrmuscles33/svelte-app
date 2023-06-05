@@ -192,6 +192,7 @@
                 top: 0;
                 left: 0;
                 max-height: 200px;
+                z-index: 2;
         }
         .droplist-bottom {
                 top: 100%;

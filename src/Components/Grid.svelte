@@ -5,6 +5,7 @@
     import Button from "./Button.svelte";
     import Arrays from "../Utils/Arrays";
     import Radio from './Radio.svelte';
+    import Droplist from './Droplist.svelte';
 
     // PUBLIC ATTRIBUTES
     // Array of objects [{label: '...', property: '...'}, render: (record) => {...}]
@@ -18,11 +19,23 @@
     export let sortDirection = 'asc';
     export let pageSize = 0;
     export let page = 1;
+    export let filters = [];
 
     // PRIVATE ATTRIBUTES
     let selectAll = selection.length == datas.length;
     let selectedValue = select == "single" && selection.length > 0 ? selection[0].id : null;
+    let showFilter = false;
+    let activeFilters = [];
+    let operation = "view";
+    let currentFilter = getDefaultFilter();
     $: visibleDatas = pageSize > 0 ? datas.slice((page - 1) * pageSize, Math.min(page * pageSize, datas.length)) : datas;
+    $: columnsFilter = columns.map(col => {
+        return {
+            label: col.label,
+            value: col.property
+        }
+    });
+    $: filterTypes = getFilterTypes(currentFilter.colonne);
     
     // EVENTS
     onMount(() => {
@@ -38,6 +51,7 @@
         });
         selection = selection.filter(record => record.id != null);
         selectedValue = select == "single" && selection.length > 0 ? selection[0].id : null;
+        activeFilters = filters.slice();
     });
     function onSelect(event) {
         var id = event.detail.target.parentElement.parentElement.getAttribute('recordId');
@@ -78,6 +92,47 @@
     function lastPage(){
         page = Math.ceil(datas.length / pageSize);
     }
+    function onClickMask(evt) {
+        if(evt.target == this){
+            onClickFermer();
+        }
+    }
+    function onClickFermer(){
+        showFilter = false;
+        filters = activeFilters.slice();
+    }
+    function onClickFilters(){
+        showFilter = true;
+        activeFilters = filters.slice();
+    }
+    function onEscMask(evt){
+        if(Events.isEsc(evt)){
+            onClickFermer();
+        }
+    }
+    function onClickReset(evt) {
+        filters = [];
+    }
+    function onClickValider(evt){
+        if(operation == "view"){
+            activeFilters = filters.slice();
+            showFilter = false;
+        } else {
+            onClickRetour(evt);
+        }
+    }
+    function onClickAjouter(evt) {
+        operation = "add";
+    }
+    function onClickModifier(evt) {
+        operation = "edit";
+    }
+    function onClickRetour(evt) {
+        operation = "view";
+    }
+    function onClickSupprimer(evt){
+        onClickRetour(evt);
+    }
     
     // METHODS
     function compareRecord(recordA, recordB) {
@@ -89,7 +144,34 @@
         }
         return true;
     }
-    
+    function getDefaultFilter(){
+        return {
+            colonne: null,
+            type: null,
+            value: null,
+            min: null,
+            max: null
+        };
+    }
+    function getFilterTypes(colonne) {
+        var colType = columns.find(col => col.property == colonne)?.type || 'string';
+        if(colType == 'date' || colType == 'number') {
+            return [
+                {label: 'Egal à', value : 'equals'},
+                {label: 'Inférieur à', value : 'before'},
+                {label: 'Supérieur à', value : 'after'},
+                {label: 'Entre', value : 'between'}
+            ];
+        } else {
+            return [
+                {label: 'Contient', value : 'contains'},
+                {label: 'Commence par', value : 'starts'},
+                {label: 'Termine par', value : 'ends'},
+                {label: 'Egal à', value : 'equals'},
+                {label: 'Dans la liste', value : 'in'}
+            ];
+        }
+    }
 </script>
 
 <div class="grid-main" style="--page-size: {pageSize}">
@@ -99,10 +181,11 @@
         </span>
         <span class="grid-toolbar-default">
             <Button
-                text="Filtrer"
+                text={"Filtrer" + (activeFilters.length > 0 ? " (" + activeFilters.length + ")" : "")}
                 border={false}
                 icon="filter_list"
                 style="margin-right:0"
+                on:click={onClickFilters}
             />
         </span>
     </div>
@@ -187,6 +270,110 @@
         {/if}
     </div>
 </div>
+<div class="grid-filter-mask"
+    class:grid-filter-visible={showFilter}
+    on:click={onClickMask}
+    on:keydown={onEscMask}>
+    <div class="grid-filter-main">
+        {#if operation == "view"}
+            <div class="grid-filter-title">
+                {#if filters.length == 0}
+                    Aucun filtre actif
+                {:else}
+                    {filters.length} filtres actifs
+                {/if}
+            </div>
+            <div class="grid-filter-filters">
+                <Button
+                    text="Ajouter un filtre"
+                    icon="filter_list"
+                    style="width:100%; text-align:center"
+                    primary={true}
+                    on:click={onClickAjouter}
+                />
+                {#if filters.length > 0}
+                    <Button
+                        text="Supprimer les filtres"
+                        icon="filter_list_off"
+                        style="width:100%; text-align:center"
+                        on:click={onClickReset}
+                    />
+                {/if}
+                {#each filters as filter}
+                    <Button
+                        text={filter}
+                        border={false}
+                        style="width:100%"
+                        on:click={onClickModifier}
+                    />
+                {/each}
+            </div>
+            <div class="grid-filter-buttons">
+                <Button
+                    text="Fermer"
+                    icon="close"
+                    border={false}
+                    on:click={onClickFermer}
+                />
+                <Button
+                    text="Valider"
+                    icon="done"
+                    primary={true}
+                    style="margin-right:0"
+                    on:click={onClickValider}
+                />
+            </div>
+        {:else}
+            <div class="grid-filter-title">
+                {#if operation == "add"}
+                    Ajouter un filtre
+                {:else}
+                    Modifier un filtre
+                {/if}
+            </div>
+            <div class="grid-filter-filters">
+                {#if operation == "edit"}
+                    <Button
+                        text="Supprimer ce filtre"
+                        icon="delete"
+                        style="width:100%; text-align:center"
+                        primary={true}
+                        on:click={onClickSupprimer}
+                    />
+                {/if}
+                <Droplist 
+                    label="Colonne"
+                    bind:value={currentFilter.colonne}
+                    items={columnsFilter}
+                    width=480
+                />
+                {#if currentFilter.colonne}
+                    <Droplist 
+                        label="Type"
+                        bind:value={currentFilter.type}
+                        bind:items={filterTypes}
+                        width=480
+                    />
+                {/if}
+            </div>
+            <div class="grid-filter-buttons">
+                <Button
+                    text="Retour"
+                    icon="arrow_back"
+                    border={false}
+                    on:click={onClickRetour}
+                />
+                <Button
+                    text="Valider"
+                    icon="done"
+                    primary={true}
+                    style="margin-right:0"
+                    on:click={onClickValider}
+                />
+            </div>
+        {/if}
+    </div>
+</div>
 
 <style>
     .grid-main .grid-table {
@@ -238,5 +425,54 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+    }
+    .grid-filter-mask {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(150,150,150,0.5);
+        top: 0;
+        left: 0;
+        backdrop-filter: blur(2px);
+        visibility: hidden;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.2s;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 2;
+    }
+    .grid-filter-visible {
+        visibility: visible;
+        pointer-events: auto;
+        opacity: 1;
+    }
+    .grid-filter-main {
+        width: 500px;
+        transform: scale(0.8);
+        background-color: #FFF;
+        border-radius: 8px;
+        box-shadow: 0 6px 25px rgba(150,150,150,0.7);
+        overflow: hidden;
+        transition: transform 0.2s;
+        overflow: visible;
+        padding: 10px 10px 5px 10px;
+    }
+    .grid-filter-visible .grid-filter-main {
+        transform: scale(1);
+    }
+    .grid-filter-title {
+        font-weight: bold;
+        font-size: 20px;
+        margin: 10px 5px;
+    }
+    .grid-filter-filters {
+        min-height: 200px;
+    }
+    .grid-filter-buttons {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
     }
 </style>

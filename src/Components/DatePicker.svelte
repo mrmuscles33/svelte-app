@@ -384,11 +384,13 @@
                         <div class="datepicker-buttons">
                                 <Button
                                         text="Fermer"
+                                        icon="close"
                                         border={false}
                                         on:click={onClickFermer}
                                 />
                                 <Button
                                         text="Valider"
+                                        icon="done"
                                         primary={true}
                                         on:click={onClickValider}
                                         on:keydown={onKeyDownValider}

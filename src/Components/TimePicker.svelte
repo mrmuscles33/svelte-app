@@ -67,7 +67,7 @@
                 focusedHour = Times.getHours(tmpValue);
                 focusedMinute = minutes.slice().sort((a,b) => Math.abs(a - Times.getMinutes(tmpValue)) <= Math.abs(b - Times.getMinutes(tmpValue)) ? -1 : 1)[0];
                 setTimeout(() => {
-                        clock.querySelector('.timepicker-hour > span[tabindex="0"]').focus();
+                        clock.querySelector('.timepicker-hour > span[tabindex="0"]')?.focus();
                 }, 100);
         }
         export function onClickMask(evt) {
@@ -361,11 +361,13 @@
                         <div class="timepicker-buttons">
                                 <Button
                                         text="Fermer"
+                                        icon="close"
                                         border={false}
                                         on:click={onClickFermer}
                                 />
                                 <Button
                                         text="Valider"
+                                        icon="done"
                                         primary={true}
                                         on:click={onClickValider}
                                         on:keydown={onKeyDownValider}

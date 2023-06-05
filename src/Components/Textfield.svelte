@@ -21,7 +21,7 @@
         export let filled = true;
         
         // PRIVATE ATTRIBUTES
-        $: inputWidth = width - (iconLeft != "" ? 40 : 12) - (iconRight != "" ? 32 : 0) - (hasError != "" ? 32 : 0) - 12;
+        $: inputWidth = width - (iconLeft != "" ? 40 : 12) - (iconRight != "" ? 32 : 0) - 12;
         $: hasError = errorMessage != "";
         let id = '_' + Math.random().toString(36).substring(2, 12);
         let input;
