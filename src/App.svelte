@@ -97,7 +97,7 @@
 	let gridColumn = [
 		{label: 'Colonne 1', property: 'prop1', type: 'date'},
 		{label: 'Colonne 2', property: 'prop2'},
-		{label: 'Colonne 3', property: 'prop3', render: (record) => record.prop3 || '<i>Vide</i>'}
+		{label: 'Colonne 3', property: 'prop3', type: 'number', render: (record) => record.prop3 || '<i>Vide</i>'}
 	];
 	let gridData = [
 		{prop1: 'Valeur A', prop2: 'Valeur 1', prop3: 'Valeur 1'},
@@ -113,14 +113,6 @@
 	let gridSelection = [
 		{prop1: 'Valeur B', prop2: 'Valeur 2'}
 	]
-	let gridFilters = [
-		'Colonne 1 contient "Bonjour"', 
-		'Date de naissance entre 01/01/1990 et 31/12/1999',
-		'Colonne 1 contient "Bonjour"', 
-		'Date de naissance entre 01/01/1990 et 31/12/1999',
-		'Colonne 1 contient "Bonjour"', 
-		'Date de naissance entre 01/01/1990 et 31/12/1999'
-	];
 </script>
 
 <main>
@@ -272,7 +264,6 @@
 			datas={gridData}
 			selection={gridSelection}
 			pageSize=5
-			filters={gridFilters}
 			select="multiple">
 			<span slot="grid-toolbar">
 				<Button

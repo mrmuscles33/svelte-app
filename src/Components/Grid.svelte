@@ -6,28 +6,30 @@
     import Arrays from "../Utils/Arrays";
     import Radio from './Radio.svelte';
     import Droplist from './Droplist.svelte';
+    import Textfield from './Textfield.svelte';
+    import DatePicker from './DatePicker.svelte';
+    import Numberfield from './Numberfield.svelte';
 
     // PUBLIC ATTRIBUTES
-    // Array of objects [{label: '...', property: '...'}, render: (record) => {...}]
-    export let columns = [];
-    // Array of objects [{prop_A: '...', prop_B: '...'}]
-    export let datas = [];
-    // null, single, multiple
-    export let select = null;
-    export let selection = [];
+    export let columns = []; // Array of objects [{label: '...', property: '...'}, type: 'string/number/date', render: (record) => {...}]
+    export let datas = []; // Array of objects [{prop_A: '...', prop_B: '...'}]
+    export let select = null; // null, single, multiple
+    export let selection = []; // Like datas
     export let sortProperty = '';
     export let sortDirection = 'asc';
     export let pageSize = 0;
     export let page = 1;
     export let filters = [];
+    export let filterWidth = 500;
 
     // PRIVATE ATTRIBUTES
-    let selectAll = selection.length == datas.length;
-    let selectedValue = select == "single" && selection.length > 0 ? selection[0].id : null;
     let showFilter = false;
-    let activeFilters = [];
+    let activeFilters = filters;
     let operation = "view";
     let currentFilter = getDefaultFilter();
+    $: filtersWidth = filterWidth - 20;
+    $: selectedValue = select == "single" && selection.length > 0 ? selection[0].id : null;
+    $: selectAll = selection.length == datas.length;
     $: visibleDatas = pageSize > 0 ? datas.slice((page - 1) * pageSize, Math.min(page * pageSize, datas.length)) : datas;
     $: columnsFilter = columns.map(col => {
         return {
@@ -35,7 +37,7 @@
             value: col.property
         }
     });
-    $: filterTypes = getFilterTypes(currentFilter.colonne);
+    $: filterTypes = getFilterTypes(currentFilter);
     
     // EVENTS
     onMount(() => {
@@ -50,28 +52,23 @@
             defaultRecord.id = datas.find(record => compareRecord(record, defaultRecord))?.id || null;
         });
         selection = selection.filter(record => record.id != null);
-        selectedValue = select == "single" && selection.length > 0 ? selection[0].id : null;
-        activeFilters = filters.slice();
     });
     function onSelect(event) {
         var id = event.detail.target.parentElement.parentElement.getAttribute('recordId');
         if(select == "single") {
             selection = [datas.find(record => record.id == id)];
-            selectedValue = selection[0].id;
         } else if(select == "multiple") {
             if(selection.some(record => record.id == id)) {
                 selection = selection.filter(record => record.id != id);
             } else {
-                selection.push(datas.find(record => record.id == id));
+                selection = [...selection, datas.find(record => record.id == id)];
             }
-            selectAll = selection.length == datas.length;
         }
     }
     function onSelectAll(event) {
         if(event.detail.target.name == "selectAll") {
             selection = selection.length == datas.length ? [] : datas;
         }
-        selectAll = selection.length == datas.length;
     }
     function onSort(event) {
         var property = event.target.getAttribute('property');
@@ -133,6 +130,12 @@
     function onClickSupprimer(evt){
         onClickRetour(evt);
     }
+    function onChangeColonne(evt) {
+        currentFilter.type = null;
+        currentFilter.value = null;
+        currentFilter.dataType = columns.find(col => col.property == evt.detail.value)?.type || 'string';
+        currentFilter = {...currentFilter};
+    }
     
     // METHODS
     function compareRecord(recordA, recordB) {
@@ -146,15 +149,16 @@
     }
     function getDefaultFilter(){
         return {
-            colonne: null,
+            property: null,
+            dataType: null,
             type: null,
             value: null,
             min: null,
             max: null
         };
     }
-    function getFilterTypes(colonne) {
-        var colType = columns.find(col => col.property == colonne)?.type || 'string';
+    function getFilterTypes(filter) {
+        var colType = columns.find(col => col.property == filter.property)?.type || 'string';
         if(colType == 'date' || colType == 'number') {
             return [
                 {label: 'Egal à', value : 'equals'},
@@ -272,6 +276,7 @@
 </div>
 <div class="grid-filter-mask"
     class:grid-filter-visible={showFilter}
+    style="--filter-width: {filterWidth}px"
     on:click={onClickMask}
     on:keydown={onEscMask}>
     <div class="grid-filter-main">
@@ -343,17 +348,80 @@
                 {/if}
                 <Droplist 
                     label="Colonne"
-                    bind:value={currentFilter.colonne}
+                    bind:value={currentFilter.property}
                     items={columnsFilter}
-                    width=480
+                    width={filtersWidth}
+                    on:change={onChangeColonne}
+                    required={true}
                 />
-                {#if currentFilter.colonne}
+                {#if currentFilter.property}
                     <Droplist 
                         label="Type"
                         bind:value={currentFilter.type}
                         bind:items={filterTypes}
-                        width=480
+                        width={filtersWidth}
+                        required={true}
                     />
+                {/if}
+                {#if currentFilter.property && currentFilter.type}
+                    {#if currentFilter.dataType == "date"}
+                        {#if currentFilter.type == "between"}
+                            <div class="grid-filter-between">
+                                <DatePicker
+                                    label="Du"
+                                    bind:value={currentFilter.min}
+                                    required={true}
+                                    width={filtersWidth / 2 - 10}
+                                />
+                                <DatePicker
+                                    label="Au"
+                                    bind:value={currentFilter.max}
+                                    required={true}
+                                    width={filtersWidth / 2 - 10}
+                                    style="margin-right:0"
+                                />
+                            </div>
+                        {:else}
+                            <DatePicker
+                                label="Valeur"
+                                bind:value={currentFilter.value}
+                                required={true}
+                                width={filtersWidth}
+                            />
+                        {/if}
+                    {:else if currentFilter.dataType == "number"}
+                        {#if currentFilter.type == "between"}
+                            <div class="grid-filter-between">
+                                <Numberfield
+                                    label="Valeur min"
+                                    bind:value={currentFilter.min}
+                                    required={true}
+                                    width={filtersWidth / 2 - 10}
+                                />
+                                <Numberfield
+                                    label="Valeur max"
+                                    bind:value={currentFilter.max}
+                                    required={true}
+                                    width={filtersWidth / 2 - 10}
+                                    style="margin-right:0"
+                                />
+                            </div>
+                        {:else}
+                            <Numberfield
+                                label="Valeur"
+                                bind:value={currentFilter.value}
+                                required={true}
+                                width={filtersWidth}
+                            />
+                        {/if}
+                    {:else}
+                        <Textfield
+                            label="Valeur"
+                            bind:value={currentFilter.value}
+                            required={true}
+                            width={filtersWidth}
+                        />
+                    {/if}
                 {/if}
             </div>
             <div class="grid-filter-buttons">
@@ -449,7 +517,7 @@
         opacity: 1;
     }
     .grid-filter-main {
-        width: 500px;
+        width: var(--filter-width);
         transform: scale(0.8);
         background-color: #FFF;
         border-radius: 8px;
@@ -474,5 +542,10 @@
         width: 100%;
         display: flex;
         justify-content: flex-end;
+    }
+    .grid-filter-between {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
     }
 </style>

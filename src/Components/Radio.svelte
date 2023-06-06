@@ -1,5 +1,7 @@
 <script>
         // IMPORTS
+        import { createEventDispatcher } from 'svelte';
+        import Events from '../Utils/Events';
         
         // PUBLIC ATTRIBUTES
         export let label = "";
@@ -13,9 +15,19 @@
         let id = '_' + Math.random().toString(36).substring(2, 12);
 
         // METHODS
+        const dispatch = createEventDispatcher();
+        function onChange (event){
+                if(!disable) {
+                        let params = Events.copy(event);
+                        params.value = value;
+                        dispatch('change', {
+                                ...params
+                        });
+                }
+        }
 </script>
 
-<input type="radio" {id} bind:group={selectedValue} {name} {value} disabled={disable}/>
+<input type="radio" {id} bind:group={selectedValue} {name} {value} disabled={disable} on:change={onChange}/>
 <label 
      class="radio-main"
      for={id}

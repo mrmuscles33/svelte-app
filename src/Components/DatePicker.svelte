@@ -23,6 +23,7 @@
         export let startWeek = Dates.MONDAY;
         export let filled = true;
         export let calendarOnly = false;
+        export let style = "";
         
         // PRIVATE ATTRIBUTES
         let pattern = Dates.getPattern(format);
@@ -290,6 +291,7 @@
         {label}
         {cls}
         {filled}
+        {style}
         bind:errorMessage={errorMessage}
         on:change={onChange}
         on:blur={onBlur}

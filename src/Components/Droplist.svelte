@@ -1,5 +1,6 @@
 <script>
         // IMPORTS
+        import { createEventDispatcher } from 'svelte';
         import Textfield from './Textfield.svelte';
         import Events from '../Utils/Events';
         
@@ -23,28 +24,30 @@
         let input;
         let visible = false;
         let position = "bottom";
-        let displayedItems = items;
         let droplist;
+        $: displayedItems = items;
         $: displayedValue = getLabel(value);
 
         // EVENTS
-	export function onClickIcon (){
+        const dispatch = createEventDispatcher();
+	function onClickIcon (){
                 if(visible) {
                         close();
                 } else {
                         open();
                 }
         }
-        export function onClickItem (evt){
+        function onClickItem (evt){
                 let pValue = evt.currentTarget.getAttribute('code');
                 if(pValue == value) {
                         displayedValue = getLabel(value);
                 } else {
                         value = pValue;
                 }
+                input.onChange(evt);
                 close();
         }
-        export function onKeyUp(evt) {
+        function onKeyUp(evt) {
                 let event = evt.detail;
                 if(Events.isArrowUp(event) || Events.isArrowDown(event)) {
                         open();
@@ -53,16 +56,17 @@
                         open();
                 }
         }
-        export function onClick(evt) {
+        function onClick(evt) {
                 if(selectOnly && !readonly) {
                         open();
                 }
         }
-
-        // METHODS
-        function getLabel(pValue){
-                var i = items.find(i => i.value == pValue);
-                return i ? i.label : "";
+        function onChange(evt) {
+                let params = Events.copy(evt.detail);
+                params.value = value;
+                dispatch('change', {
+                        ...params
+                });
         }
         function onKeyDownItem(event){
                 if(Events.isEnter(event)){
@@ -90,6 +94,17 @@
                 event.preventDefault();
                 event.stopPropagation();
         }
+        function onFocusOut(event){
+                if (!event.currentTarget.contains(event.relatedTarget)) {
+                        visible = false;
+                }
+        }
+
+        // METHODS
+        function getLabel(pValue){
+                var i = items.find(i => i.value == pValue);
+                return i ? i.label : "";
+        }
         function open() {
                 position = (window.innerHeight - input.getInput().getBoundingClientRect().top) < 250 ? 'top' : 'bottom';
                 visible = true;
@@ -98,11 +113,6 @@
         function close() {
                 visible = false;
                 displayedItems = items;
-        }
-        function onFocusOut(event){
-                if (!event.currentTarget.contains(event.relatedTarget)) {
-                        visible = false;
-                }
         }
         function focusItem() {
                 setTimeout(() => {
@@ -132,8 +142,7 @@
                 {label}
                 {cls}
                 bind:errorMessage={errorMessage}
-                on:change
-                on:blur
+                on:change={onChange}
                 on:clickIcon={onClickIcon}
                 on:click={onClick}
                 on:focus
