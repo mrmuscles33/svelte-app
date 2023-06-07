@@ -28,7 +28,7 @@
 
         // EVENTS
         const dispatch = createEventDispatcher();
-        export function onChange(evt){
+        function onChange(evt){
                 let event = evt.detail;
                 if(errorMessage == "" && value != ""){
                         if(min != null && max != null && (parseFloat(value.replace(",",".")) < parseFloat(min.replace(",",".")) || parseFloat(value.replace(",",".")) > parseFloat(max.replace(",",".")))){

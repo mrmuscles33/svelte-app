@@ -39,7 +39,7 @@
 
         // EVENTS
         const dispatch = createEventDispatcher();
-        export function onBlur(evt) {
+        function onBlur(evt) {
                 let event = evt.detail;
                 value = Times.isValid(value) ? Times.format(value, format) : value;
                 let params = Events.copy(event);
@@ -48,7 +48,7 @@
                         ...params
                 });
         }
-        export function onChange(evt){
+        function onChange(evt){
                 let event = evt.detail;
                 if(errorMessage == "" && value != ""){
                         errorMessage = Times.toTime(value) < Times.toTime(minTime) || Times.toTime(value) > Times.toTime(maxTime) ? "L'heure doit etre comprise entre " + minTime + " et " + maxTime : "";
@@ -59,7 +59,7 @@
                         ...params
                 });
         }
-	export function onClickIcon() {
+	function onClickIcon() {
                 visible = true;
                 selectHour = true;
                 tmpValue = Times.isValid(value) ? value : Times.toText(Times.now(), Times.H_M_S);
@@ -70,23 +70,23 @@
                         clock.querySelector('.timepicker-hour > span[tabindex="0"]')?.focus();
                 }, 100);
         }
-        export function onClickMask(evt) {
+        function onClickMask(evt) {
                 if(evt.target == this){
                         onClickFermer();
                 }
         }
-        export function onClickFermer(){
+        function onClickFermer(){
                 visible = false;
                 input.getInput().focus();
         }
-        export function onClickValider(){
+        function onClickValider(){
                 onClickFermer();
                 value = Times.format(tmpValue, format);
                 setTimeout(() => {
                         input.onChange();
                 }, 200);
         }
-        export function onClickHour(evt){
+        function onClickHour(evt){
                 var hour = evt.currentTarget.getAttribute('hour');
                 if(Times.getHours(minTime) > parseInt(hour) || Times.getHours(maxTime) < parseInt(hour)) return false;
                 tmpValue = Times.toText((parseInt(hour) * 60 * 60) + (Times.getMinutes(tmpValue) * 60), Times.H_M_S);
@@ -97,22 +97,22 @@
                         parent.querySelector('[tabindex="0"]').focus();
                 }, 50);
         }
-        export function onClickMinute(evt){
+        function onClickMinute(evt){
                 var minute = evt.currentTarget.getAttribute('minute');
                 var time = (Times.getHours(tmpValue) * 60 * 60) + (parseInt(minute) * 60);
                 if(Times.toTime(minTime, format) > time || Times.toTime(maxTime, format) < time) return false;
                 tmpValue = Times.toText(60 * 60 * Times.getHours(tmpValue) + (60 * parseInt(minute)), Times.H_M_S);
         }
-        export function onClickSelectHour(){
+        function onClickSelectHour(){
                 selectHour = true;
         }
-        export function onClickSelectMinute(){
+        function onClickSelectMinute(){
                 selectHour = false;
         }
-        export function onClickAM(){
+        function onClickAM(){
                 morning = true;
         }
-        export function onClickPM(){
+        function onClickPM(){
                 morning = false;
         }
 

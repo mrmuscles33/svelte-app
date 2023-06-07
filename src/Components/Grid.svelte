@@ -47,11 +47,15 @@
         if(sortProperty && sortDirection) {
             Arrays.sort(datas, sortProperty, sortDirection);
         }
-        datas = datas;
+        datas = [...datas];
         selection.forEach(defaultRecord => {
             defaultRecord.id = datas.find(record => compareRecord(record, defaultRecord))?.id || null;
         });
         selection = selection.filter(record => record.id != null);
+        filters.forEach(filter => {
+            filter.id = '_' + Math.random().toString(36).substring(2, 12); 
+        });
+        filters = [...filters];
     });
     function onSelect(event) {
         var id = event.detail.target.parentElement.parentElement.getAttribute('recordId');
@@ -101,6 +105,8 @@
     function onClickFilters(){
         showFilter = true;
         activeFilters = filters.slice();
+        operation = activeFilters.length > 0 ? "view" : "add";
+        currentFilter = getDefaultFilter();
     }
     function onEscMask(evt){
         if(Events.isEsc(evt)){
@@ -114,20 +120,28 @@
         if(operation == "view"){
             activeFilters = filters.slice();
             showFilter = false;
+        } else if(operation == "add"){
+            currentFilter.id ??= '_' + Math.random().toString(36).substring(2, 12);
+            filters = [...filters, currentFilter];
+            onClickRetour(evt);
         } else {
+            filters = [...filters];
             onClickRetour(evt);
         }
     }
     function onClickAjouter(evt) {
         operation = "add";
     }
-    function onClickModifier(evt) {
+    function onClickModifier(id) {
         operation = "edit";
+        currentFilter = filters.find(f => f.id == id);
     }
     function onClickRetour(evt) {
         operation = "view";
+        currentFilter = getDefaultFilter();
     }
     function onClickSupprimer(evt){
+        filters = filters.filter(f => f.id != currentFilter.id);
         onClickRetour(evt);
     }
     function onChangeColonne(evt) {
@@ -161,7 +175,7 @@
         var colType = columns.find(col => col.property == filter.property)?.type || 'string';
         if(colType == 'date' || colType == 'number') {
             return [
-                {label: 'Egal à', value : 'equals'},
+                {label: 'Égal à', value : 'equals'},
                 {label: 'Inférieur à', value : 'before'},
                 {label: 'Supérieur à', value : 'after'},
                 {label: 'Entre', value : 'between'}
@@ -171,10 +185,16 @@
                 {label: 'Contient', value : 'contains'},
                 {label: 'Commence par', value : 'starts'},
                 {label: 'Termine par', value : 'ends'},
-                {label: 'Egal à', value : 'equals'},
+                {label: 'Égal à', value : 'equals'},
                 {label: 'Dans la liste', value : 'in'}
             ];
         }
+    }
+    function getLabel(filter) {
+        let label = columns.find(col => col.property == filter.property)?.label || filter.property;
+        label += ' ' + (getFilterTypes(filter).find(type => type.value == filter.type)?.label || '').toLocaleLowerCase();
+        label += ' ' + filter.value;
+        return label;
     }
 </script>
 
@@ -306,10 +326,10 @@
                 {/if}
                 {#each filters as filter}
                     <Button
-                        text={filter}
+                        text={getLabel(filter)}
                         border={false}
                         style="width:100%"
-                        on:click={onClickModifier}
+                        on:click={onClickModifier.bind(this, filter.id)}
                     />
                 {/each}
             </div>
@@ -425,12 +445,21 @@
                 {/if}
             </div>
             <div class="grid-filter-buttons">
-                <Button
-                    text="Retour"
-                    icon="arrow_back"
-                    border={false}
-                    on:click={onClickRetour}
-                />
+                {#if filters.length == 0}
+                    <Button
+                        text="Fermer"
+                        icon="close"
+                        border={false}
+                        on:click={onClickFermer}
+                    />
+                {:else}
+                    <Button
+                        text="Retour"
+                        icon="arrow_back"
+                        border={false}
+                        on:click={onClickRetour}
+                    />
+                {/if}
                 <Button
                     text="Valider"
                     icon="done"

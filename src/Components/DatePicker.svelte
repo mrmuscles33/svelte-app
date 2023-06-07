@@ -50,7 +50,7 @@
 
         // EVENTS
         const dispatch = createEventDispatcher();
-        export function onBlur(evt) {
+        function onBlur(evt) {
                 let event = evt.detail;
                 value = Dates.isValid(value) ? Dates.format(value, null, format) : value;
                 let params = Events.copy(event);
@@ -59,7 +59,7 @@
                         ...params
                 });
         }
-        export function onChange(evt){
+        function onChange(evt){
                 let event = evt.detail;
                 if(errorMessage == "" && value != ""){
                         errorMessage = Dates.toDate(value, format) < realMinDate || Dates.toDate(value, format) > realMaxDate ? "La date doit etre comprise entre " + minDate + " et " + maxDate : "";
@@ -70,7 +70,7 @@
                         ...params
                 });
         }
-	export function onClickIcon() {
+	function onClickIcon() {
                 visible = true;
                 tmpValue = Dates.isValid(value, format) ? Dates.format(value, format, Dates.D_M_Y) : Dates.toText(Dates.today(), Dates.D_M_Y);
                 currentMonth = Dates.format(tmpValue, Dates.D_M_Y, Dates.M_Y);
@@ -80,28 +80,28 @@
                         calendar.querySelector('.datepicker-day[tabindex="0"]').focus();
                 }, 100);
         }
-        export function onClickMask(evt) {
+        function onClickMask(evt) {
                 if(evt.target == this){
                         onClickFermer();
                 }
         }
-        export function onClickFermer(){
+        function onClickFermer(){
                 visible = false;
                 input.getInput().focus();
         }
-        export function onClickValider(){
+        function onClickValider(){
                 onClickFermer();
                 value = Dates.format(tmpValue, Dates.D_M_Y, format);
                 setTimeout(() => {
                         input.onChange();
                 }, 200);
         }
-        export function onClickDay(evt) {
+        function onClickDay(evt) {
                 var clickedDate = evt.currentTarget.getAttribute('value');
                 if(Dates.toDate(clickedDate, Dates.D_M_Y) < realMinDate || Dates.toDate(clickedDate, Dates.D_M_Y) > realMaxDate) return false;
                 tmpValue = clickedDate;
         }
-        export function onClickYearButton(){
+        function onClickYearButton(){
                 showYears = !showYears;
                 if(showYears) {
                         var currentYear = Dates.toDate(tmpValue, Dates.D_M_Y).getFullYear();
@@ -127,7 +127,7 @@
                         }, 100);
                 }
         }
-        export function onClickPrevious(){
+        function onClickPrevious(){
                 if(showYears) {
                         yearsPage--;
                         displayedYears = allYear.slice(yearsPage * 18, yearsPage * 18 + 18);
@@ -137,7 +137,7 @@
                         currentMonth = Dates.toText(date, Dates.M_Y);
                 }
         }
-        export function onClickNext(){
+        function onClickNext(){
                 if(showYears) {
                         yearsPage++;
                         displayedYears = allYear.slice(yearsPage * 18, yearsPage * 18 + 18);
@@ -147,7 +147,7 @@
                         currentMonth = Dates.toText(date, Dates.M_Y);
                 }
         }
-        export function onClickYear(evt){
+        function onClickYear(evt){
                 var year = evt.currentTarget.getAttribute('value');
                 var newDate = Dates.toDate(tmpValue, Dates.D_M_Y);
                 newDate.setFullYear(year);

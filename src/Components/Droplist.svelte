@@ -15,7 +15,7 @@
         export let readonly = false;
         export let cls = "";
         export let format = null;
-        export let items = [];
+        export let items = []; // Array of object [{label: '...', value: '...'}]
         export let selectOnly = false;
         export let render = null;
         
@@ -62,6 +62,21 @@
                 }
         }
         function onChange(evt) {
+                let params = Events.copy(evt.detail);
+                params.value = value;
+                dispatch('change', {
+                        ...params
+                });
+        }
+        function onBlur(evt){
+                let i = items.find(item => (item.label || '').toLowerCase() == (displayedValue || '').toLowerCase());
+                if(i) {
+                        value = i.value;
+                } else {
+                        // Double change to trigger getLabel
+                        value = null;
+                        value = '';
+                }
                 let params = Events.copy(evt.detail);
                 params.value = value;
                 dispatch('change', {
@@ -145,6 +160,7 @@
                 on:change={onChange}
                 on:clickIcon={onClickIcon}
                 on:click={onClick}
+                on:blur={onBlur}
                 on:focus
                 on:focusout
                 on:input

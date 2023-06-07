@@ -29,7 +29,7 @@
 
         // EVENTS
 	const dispatch = createEventDispatcher();
-        export function onClick (event) {
+        function onClick (event) {
                 let params = Events.copy(event);
                 dispatch('click', {
                         ...params
@@ -38,7 +38,7 @@
                         input.focus();
                 }
         }
-        export function onClickIcon(event) {
+        function onClickIcon(event) {
                 let params = Events.copy(event);
                 params.value = value;
                 dispatch('clickIcon', {
@@ -66,42 +66,42 @@
                         oldValue = value;
                 }, 100);
         }
-        export function onInput(event) {
+        function onInput(event) {
                 let params = Events.copy(event);
                 params.value = value;
                 dispatch('input', {
                         ...params
                 });
         }
-        export function onFocus(event) {
+        function onFocus(event) {
                 let params = Events.copy(event);
                 params.value = value;
                 dispatch('focus', {
                         ...params
                 });
         }
-        export function onFocusOut(event){
+        function onFocusOut(event){
                 let params = Events.copy(event);
                 params.value = value;
                 dispatch('focusout', {
                         ...params
                 });
         }
-        export function onBlur(event){
+        function onBlur(event){
                 let params = Events.copy(event);
                 params.value = value;
                 dispatch('blur', {
                         ...params
                 });
         }
-        export function onKeyDown(event){
+        function onKeyDown(event){
                 let params = Events.copy(event);
                 params.value = value;
                 dispatch('keydown', {
                         ...params
                 });
         }
-        export function onKeyUp(event){
+        function onKeyUp(event){
                 let params = Events.copy(event);
                 params.value = value;
                 // Fire blur event before change
