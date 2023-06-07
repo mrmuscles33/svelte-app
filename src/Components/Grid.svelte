@@ -9,6 +9,7 @@
     import Textfield from './Textfield.svelte';
     import DatePicker from './DatePicker.svelte';
     import Numberfield from './Numberfield.svelte';
+    import Events from '../Utils/Events';
 
     // PUBLIC ATTRIBUTES
     export let columns = []; // Array of objects [{label: '...', property: '...'}, type: 'string/number/date', render: (record) => {...}]
@@ -24,9 +25,10 @@
 
     // PRIVATE ATTRIBUTES
     let showFilter = false;
-    let activeFilters = filters;
     let operation = "view";
     let currentFilter = getDefaultFilter();
+    let filterTypes = [];
+    $: tmpFilters = filters;
     $: filtersWidth = filterWidth - 20;
     $: selectedValue = select == "single" && selection.length > 0 ? selection[0].id : null;
     $: selectAll = selection.length == datas.length;
@@ -37,7 +39,6 @@
             value: col.property
         }
     });
-    $: filterTypes = getFilterTypes(currentFilter);
     
     // EVENTS
     onMount(() => {
@@ -57,8 +58,7 @@
         });
         filters = [...filters];
     });
-    function onSelect(event) {
-        var id = event.detail.target.parentElement.parentElement.getAttribute('recordId');
+    function onSelect(id) {
         if(select == "single") {
             selection = [datas.find(record => record.id == id)];
         } else if(select == "multiple") {
@@ -100,12 +100,11 @@
     }
     function onClickFermer(){
         showFilter = false;
-        filters = activeFilters.slice();
     }
     function onClickFilters(){
         showFilter = true;
-        activeFilters = filters.slice();
-        operation = activeFilters.length > 0 ? "view" : "add";
+        tmpFilters = [...filters];
+        operation = tmpFilters.length > 0 ? "view" : "add";
         currentFilter = getDefaultFilter();
     }
     function onEscMask(evt){
@@ -114,19 +113,23 @@
         }
     }
     function onClickReset(evt) {
-        filters = [];
+        tmpFilters = [];
     }
     function onClickValider(evt){
         if(operation == "view"){
-            activeFilters = filters.slice();
+            filters = [...tmpFilters];
             showFilter = false;
         } else if(operation == "add"){
-            currentFilter.id ??= '_' + Math.random().toString(36).substring(2, 12);
-            filters = [...filters, currentFilter];
-            onClickRetour(evt);
+            if(checkFilter(currentFilter)) {
+                currentFilter.id ??= '_' + Math.random().toString(36).substring(2, 12);
+                tmpFilters = [...tmpFilters, currentFilter];
+                onClickRetour(evt);
+            }
         } else {
-            filters = [...filters];
-            onClickRetour(evt);
+            if(checkFilter(currentFilter)) {
+                tmpFilters = [...tmpFilters];
+                onClickRetour(evt);
+            }
         }
     }
     function onClickAjouter(evt) {
@@ -134,20 +137,21 @@
     }
     function onClickModifier(id) {
         operation = "edit";
-        currentFilter = filters.find(f => f.id == id);
+        currentFilter = tmpFilters.find(f => f.id == id);
     }
     function onClickRetour(evt) {
         operation = "view";
         currentFilter = getDefaultFilter();
     }
     function onClickSupprimer(evt){
-        filters = filters.filter(f => f.id != currentFilter.id);
+        tmpFilters = tmpFilters.filter(f => f.id != currentFilter.id);
         onClickRetour(evt);
     }
     function onChangeColonne(evt) {
         currentFilter.type = null;
         currentFilter.value = null;
         currentFilter.dataType = columns.find(col => col.property == evt.detail.value)?.type || 'string';
+        filterTypes = getFilterTypes(currentFilter);
         currentFilter = {...currentFilter};
     }
     
@@ -193,8 +197,28 @@
     function getLabel(filter) {
         let label = columns.find(col => col.property == filter.property)?.label || filter.property;
         label += ' ' + (getFilterTypes(filter).find(type => type.value == filter.type)?.label || '').toLocaleLowerCase();
-        label += ' ' + filter.value;
+        if(filter.type == 'between') {
+            label += ' ' + filter.min + ' et ' + filter.max;
+        } else {
+            label += ' ' + filter.value;
+        }
         return label;
+    }
+    function checkFilter(filter) {
+        if(!filter.property) {
+            alert('Veuillez choisir une colonne');
+            return false;
+        } else if(!filter.type) {
+            alert('Veuillez choisir un type');
+            return false;
+        } else if(filter.type == 'between' && (!filter.min || !filter.max)) {
+            alert('Veuillez choisir les bornes');
+            return false;
+        } else if(filter.type && filter.type != 'between' && !filter.value) {
+            alert('Veuillez choisir une valeur');
+            return false;
+        }
+        return true;
     }
 </script>
 
@@ -205,7 +229,7 @@
         </span>
         <span class="grid-toolbar-default">
             <Button
-                text={"Filtrer" + (activeFilters.length > 0 ? " (" + activeFilters.length + ")" : "")}
+                text={"Filtrer" + (filters.length > 0 ? " (" + filters.length + ")" : "")}
                 border={false}
                 icon="filter_list"
                 style="margin-right:0"
@@ -245,13 +269,13 @@
             </thead>
             <tbody>
                 {#each visibleDatas as record}
-                    <tr recordId={record.id}>
+                    <tr>
                         {#if select == 'multiple'}
                             <td class="grid-cell-select">
                                 <Checkbox 
                                     style="margin:0" 
                                     check={selection.some(r => r.id == record.id)} 
-                                    on:change={onSelect}
+                                    on:change={onSelect.bind(this, record.id)}
                                 />
                             </td>
                         {/if}
@@ -262,7 +286,7 @@
                                     name="selection"
                                     value={record.id}
                                     bind:selectedValue={selectedValue} 
-                                    on:change={onSelect}
+                                    on:change={onSelect.bind(this, record.id)}
                                 />
                             </td>
                         {/if}
@@ -302,10 +326,12 @@
     <div class="grid-filter-main">
         {#if operation == "view"}
             <div class="grid-filter-title">
-                {#if filters.length == 0}
+                {#if tmpFilters.length == 0}
                     Aucun filtre actif
+                {:else if tmpFilters.length == 1}
+                    {tmpFilters.length} filtre actif
                 {:else}
-                    {filters.length} filtres actifs
+                    {tmpFilters.length} filtres actifs
                 {/if}
             </div>
             <div class="grid-filter-filters">
@@ -316,7 +342,7 @@
                     primary={true}
                     on:click={onClickAjouter}
                 />
-                {#if filters.length > 0}
+                {#if tmpFilters.length > 0}
                     <Button
                         text="Supprimer les filtres"
                         icon="filter_list_off"
@@ -324,7 +350,7 @@
                         on:click={onClickReset}
                     />
                 {/if}
-                {#each filters as filter}
+                {#each tmpFilters as filter}
                     <Button
                         text={getLabel(filter)}
                         border={false}
@@ -356,7 +382,7 @@
                     Modifier un filtre
                 {/if}
             </div>
-            <div class="grid-filter-filters">
+            <div class="grid-filter-filters grid-filter-edit">
                 {#if operation == "edit"}
                     <Button
                         text="Supprimer ce filtre"
@@ -378,7 +404,7 @@
                     <Droplist 
                         label="Type"
                         bind:value={currentFilter.type}
-                        bind:items={filterTypes}
+                        items={filterTypes}
                         width={filtersWidth}
                         required={true}
                     />
@@ -391,14 +417,13 @@
                                     label="Du"
                                     bind:value={currentFilter.min}
                                     required={true}
-                                    width={filtersWidth / 2 - 10}
+                                    width={filtersWidth / 2 - 5}
                                 />
                                 <DatePicker
                                     label="Au"
                                     bind:value={currentFilter.max}
                                     required={true}
-                                    width={filtersWidth / 2 - 10}
-                                    style="margin-right:0"
+                                    width={filtersWidth / 2 - 5}
                                 />
                             </div>
                         {:else}
@@ -416,14 +441,13 @@
                                     label="Valeur min"
                                     bind:value={currentFilter.min}
                                     required={true}
-                                    width={filtersWidth / 2 - 10}
+                                    width={filtersWidth / 2 - 5}
                                 />
                                 <Numberfield
                                     label="Valeur max"
                                     bind:value={currentFilter.max}
                                     required={true}
-                                    width={filtersWidth / 2 - 10}
-                                    style="margin-right:0"
+                                    width={filtersWidth / 2 - 5}
                                 />
                             </div>
                         {:else}
@@ -445,7 +469,7 @@
                 {/if}
             </div>
             <div class="grid-filter-buttons">
-                {#if filters.length == 0}
+                {#if tmpFilters.length == 0}
                     <Button
                         text="Fermer"
                         icon="close"
@@ -566,6 +590,11 @@
     }
     .grid-filter-filters {
         min-height: 200px;
+    }
+    .grid-filter-edit {
+        display: grid;
+        grid-auto-rows: min-content;
+        grid-row-gap: 5px;
     }
     .grid-filter-buttons {
         width: 100%;

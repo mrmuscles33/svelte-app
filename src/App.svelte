@@ -227,7 +227,7 @@
 		<h3>Date & Time Pickers</h3>
 		<DatePicker
 			label="Date"
-			minDate="2021/10/01"
+			minDate="2000/01/01"
 			maxDate="2024/12/31"
 			format={Dates.Y_M_D}
 			on:change={onChangeDate}

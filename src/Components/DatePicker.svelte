@@ -129,22 +129,30 @@
         }
         function onClickPrevious(){
                 if(showYears) {
-                        yearsPage--;
-                        displayedYears = allYear.slice(yearsPage * 18, yearsPage * 18 + 18);
+                        if(yearsPage > 0) {
+                                yearsPage--;
+                                displayedYears = allYear.slice(yearsPage * 18, yearsPage * 18 + 18);
+                        }
                 } else {
-                        var date = Dates.toDate(currentMonth, Dates.M_Y);
-                        date.setMonth(date.getMonth() - 1);
-                        currentMonth = Dates.toText(date, Dates.M_Y);
+                        if(!displayedDays.some(d => Dates.toText(d, format) == minDate)) {
+                                var date = Dates.toDate(currentMonth, Dates.M_Y);
+                                date.setMonth(date.getMonth() - 1);
+                                currentMonth = Dates.toText(date, Dates.M_Y);
+                        }
                 }
         }
         function onClickNext(){
                 if(showYears) {
-                        yearsPage++;
-                        displayedYears = allYear.slice(yearsPage * 18, yearsPage * 18 + 18);
+                        if(displayedYears.length >= 12) {
+                                yearsPage++;
+                                displayedYears = allYear.slice(yearsPage * 18, yearsPage * 18 + 18);
+                        }
                 } else {
-                        var date = Dates.toDate(currentMonth, Dates.M_Y);
-                        date.setMonth(date.getMonth() + 1);
-                        currentMonth = Dates.toText(date, Dates.M_Y);
+                        if(!displayedDays.some(d => Dates.toText(d, format) == maxDate)) {
+                                var date = Dates.toDate(currentMonth, Dates.M_Y);
+                                date.setMonth(date.getMonth() + 1);
+                                currentMonth = Dates.toText(date, Dates.M_Y);
+                        }
                 }
         }
         function onClickYear(evt){
@@ -154,6 +162,103 @@
                 tmpValue = Dates.toText(newDate, Dates.D_M_Y);
                 currentMonth = Dates.format(tmpValue, Dates.D_M_Y, Dates.M_Y);
                 onClickYearButton();
+        }
+        function onEscMask(evt){
+                if(Events.isEsc(evt)){
+                        onClickFermer();
+                }
+        }
+        function onEnterDay(event){
+                if(Events.isEnter(event)) {
+                        onClickDay(event);
+                }
+        }
+        function onEnterYear(event){
+                if(Events.isEnter(event)) {
+                        onClickYear(event);
+                }
+        }
+        function onNavigateDay(event){
+                if(Events.isArrow(event)) {
+                        var clickedDate = event.currentTarget.getAttribute('value');
+                        var nextDate = null;
+                        if (Events.isArrowLeft(event)) {
+                                nextDate = Dates.addDays(Dates.toDate(clickedDate, Dates.D_M_Y), -1);
+                        } else if (Events.isArrowRight(event)) {
+                                nextDate = Dates.addDays(Dates.toDate(clickedDate, Dates.D_M_Y), 1);
+                        } else if (Events.isArrowUp(event)) {
+                                nextDate = Dates.addDays(Dates.toDate(clickedDate, Dates.D_M_Y), -7);
+                        } else if (Events.isArrowDown(event)) {
+                                nextDate = Dates.addDays(Dates.toDate(clickedDate, Dates.D_M_Y), 7);
+                        }
+                        if(displayedDays.some(d => Dates.toText(d, Dates.D_M_Y) == Dates.toText(nextDate, Dates.D_M_Y)) && realMinDate <= nextDate  && nextDate <= realMaxDate) {
+                                calendar.querySelector('span.datepicker-day[value="' + Dates.toText(nextDate, Dates.D_M_Y) + '"]').focus();
+                                focusedDate = Dates.toText(nextDate, Dates.D_M_Y);
+                        } else {
+                                // Try on next/preivous month
+                                if(Events.isArrowLeft(event) || Events.isArrowUp(event)) {
+                                        onClickPrevious();
+                                } else if(Events.isArrowRight(event) || Events.isArrowDown(event)) {
+                                        onClickNext();
+                                }
+                                setTimeout(() => {
+                                        if(displayedDays.some(d => Dates.toText(d, Dates.D_M_Y) == Dates.toText(nextDate, Dates.D_M_Y)) && realMinDate <= nextDate  && nextDate <= realMaxDate) {
+                                                calendar.querySelector('span.datepicker-day[value="' + Dates.toText(nextDate, Dates.D_M_Y) + '"]').focus();
+                                                focusedDate = Dates.toText(nextDate, Dates.D_M_Y);
+                                        }
+                                }, 100);
+                        }
+                        event.preventDefault();
+                        event.stopPropagation();
+                }
+        }
+        function onNavigateYear(event){
+                if(Events.isArrow(event)) {
+                        var clickedYear = parseInt(event.currentTarget.getAttribute('value'));
+                        var nextYear = clickedYear;
+                        if (Events.isArrowLeft(event)) {
+                                nextYear--;
+                        } else if (Events.isArrowRight(event)) {
+                                nextYear++;
+                        } else if (Events.isArrowUp(event)) {
+                                nextYear -= 3;
+                        } else if (Events.isArrowDown(event)) {
+                                nextYear += 3;
+                        }
+                        if(displayedYears.some(y => y == nextYear)) {
+                                calendar.querySelector('span.datepicker-year[value="' + nextYear + '"]').focus();
+                                focusedYear = nextYear;
+                        } else {
+                                // Try on next/preivous month
+                                if(Events.isArrowLeft(event) || Events.isArrowUp(event)) {
+                                        onClickPrevious();
+                                } else if(Events.isArrowRight(event) || Events.isArrowDown(event)) {
+                                        onClickNext();
+                                }
+                                setTimeout(() => {
+                                        if(displayedYears.some(y => y == nextYear)) {
+                                                calendar.querySelector('span.datepicker-year[value="' + nextYear + '"]').focus();
+                                                focusedYear = nextYear;
+                                        }
+                                }, 100);
+                        }
+                        event.preventDefault();
+                        event.stopPropagation();
+                }
+        }
+        function onKeyDownYearButton(evt){
+                evt = evt.detail.event;
+                if(Events.isTab(evt) && Events.isShift(evt)){
+                        evt.preventDefault();
+                        evt.stopPropagation();
+                }
+        }
+        function onKeyDownValider(evt){
+                evt = evt.detail.event;
+                if(Events.isTab(evt) && !Events.isShift(evt)){
+                        evt.preventDefault();
+                        evt.stopPropagation();
+                }
         }
 
         // METHODS
@@ -203,77 +308,6 @@
                         years.push(i);
                 }
                 return years;
-        }
-        function onEscMask(evt){
-                if(Events.isEsc(evt)){
-                        onClickFermer();
-                }
-        }
-        function onEnterDay(event){
-                if(Events.isEnter(event)) {
-                        onClickDay(event);
-                }
-        }
-        function onEnterYear(event){
-                if(Events.isEnter(event)) {
-                        onClickYear(event);
-                }
-        }
-        function onNavigateDay(event){
-                if(Events.isArrow(event)) {
-                        var clickedDate = event.currentTarget.getAttribute('value');
-                        var nextDate = null;
-                        if (Events.isArrowLeft(event)) {
-                                nextDate = Dates.addDays(Dates.toDate(clickedDate, Dates.D_M_Y), -1);
-                        } else if (Events.isArrowRight(event)) {
-                                nextDate = Dates.addDays(Dates.toDate(clickedDate, Dates.D_M_Y), 1);
-                        } else if (Events.isArrowUp(event)) {
-                                nextDate = Dates.addDays(Dates.toDate(clickedDate, Dates.D_M_Y), -7);
-                        } else if (Events.isArrowDown(event)) {
-                                nextDate = Dates.addDays(Dates.toDate(clickedDate, Dates.D_M_Y), 7);
-                        }
-                        if(displayedDays.some(d => Dates.toText(d, Dates.D_M_Y) == Dates.toText(nextDate, Dates.D_M_Y)) && realMinDate <= nextDate  && nextDate <= realMaxDate) {
-                                event.currentTarget.parentElement.querySelector('[value="' + Dates.toText(nextDate, Dates.D_M_Y) + '"]').focus();
-                                focusedDate = Dates.toText(nextDate, Dates.D_M_Y);
-                        }
-                        event.preventDefault();
-                        event.stopPropagation();
-                }
-        }
-        function onNavigateYear(event){
-                if(Events.isArrow(event)) {
-                        var clickedYear = parseInt(event.currentTarget.getAttribute('value'));
-                        var nextYear = clickedYear;
-                        if (Events.isArrowLeft(event)) {
-                                nextYear--;
-                        } else if (Events.isArrowRight(event)) {
-                                nextYear++;
-                        } else if (Events.isArrowUp(event)) {
-                                nextYear -= 3;
-                        } else if (Events.isArrowDown(event)) {
-                                nextYear += 3;
-                        }
-                        if(displayedYears.some(y => y == nextYear)) {
-                                event.currentTarget.parentElement.querySelector('[value="' + nextYear + '"]').focus();
-                                focusedYear = nextYear;
-                        }
-                        event.preventDefault();
-                        event.stopPropagation();
-                }
-        }
-        function onKeyDownYearButton(evt){
-                evt = evt.detail.event;
-                if(Events.isTab(evt) && Events.isShift(evt)){
-                        evt.preventDefault();
-                        evt.stopPropagation();
-                }
-        }
-        function onKeyDownValider(evt){
-                evt = evt.detail.event;
-                if(Events.isTab(evt) && !Events.isShift(evt)){
-                        evt.preventDefault();
-                        evt.stopPropagation();
-                }
         }
 </script>
 

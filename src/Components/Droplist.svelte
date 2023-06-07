@@ -79,7 +79,7 @@
                 }
                 let params = Events.copy(evt.detail);
                 params.value = value;
-                dispatch('change', {
+                dispatch('blur', {
                         ...params
                 });
         }
