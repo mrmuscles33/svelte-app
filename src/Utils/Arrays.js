@@ -13,7 +13,6 @@ const Arrays = {
                 return a == b ? 0 : a < b;
             }
         });
-        return array;
     }
 }
 export default Arrays;

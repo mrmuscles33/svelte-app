@@ -10,6 +10,7 @@
     import DatePicker from './DatePicker.svelte';
     import Numberfield from './Numberfield.svelte';
     import Events from '../Utils/Events';
+    import Objects from '../Utils/Objects';
 
     // PUBLIC ATTRIBUTES
     export let columns = []; // Array of objects [{label: '...', property: '...'}, type: 'string/number/date', render: (record) => {...}]
@@ -50,7 +51,7 @@
         }
         datas = [...datas];
         selection.forEach(defaultRecord => {
-            defaultRecord.id = datas.find(record => compareRecord(record, defaultRecord))?.id || null;
+            defaultRecord.id = datas.find(record => Objects.equals(record, defaultRecord, [], ['id']))?.id || null;
         });
         selection = selection.filter(record => record.id != null);
         filters.forEach(filter => {
@@ -156,15 +157,6 @@
     }
     
     // METHODS
-    function compareRecord(recordA, recordB) {
-        const keysA = Object.keys(recordA).filter(prop => prop != 'id');
-        const keysB = Object.keys(recordB).filter(prop => prop != 'id');
-        if (keysA.length != keysB.length) return false;
-        for (const key of keysA) {
-            if (recordA[key] != recordB[key]) return false;
-        }
-        return true;
-    }
     function getDefaultFilter(){
         return {
             property: null,
@@ -222,7 +214,9 @@
     }
 </script>
 
+<!-- GRID -->
 <div class="grid-main" style="--page-size: {pageSize}">
+    <!-- TOOLBAR -->
     <div class="grid-toolbar">
         <span class="grid-toolbar-custom">
             <slot name="grid-toolbar"></slot>
@@ -237,8 +231,10 @@
             />
         </span>
     </div>
+    <!-- TABLE -->
     <div class="grid-table">
         <table>
+            <!-- HEADER -->
             <thead>
                 <tr>
                     {#if select == 'multiple'}
@@ -267,6 +263,7 @@
                     {/each}
                 </tr>
             </thead>
+            <!-- DATAS -->
             <tbody>
                 {#each visibleDatas as record}
                     <tr>
@@ -304,6 +301,7 @@
             </tbody>
         </table>
     </div>
+    <!-- PAGING -->
     <div class="grid-paging">
         <span class="grid-paging-text">
             {(page - 1) * pageSize + 1} - {Math.min(page * pageSize, datas.length)} sur {datas.length} résultats
@@ -318,13 +316,17 @@
         {/if}
     </div>
 </div>
+
+<!-- FILTERS -->
 <div class="grid-filter-mask"
     class:grid-filter-visible={showFilter}
     style="--filter-width: {filterWidth}px"
     on:click={onClickMask}
     on:keydown={onEscMask}>
     <div class="grid-filter-main">
+        <!-- VIEW -->
         {#if operation == "view"}
+            <!-- TITLE -->
             <div class="grid-filter-title">
                 {#if tmpFilters.length == 0}
                     Aucun filtre actif
@@ -334,6 +336,7 @@
                     {tmpFilters.length} filtres actifs
                 {/if}
             </div>
+            <!-- FILTERS -->
             <div class="grid-filter-filters">
                 <Button
                     text="Ajouter un filtre"
@@ -359,6 +362,7 @@
                     />
                 {/each}
             </div>
+            <!-- BUTTONS -->
             <div class="grid-filter-buttons">
                 <Button
                     text="Fermer"
@@ -374,7 +378,9 @@
                     on:click={onClickValider}
                 />
             </div>
+        <!-- EDIT -->
         {:else}
+            <!-- TITLE -->
             <div class="grid-filter-title">
                 {#if operation == "add"}
                     Ajouter un filtre
@@ -382,6 +388,7 @@
                     Modifier un filtre
                 {/if}
             </div>
+            <!-- FILTER -->
             <div class="grid-filter-filters grid-filter-edit">
                 {#if operation == "edit"}
                     <Button
@@ -392,6 +399,7 @@
                         on:click={onClickSupprimer}
                     />
                 {/if}
+                <!-- COLUMN -->
                 <Droplist 
                     label="Colonne"
                     bind:value={currentFilter.property}
@@ -400,6 +408,7 @@
                     on:change={onChangeColonne}
                     required={true}
                 />
+                <!-- TYPE -->
                 {#if currentFilter.property}
                     <Droplist 
                         label="Type"
@@ -409,7 +418,9 @@
                         required={true}
                     />
                 {/if}
+                <!-- VALUES -->
                 {#if currentFilter.property && currentFilter.type}
+                    <!-- DATE -->
                     {#if currentFilter.dataType == "date"}
                         {#if currentFilter.type == "between"}
                             <div class="grid-filter-between">
@@ -434,6 +445,7 @@
                                 width={filtersWidth}
                             />
                         {/if}
+                    <!-- NUMBER -->
                     {:else if currentFilter.dataType == "number"}
                         {#if currentFilter.type == "between"}
                             <div class="grid-filter-between">
@@ -458,6 +470,7 @@
                                 width={filtersWidth}
                             />
                         {/if}
+                    <!-- STRING -->
                     {:else}
                         <Textfield
                             label="Valeur"
@@ -468,6 +481,7 @@
                     {/if}
                 {/if}
             </div>
+            <!-- BUTTONS -->
             <div class="grid-filter-buttons">
                 {#if tmpFilters.length == 0}
                     <Button
