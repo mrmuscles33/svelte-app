@@ -75,8 +75,7 @@
             selection = selection.length == datas.length ? [] : datas;
         }
     }
-    function onSort(event) {
-        var property = event.target.getAttribute('property');
+    function onSort(property) {
         sortDirection = property == sortProperty && sortDirection == 'asc' ? 'desc' : 'asc';
         sortProperty = property;
         Arrays.sort(datas, sortProperty, sortDirection);
@@ -123,7 +122,7 @@
         } else if(operation == "add"){
             if(checkFilter(currentFilter)) {
                 currentFilter.id ??= '_' + Math.random().toString(36).substring(2, 12);
-                tmpFilters = [...tmpFilters, currentFilter];
+                tmpFilters = [...tmpFilters, {...currentFilter}];
                 onClickRetour(evt);
             }
         } else {
@@ -138,7 +137,7 @@
     }
     function onClickModifier(id) {
         operation = "edit";
-        currentFilter = tmpFilters.find(f => f.id == id);
+        currentFilter = {...tmpFilters.find(f => f.id == id)};
     }
     function onClickRetour(evt) {
         operation = "view";
@@ -253,7 +252,7 @@
                         {#if column.sortable == false}
                             <th>{column.label}</th>
                         {:else}
-                            <th class="sortable" property={column.property} on:click={onSort}>
+                            <th class="sortable" on:click={onSort.bind(this, column.property)}>
                                 {column.label}
                                 {#if column.property == sortProperty}
                                     <span class="material-icons-round">{sortDirection == 'asc' ? "arrow_upward" : "arrow_downward"}</span>
