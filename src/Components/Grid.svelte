@@ -11,9 +11,10 @@
     import Numberfield from './Numberfield.svelte';
     import Events from '../Utils/Events';
     import Objects from '../Utils/Objects';
+    import Dates from '../Utils/Dates';
 
     // PUBLIC ATTRIBUTES
-    export let columns = []; // Array of objects [{label: '...', property: '...'}, type: 'string/number/date', render: (record) => {...}]
+    export let columns = []; // Array of objects [{label: '...', property: '...', type: 'string/number/date', render: (record) => {...}}]
     export let datas = []; // Array of objects [{prop_A: '...', prop_B: '...'}]
     export let select = null; // null, single, multiple
     export let selection = []; // Like datas
@@ -28,12 +29,13 @@
     let showFilter = false;
     let operation = "view";
     let currentFilter = getDefaultFilter();
-    let filterTypes = [];
+    $: filterTypes = getFilterTypes(currentFilter);
+    $: filteredDatas = Arrays.filter(datas, filters);
     $: tmpFilters = filters;
     $: filtersWidth = filterWidth - 20;
     $: selectedValue = select == "single" && selection.length > 0 ? selection[0].id : null;
-    $: selectAll = selection.length == datas.length;
-    $: visibleDatas = pageSize > 0 ? datas.slice((page - 1) * pageSize, Math.min(page * pageSize, datas.length)) : datas;
+    $: selectAll = selection.length == filteredDatas.length;
+    $: visibleDatas = pageSize > 0 ? filteredDatas.slice((page - 1) * pageSize, Math.min(page * pageSize, filteredDatas.length)) : filteredDatas;
     $: columnsFilter = columns.map(col => {
         return {
             label: col.label,
@@ -43,15 +45,15 @@
     
     // EVENTS
     onMount(() => {
-        datas.forEach(record => {
+        filteredDatas.forEach(record => {
             record.id = '_' + Math.random().toString(36).substring(2, 12); 
         });
         if(sortProperty && sortDirection) {
-            Arrays.sort(datas, sortProperty, sortDirection);
+            filteredDatas = Arrays.sort(filteredDatas, sortProperty, sortDirection, getFormatSort());
         }
-        datas = [...datas];
+        filteredDatas = [...filteredDatas];
         selection.forEach(defaultRecord => {
-            defaultRecord.id = datas.find(record => Objects.equals(record, defaultRecord, [], ['id']))?.id || null;
+            defaultRecord.id = filteredDatas.find(record => Objects.equals(record, defaultRecord, [], ['id']))?.id || null;
         });
         selection = selection.filter(record => record.id != null);
         filters.forEach(filter => {
@@ -61,25 +63,24 @@
     });
     function onSelect(id) {
         if(select == "single") {
-            selection = [datas.find(record => record.id == id)];
+            selection = [filteredDatas.find(record => record.id == id)];
         } else if(select == "multiple") {
             if(selection.some(record => record.id == id)) {
                 selection = selection.filter(record => record.id != id);
             } else {
-                selection = [...selection, datas.find(record => record.id == id)];
+                selection = [...selection, filteredDatas.find(record => record.id == id)];
             }
         }
     }
     function onSelectAll(event) {
         if(event.detail.target.name == "selectAll") {
-            selection = selection.length == datas.length ? [] : datas;
+            selection = selection.length == filteredDatas.length ? [] : filteredDatas;
         }
     }
     function onSort(property) {
         sortDirection = property == sortProperty && sortDirection == 'asc' ? 'desc' : 'asc';
         sortProperty = property;
-        Arrays.sort(datas, sortProperty, sortDirection);
-        datas = datas;
+        filteredDatas = [...Arrays.sort(filteredDatas, sortProperty, sortDirection, getFormatSort())];
     }
     function firstPage() {
         page = 1;
@@ -88,10 +89,10 @@
         if(page > 1) page--;
     }
     function nextPage(){
-        if(page < Math.ceil(datas.length / pageSize)) page++;
+        if(page < Math.ceil(filteredDatas.length / pageSize)) page++;
     }
     function lastPage(){
-        page = Math.ceil(datas.length / pageSize);
+        page = Math.ceil(filteredDatas.length / pageSize);
     }
     function onClickMask(evt) {
         if(evt.target == this){
@@ -116,17 +117,21 @@
         tmpFilters = [];
     }
     function onClickValider(evt){
+        // Validate
         if(operation == "view"){
             filters = [...tmpFilters];
             showFilter = false;
         } else if(operation == "add"){
+            // Add
             if(checkFilter(currentFilter)) {
                 currentFilter.id ??= '_' + Math.random().toString(36).substring(2, 12);
                 tmpFilters = [...tmpFilters, {...currentFilter}];
                 onClickRetour(evt);
             }
         } else {
+            // Modify
             if(checkFilter(currentFilter)) {
+                tmpFilters.splice(tmpFilters.findIndex(f => f.id == currentFilter.id), 1, currentFilter);
                 tmpFilters = [...tmpFilters];
                 onClickRetour(evt);
             }
@@ -151,7 +156,7 @@
         currentFilter.type = null;
         currentFilter.value = null;
         currentFilter.dataType = columns.find(col => col.property == evt.detail.value)?.type || 'string';
-        filterTypes = getFilterTypes(currentFilter);
+        currentFilter.format = columns.find(col => col.property == evt.detail.value)?.format || null;
         currentFilter = {...currentFilter};
     }
     
@@ -163,7 +168,8 @@
             type: null,
             value: null,
             min: null,
-            max: null
+            max: null,
+            format: null
         };
     }
     function getFilterTypes(filter) {
@@ -210,6 +216,13 @@
             return false;
         }
         return true;
+    }
+    function getFormatSort() {
+        var col = columns.find(c => c.property == sortProperty);
+        if(col && col.type == 'date') {
+            return col.format || Dates.M_D_Y;
+        }
+        return null;
     }
 </script>
 
@@ -303,14 +316,14 @@
     <!-- PAGING -->
     <div class="grid-paging">
         <span class="grid-paging-text">
-            {(page - 1) * pageSize + 1} - {Math.min(page * pageSize, datas.length)} sur {datas.length} résultats
+            {(page - 1) * pageSize + 1} - {Math.min(page * pageSize, filteredDatas.length)} sur {filteredDatas.length} résultats
         </span>
-        {#if datas.length != visibleDatas.length}
+        {#if filteredDatas.length != visibleDatas.length}
             <span class="grid-paging-buttons">
                 <Button icon="keyboard_double_arrow_left" border={false} disable={page == 1} on:click={firstPage}/>
                 <Button icon="keyboard_arrow_left" border={false} disable={page == 1} on:click={previousPage}/>
-                <Button icon="keyboard_arrow_right" border={false} disable={Math.ceil(datas.length / pageSize) == page} on:click={nextPage}/>
-                <Button icon="keyboard_double_arrow_right" border={false} disable={Math.ceil(datas.length / pageSize) == page} on:click={lastPage} style="margin-right:0"/>
+                <Button icon="keyboard_arrow_right" border={false} disable={Math.ceil(filteredDatas.length / pageSize) == page} on:click={nextPage}/>
+                <Button icon="keyboard_double_arrow_right" border={false} disable={Math.ceil(filteredDatas.length / pageSize) == page} on:click={lastPage} style="margin-right:0"/>
             </span>
         {/if}
     </div>
@@ -377,7 +390,7 @@
                     on:click={onClickValider}
                 />
             </div>
-        <!-- EDIT -->
+        <!-- ADD/MODIFY -->
         {:else}
             <!-- TITLE -->
             <div class="grid-filter-title">
@@ -427,12 +440,14 @@
                                     label="Du"
                                     bind:value={currentFilter.min}
                                     required={true}
+                                    format={currentFilter.format || Dates.D_M_Y}
                                     width={filtersWidth / 2 - 5}
                                 />
                                 <DatePicker
                                     label="Au"
                                     bind:value={currentFilter.max}
                                     required={true}
+                                    format={currentFilter.format || Dates.D_M_Y}
                                     width={filtersWidth / 2 - 5}
                                 />
                             </div>
@@ -441,6 +456,7 @@
                                 label="Valeur"
                                 bind:value={currentFilter.value}
                                 required={true}
+                                format={currentFilter.format || Dates.D_M_Y}
                                 width={filtersWidth}
                             />
                         {/if}

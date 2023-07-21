@@ -95,20 +95,20 @@
 	}
 
 	let gridColumn = [
-		{label: 'Colonne 1', property: 'prop1', type: 'date'},
+		{label: 'Colonne 1', property: 'prop1', type: 'date', format: Dates.D_M_Y},
 		{label: 'Colonne 2', property: 'prop2'},
 		{label: 'Colonne 3', property: 'prop3', type: 'number', render: (record) => record.prop3 || '<i>Vide</i>'}
 	];
 	let gridData = [
-		{prop1: 'Valeur A', prop2: 'Valeur 1', prop3: 'Valeur 1'},
-		{prop1: 'Valeur B', prop2: 'Valeur 2'},
-		{prop1: 'Valeur C', prop2: 'Valeur 3', prop3: 'Valeur 1', prop4: 'Valeur'},
-		{prop1: 'Valeur E', prop2: 'Valeur 1', prop3: 'Valeur 1'},
-		{prop1: 'Valeur F', prop2: 'Valeur 2'},
-		{prop1: 'Valeur G', prop2: 'Valeur 3', prop3: 'Valeur 1', prop4: 'Valeur'},
-		{prop1: 'Valeur H', prop2: 'Valeur 1', prop3: 'Valeur 1'},
-		{prop1: 'Valeur I', prop2: 'Valeur 2'},
-		{prop1: 'Valeur J', prop2: 'Valeur 3', prop3: 'Valeur 1', prop4: 'Valeur'},
+		{prop1: '01/01/2023', prop2: 'Valeur A', prop3: 'Valeur 1'},
+		{prop1: '02/01/2023', prop2: 'Valeur B'},
+		{prop1: '03/03/2023', prop2: 'Valeur C', prop3: 'Valeur 2', prop4: 'Valeur'},
+		{prop1: '04/01/2023', prop2: 'Valeur D', prop3: 'Valeur 1'},
+		{prop1: '05/01/2023', prop2: 'Valeur E'},
+		{prop1: '06/07/2023', prop2: 'Valeur F', prop3: 'Valeur 2', prop4: 'Valeur'},
+		{prop1: '07/01/2023', prop2: 'Valeur G', prop3: 'Valeur 1'},
+		{prop1: '08/01/2023', prop2: 'Valeur H'},
+		{prop1: '09/11/2023', prop2: 'Valeur I', prop3: 'Valeur 1', prop4: 'Valeur'},
 	];
 	let gridSelection = [
 		{prop1: 'Valeur B', prop2: 'Valeur 2'}

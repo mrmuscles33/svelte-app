@@ -88,6 +88,21 @@ const Dates = {
         }
         return retour;
     },
+    before: (pDateA, pDateB, pFormat) => {
+        let formatA = pFormat || Dates.getFormat(pDateA);
+        let formatB = pFormat || Dates.getFormat(pDateB);
+        return Dates.format(pDateA, formatA, Dates.YMD) < Dates.format(pDateB, formatB, Dates.YMD);
+    },
+    after: (pDateA, pDateB, pFormat) => {
+        let formatA = pFormat || Dates.getFormat(pDateA);
+        let formatB = pFormat || Dates.getFormat(pDateB);
+        return Dates.format(pDateA, formatA, Dates.YMD) > Dates.format(pDateB, formatB, Dates.YMD);
+    },
+    equals: (pDateA, pDateB, pFormat) => {
+        let formatA = pFormat || Dates.getFormat(pDateA);
+        let formatB = pFormat || Dates.getFormat(pDateB);
+        return Dates.format(pDateA, formatA, Dates.YMD) == Dates.format(pDateB, formatB, Dates.YMD);
+    },
     format : (pStrDate, pInFormat, pOutFormat) => {
         let inFormat = (pInFormat || Dates.getFormat(pStrDate)).toUpperCase();
         return Dates.toText(Dates.toDate(pStrDate, inFormat), pOutFormat.toUpperCase());
@@ -95,16 +110,16 @@ const Dates = {
     getPatterns : () => {
         // Defined formats
         let formats = {};
-        formats[Dates.D_M_Y] = '^(([0][1-9])|([1-2]\\d)|([3][0-1]))(\/|-|\.)(([0]\\d)|([1][0-2]))(\/|-|\.)\\d{4}$';
-        formats[Dates.M_D_Y] = '^(([0]\\d)|([1][0-2]))(\/|-|\.)(([0][1-9])|([1-2]\\d)|([3][0-1]))(\/|-|\.)\\d{4}$';
-        formats[Dates.Y_M_D] = '^\\d{4}(\/|-|\.)(([0]\\d)|([1][0-2]))(\/|-|\.)(([0][1-9])|([1-2]\\d)|([3][0-1]))$';
-        formats[Dates.Y_D_M] = '^\\d{4}(\/|-|\.)(([0][1-9])|([1-2]\\d)|([3][0-1]))(\/|-|\.)(([0]\\d)|([1][0-2]))$';
+        formats[Dates.D_M_Y] = '^(([0][1-9])|([1-2]\\d)|([3][0-1]))(/|-|.)(([0]\\d)|([1][0-2]))(/|-|.)\\d{4}$';
+        formats[Dates.M_D_Y] = '^(([0]\\d)|([1][0-2]))(/|-|.)(([0][1-9])|([1-2]\\d)|([3][0-1]))(/|-|.)\\d{4}$';
+        formats[Dates.Y_M_D] = '^\\d{4}(/|-|.)(([0]\\d)|([1][0-2]))(/|-|.)(([0][1-9])|([1-2]\\d)|([3][0-1]))$';
+        formats[Dates.Y_D_M] = '^\\d{4}(/|-|.)(([0][1-9])|([1-2]\\d)|([3][0-1]))(/|-|.)(([0]\\d)|([1][0-2]))$';
         formats[Dates.DMY] = '^(([0][1-9])|([1-2]\\d)|([3][0-1]))(([0]\\d)|([1][0-2]))\\d{4}$';
         formats[Dates.MDY] = '^(([0]\\d)|([1][0-2]))(([0][1-9])|([1-2]\\d)|([3][0-1]))\\d{4}$';
         formats[Dates.YMD] = '^\\d{4}(([0]\\d)|([1][0-2]))(([0][1-9])|([1-2]\\d)|([3][0-1]))$';
         formats[Dates.YDM] = '^\\d{4}(([0][1-9])|([1-2]\\d)|([3][0-1]))(([0]\\d)|([1][0-2]))$';
-        formats[Dates.M_Y] = '^(([0]\\d)|([1][0-2]))(\/|-|\.)\\d{4}$';
-        formats[Dates.Y_M] = '^\\d{4}(\/|-|\.)(([0]\\d)|([1][0-2]))$';
+        formats[Dates.M_Y] = '^(([0]\\d)|([1][0-2]))(/|-|.)\\d{4}$';
+        formats[Dates.Y_M] = '^\\d{4}(/|-|.)(([0]\\d)|([1][0-2]))$';
         formats[Dates.MY] = '^(([0]\\d)|([1][0-2]))\\d{4}$';
         formats[Dates.YM] = '^\\d{4}(([0]\\d)|([1][0-2]))$';
         return formats;
