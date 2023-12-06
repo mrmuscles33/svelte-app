@@ -140,7 +140,16 @@
      style="--width: {width}px;
             --width-input: {inputWidth}px;
             {style}">
-        <input use:typeAction bind:this={input} {id} bind:value={value} {required} pattern={pattern || null} {readonly} disabled={disable} placeholder="." 
+        <input use:typeAction 
+                bind:this={input} 
+                {id} 
+                bind:value={value} 
+                {required} 
+                pattern={pattern || null} 
+                {readonly} 
+                disabled={disable} 
+                tabindex={readonly || disable ? "-1" : "0"} 
+                placeholder="." 
                 on:change={onChange} 
                 on:input={onInput}
                 on:focus={onFocus}

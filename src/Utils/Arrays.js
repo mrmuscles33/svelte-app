@@ -47,11 +47,11 @@ const Arrays = {
                     case Arrays.CONTAINS:
                         return itemValue.includes(filter.value);
                     case Arrays.STARTS:
-                        return itemValue.startsWith(filter.value);
+                        return itemValue.trim().startsWith(filter.value);
                     case Arrays.ENDS:
-                        return itemValue.endsWith(filter.value);
+                        return itemValue.trim().endsWith(filter.value);
                     case Arrays.IN:
-                        return true; // TODO
+                        return filter.value.split(',').map(el => el.trim()).includes(itemValue);
                     default:
                         return true;
                 }

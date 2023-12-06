@@ -16,8 +16,8 @@
         export let cls = "";
         export let format = null;
         export let items = []; // Array of object [{label: '...', value: '...'}]
-        export let selectOnly = false;
         export let render = null;
+        export let filter = false;
         
         // PRIVATE ATTRIBUTES
         let type = "text";
@@ -25,6 +25,7 @@
         let visible = false;
         let position = "bottom";
         let droplist;
+        let filterValue;
         $: displayedItems = items;
         $: displayedValue = getLabel(value);
 
@@ -46,18 +47,24 @@
                 }
                 input.onChange(evt);
                 close();
+                focusIcon();
+        }
+        function focusIcon() {
+                setTimeout(() => {
+                        input.getInput().parentElement.querySelector('.textfield-icon-right').focus();
+                }, 100);
         }
         function onKeyUp(evt) {
                 let event = evt.detail;
                 if(Events.isArrowUp(event) || Events.isArrowDown(event)) {
                         open();
-                } else if(Events.isEnter(event)) {
-                        displayedItems = items.filter(i => i.label.toLowerCase().includes(displayedValue.toLowerCase()));
-                        open();
                 }
         }
+        function onKeyUpFilter(evt) {
+                displayedItems = items.filter(i => i.label.toLowerCase().includes(filterValue.toLowerCase()));
+        }
         function onClick(evt) {
-                if(selectOnly && !readonly) {
+                if(!readonly) {
                         open();
                 }
         }
@@ -86,9 +93,6 @@
         function onKeyDownItem(event){
                 if(Events.isEnter(event)){
                         onClickItem(event);
-                        setTimeout(() => {
-                                input.getInput().focus();
-                        }, 100);
                         event.preventDefault();
                         event.stopPropagation();
                 } else {
@@ -111,8 +115,11 @@
         }
         function onFocusOut(event){
                 if (!event.currentTarget.contains(event.relatedTarget)) {
-                        visible = false;
+                        close();
                 }
+        }
+        export function focus() {
+                focusIcon();
         }
 
         // METHODS
@@ -123,6 +130,8 @@
         function open() {
                 position = (window.innerHeight - input.getInput().getBoundingClientRect().top) < 250 ? 'top' : 'bottom';
                 visible = true;
+                filterValue = '';
+                displayedItems = items;
                 focusItem();
         }
         function close() {
@@ -152,7 +161,7 @@
                 {required}
                 {type}
                 {format}
-                readonly={readonly || selectOnly}
+                readonly={true}
                 iconRight={readonly ? "" : "expand_more"}
                 {label}
                 {cls}
@@ -176,6 +185,16 @@
                 class="droplist-items droplist-{position}" 
                 class:droplist-visible={visible}
                 style="--width: {width}px;">
+                {#if filter}
+                        <Textfield
+                                bind:value={filterValue}
+                                filled={false}
+                                iconLeft="search"
+                                width={width-20}
+                                style="margin:10px 10px 0px 10px"
+                                on:keyup={onKeyUpFilter}
+                        />
+                {/if}
                 {#each displayedItems as item}
                         <li 
                                 tabindex={

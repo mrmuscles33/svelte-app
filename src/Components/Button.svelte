@@ -14,6 +14,7 @@
         
         // PRIVATE ATTRIBUTES
         let iconPadding = text == "" ? '0 12px' : '0 16px 0 12px';
+        let button;
 
         // METHODS
 	const dispatch = createEventDispatcher();
@@ -42,6 +43,12 @@
                         });
                 }
         }
+
+        export function focus() {
+                setTimeout(() => {
+                        button.focus();
+                }, 100);
+        }
 </script>
 
 <span class="btn-main {cls}" 
@@ -50,6 +57,7 @@
      class:border
      class:disable
      role="button"
+     bind:this={button}
      tabindex={disable ? "-1" : "0"}
      on:click|stopPropagation|preventDefault={onClick}
      on:keyup|stopPropagation|preventDefault={onKeyUp}
@@ -86,10 +94,12 @@
                 border-color: var(--color-primary);
         }
         .btn-main:hover,
+        .btn-main:focus,
         .btn-main:focus-visible {
                 background-color: var(--color-hover);
         }
         .btn-main.primary:hover,
+        .btn-main.primary:focus,
         .btn-main.primary:focus-visible {
                 border-color: var(--color-hover);
         }

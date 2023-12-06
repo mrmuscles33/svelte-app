@@ -10,6 +10,10 @@
 /* TimePicker.svelte */
 /* Droplist.svelte */
 
+html {
+    --scroolbar-color: #777;
+}
+
 /* Button.svelte */
 .btn-main {
     /* Border color */

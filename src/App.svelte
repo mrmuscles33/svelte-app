@@ -113,6 +113,12 @@
 	let gridSelection = [
 		{prop1: 'Valeur B', prop2: 'Valeur 2'}
 	]
+	let filters = [{
+		property: 'prop2',
+		dataType: 'string',
+		type: 'equals',	
+		value: 'Valeur A',
+	}];
 </script>
 
 <main>
@@ -244,6 +250,7 @@
 		<h3>Droplists</h3>
 		<Droplist 
 			label="Langue"
+			filter={true}
 			value={droplistValue}
 			items={droplistItems}
 			render={droplistItemsRender}
@@ -252,7 +259,6 @@
 			label="Sexe"
 			items={droplistItems2}
 			render={droplistItems2Render}
-			selectOnly={true}
 		/>
 	</section>
 	<br/>
@@ -263,6 +269,7 @@
 			columns={gridColumn} 
 			datas={gridData}
 			selection={gridSelection}
+			filters={filters}
 			pageSize=5
 			select="multiple">
 			<span slot="grid-toolbar">

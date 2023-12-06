@@ -29,6 +29,9 @@
     let showFilter = false;
     let operation = "view";
     let currentFilter = getDefaultFilter();
+    let filterButton;
+    let filterBtnAdd;
+    let filterDroplistCol;
     $: filterTypes = getFilterTypes(currentFilter);
     $: filteredDatas = Arrays.filter(datas, filters);
     $: tmpFilters = filters;
@@ -45,17 +48,25 @@
     
     // EVENTS
     onMount(() => {
-        filteredDatas.forEach(record => {
+        // Generate id for each record
+        datas.forEach(record => {
             record.id = '_' + Math.random().toString(36).substring(2, 12); 
         });
+        datas = [...datas];
+
+        // Init sort
         if(sortProperty && sortDirection) {
             filteredDatas = Arrays.sort(filteredDatas, sortProperty, sortDirection, getFormatSort());
         }
         filteredDatas = [...filteredDatas];
+
+        // Init selection
         selection.forEach(defaultRecord => {
             defaultRecord.id = filteredDatas.find(record => Objects.equals(record, defaultRecord, [], ['id']))?.id || null;
         });
         selection = selection.filter(record => record.id != null);
+
+        // Generate id for each filter
         filters.forEach(filter => {
             filter.id = '_' + Math.random().toString(36).substring(2, 12); 
         });
@@ -63,11 +74,15 @@
     });
     function onSelect(id) {
         if(select == "single") {
+            // Single selection : find the only one element
             selection = [filteredDatas.find(record => record.id == id)];
         } else if(select == "multiple") {
+            // Multiple selection
             if(selection.some(record => record.id == id)) {
+                // Remove selection
                 selection = selection.filter(record => record.id != id);
             } else {
+                // Add selection
                 selection = [...selection, filteredDatas.find(record => record.id == id)];
             }
         }
@@ -101,12 +116,27 @@
     }
     function onClickFermer(){
         showFilter = false;
+        filterButton.focus();
     }
     function onClickFilters(){
+        // Open filter panel
         showFilter = true;
         tmpFilters = [...filters];
         operation = tmpFilters.length > 0 ? "view" : "add";
         currentFilter = getDefaultFilter();
+        setFocusFilter();
+    }
+    function setFocusFilter() {
+        // Set focus to first visible item
+        if(operation == "view") {
+            setTimeout(() => {
+                filterBtnAdd.focus();
+            }, 100);
+        } else if(operation == "add" || operation == "edit"){
+            setTimeout(() => {
+                filterDroplistCol.focus();
+            }, 100);
+        }
     }
     function onEscMask(evt){
         if(Events.isEsc(evt)){
@@ -115,12 +145,13 @@
     }
     function onClickReset(evt) {
         tmpFilters = [];
+        setFocusFilter();
     }
     function onClickValider(evt){
-        // Validate
         if(operation == "view"){
+            // Validate
             filters = [...tmpFilters];
-            showFilter = false;
+            onClickFermer();
         } else if(operation == "add"){
             // Add
             if(checkFilter(currentFilter)) {
@@ -139,13 +170,16 @@
     }
     function onClickAjouter(evt) {
         operation = "add";
+        setFocusFilter();
     }
     function onClickModifier(id) {
         operation = "edit";
+        setFocusFilter();
         currentFilter = {...tmpFilters.find(f => f.id == id)};
     }
     function onClickRetour(evt) {
         operation = "view";
+        setFocusFilter();
         currentFilter = getDefaultFilter();
     }
     function onClickSupprimer(evt){
@@ -218,6 +252,7 @@
         return true;
     }
     function getFormatSort() {
+        // Get format for date sort
         var col = columns.find(c => c.property == sortProperty);
         if(col && col.type == 'date') {
             return col.format || Dates.M_D_Y;
@@ -238,6 +273,7 @@
                 text={"Filtrer" + (filters.length > 0 ? " (" + filters.length + ")" : "")}
                 border={false}
                 icon="filter_list"
+                bind:this={filterButton}
                 style="margin-right:0"
                 on:click={onClickFilters}
             />
@@ -278,7 +314,7 @@
             <!-- DATAS -->
             <tbody>
                 {#each visibleDatas as record}
-                    <tr>
+                    <tr recordId={record.id}>
                         {#if select == 'multiple'}
                             <td class="grid-cell-select">
                                 <Checkbox 
@@ -355,6 +391,7 @@
                     icon="filter_list"
                     style="width:100%; text-align:center"
                     primary={true}
+                    bind:this={filterBtnAdd}
                     on:click={onClickAjouter}
                 />
                 {#if tmpFilters.length > 0}
@@ -406,7 +443,7 @@
                     <Button
                         text="Supprimer ce filtre"
                         icon="delete"
-                        style="width:100%; text-align:center"
+                        style="text-align:center"
                         primary={true}
                         on:click={onClickSupprimer}
                     />
@@ -419,6 +456,7 @@
                     width={filtersWidth}
                     on:change={onChangeColonne}
                     required={true}
+                    bind:this={filterDroplistCol}
                 />
                 <!-- TYPE -->
                 {#if currentFilter.property}
