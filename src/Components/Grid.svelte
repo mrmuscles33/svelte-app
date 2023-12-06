@@ -182,7 +182,11 @@
         setFocusFilter();
         currentFilter = getDefaultFilter();
     }
-    function onClickSupprimer(evt){
+    function onClickSupprimer1(id){
+        currentFilter = {...tmpFilters.find(f => f.id == id)};
+        tmpFilters = tmpFilters.filter(f => f.id != currentFilter.id);
+    }
+    function onClickSupprimer2(evt){
         tmpFilters = tmpFilters.filter(f => f.id != currentFilter.id);
         onClickRetour(evt);
     }
@@ -208,7 +212,14 @@
     }
     function getFilterTypes(filter) {
         var colType = columns.find(col => col.property == filter.property)?.type || 'string';
-        if(colType == 'date' || colType == 'number') {
+        if(colType == 'date') {
+            return [
+                {label: 'Égal à', value : 'equals'},
+                {label: 'Jusqu\'au', value : 'before'},
+                {label: 'Depuis le', value : 'after'},
+                {label: 'Entre', value : 'between'}
+            ];
+        } else if(colType == 'number') {
             return [
                 {label: 'Égal à', value : 'equals'},
                 {label: 'Inférieur à', value : 'before'},
@@ -384,31 +395,30 @@
                     {tmpFilters.length} filtres actifs
                 {/if}
             </div>
+            <!-- ADD BUTTON -->
+            <Button
+                text="Ajouter"
+                icon="add"
+                primary={true}
+                bind:this={filterBtnAdd}
+                on:click={onClickAjouter}
+            />
             <!-- FILTERS -->
             <div class="grid-filter-filters">
-                <Button
-                    text="Ajouter un filtre"
-                    icon="filter_list"
-                    style="width:100%; text-align:center"
-                    primary={true}
-                    bind:this={filterBtnAdd}
-                    on:click={onClickAjouter}
-                />
-                {#if tmpFilters.length > 0}
-                    <Button
-                        text="Supprimer les filtres"
-                        icon="filter_list_off"
-                        style="width:100%; text-align:center"
-                        on:click={onClickReset}
-                    />
-                {/if}
                 {#each tmpFilters as filter}
+                <div style="display: flex;">
                     <Button
                         text={getLabel(filter)}
                         border={false}
-                        style="width:100%"
                         on:click={onClickModifier.bind(this, filter.id)}
+                        style="flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
                     />
+                    <Button
+                        border={false}
+                        icon="delete"
+                        on:click={onClickSupprimer1.bind(this, filter.id)}
+                    />
+                </div>
                 {/each}
             </div>
             <!-- BUTTONS -->
@@ -417,13 +427,23 @@
                     text="Fermer"
                     icon="close"
                     border={false}
+                    style="flex-grow:1; text-align: center"
                     on:click={onClickFermer}
                 />
+                {#if tmpFilters.length > 0}
+                    <Button
+                        text="Réinitialiser"
+                        icon="restart_alt"
+                        border={false}
+                        style="flex-grow:1; text-align: center"
+                        on:click={onClickReset}
+                    />
+                {/if}
                 <Button
                     text="Valider"
                     icon="done"
                     primary={true}
-                    style="margin-right:0"
+                    style="flex-grow:1; text-align: center"
                     on:click={onClickValider}
                 />
             </div>
@@ -439,15 +459,6 @@
             </div>
             <!-- FILTER -->
             <div class="grid-filter-filters grid-filter-edit">
-                {#if operation == "edit"}
-                    <Button
-                        text="Supprimer ce filtre"
-                        icon="delete"
-                        style="text-align:center"
-                        primary={true}
-                        on:click={onClickSupprimer}
-                    />
-                {/if}
                 <!-- COLUMN -->
                 <Droplist 
                     label="Colonne"
@@ -541,6 +552,7 @@
                         text="Fermer"
                         icon="close"
                         border={false}
+                        style="flex-grow:1; text-align: center"
                         on:click={onClickFermer}
                     />
                 {:else}
@@ -548,14 +560,24 @@
                         text="Retour"
                         icon="arrow_back"
                         border={false}
+                        style="flex-grow:1; text-align: center"
                         on:click={onClickRetour}
+                    />
+                {/if}
+                {#if operation == "edit"}
+                    <Button
+                        text="Supprimer"
+                        icon="delete"
+                        border={false}
+                        style="flex-grow:1; text-align: center"
+                        on:click={onClickSupprimer2}
                     />
                 {/if}
                 <Button
                     text="Valider"
                     icon="done"
                     primary={true}
-                    style="margin-right:0"
+                    style="flex-grow:1; text-align: center"
                     on:click={onClickValider}
                 />
             </div>

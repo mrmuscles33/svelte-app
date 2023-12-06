@@ -362,12 +362,14 @@
                                 <Button
                                         text="Fermer"
                                         icon="close"
+                                        style="flex-grow:1; text-align: center"
                                         border={false}
                                         on:click={onClickFermer}
                                 />
                                 <Button
                                         text="Valider"
                                         icon="done"
+                                        style="flex-grow:1; text-align: center"
                                         primary={true}
                                         on:click={onClickValider}
                                         on:keydown={onKeyDownValider}
@@ -620,6 +622,6 @@
                 border: 2px solid var(--color-primary);
         }
         .timepicker-buttons {
-                float: right;
+                display: flex;
         }
 </style>

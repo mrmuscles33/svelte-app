@@ -357,7 +357,7 @@
                                         style="margin-left: 8px"
                                 />
                         </Tooltip>
-                        <div class="datepicker-buttons">
+                        <div class="datepicker-prev-next">
                                 <Tooltip text={showYears ? "Années précédentes" : "Mois précedent"}>
                                         <Button
                                                 text=""
@@ -422,12 +422,14 @@
                                         text="Fermer"
                                         icon="close"
                                         border={false}
+                                        style="flex-grow:1; text-align: center"
                                         on:click={onClickFermer}
                                 />
                                 <Button
                                         text="Valider"
                                         icon="done"
                                         primary={true}
+                                        style="flex-grow:1; text-align: center"
                                         on:click={onClickValider}
                                         on:keydown={onKeyDownValider}
                                 />
@@ -564,6 +566,9 @@
                 color: var(--color-font-selected);
         }
         .datepicker-buttons {
+                display: flex;
+        }
+        .datepicker-prev-next {
                 float: right;
         }
 </style>
