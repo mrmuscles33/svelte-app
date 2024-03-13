@@ -24,6 +24,10 @@
         export let filled = true;
         export let calendarOnly = false;
         export let style = "";
+        export let flex = false;
+
+        export let pickerCls = "";
+        export let pickerStyle = "";
         
         // PRIVATE ATTRIBUTES
         let pattern = Dates.getPattern(format);
@@ -326,6 +330,7 @@
         {cls}
         {filled}
         {style}
+        {flex}
         bind:errorMessage={errorMessage}
         on:change={onChange}
         on:blur={onBlur}
@@ -338,8 +343,9 @@
         bind:this={input}
 />
 
-<div class="datepicker-mask" {id}
+<div class="datepicker-mask {pickerCls}" {id}
      class:datepicker-visible={visible}
+     style={pickerStyle}
      on:click={onClickMask}
      on:keydown={onEscMask}>
         <div class="datepicker-main">
@@ -443,7 +449,7 @@
                 position: fixed;
                 width: 100%;
                 height: 100%;
-                background-color: rgba(150,150,150,0.5);
+                background-color: var(--mask-color);
                 top: 0;
                 left: 0;
                 backdrop-filter: blur(2px);

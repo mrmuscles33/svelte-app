@@ -12,6 +12,8 @@
     import Events from '../Utils/Events';
     import Objects from '../Utils/Objects';
     import Dates from '../Utils/Dates';
+    import Modal from './Modal.svelte';
+    import Toolbar from './Toolbar.svelte';
 
     // PUBLIC ATTRIBUTES
     export let columns = []; // Array of objects [{label: '...', property: '...', type: 'string/number/date', render: (record) => {...}}]
@@ -275,21 +277,18 @@
 <!-- GRID -->
 <div class="grid-main" style="--page-size: {pageSize}">
     <!-- TOOLBAR -->
-    <div class="grid-toolbar">
-        <span class="grid-toolbar-custom">
-            <slot name="grid-toolbar"></slot>
-        </span>
-        <span class="grid-toolbar-default">
-            <Button
-                text={"Filtrer" + (filters.length > 0 ? " (" + filters.length + ")" : "")}
-                border={false}
-                icon="filter_list"
-                bind:this={filterButton}
-                style="margin-right:0"
-                on:click={onClickFilters}
-            />
-        </span>
-    </div>
+    <Toolbar align="left">
+        <slot name="grid-toolbar"></slot>
+        <span style="flex-grow: 1;"></span>
+        <Button
+            text={"Filtrer" + (filters.length > 0 ? " (" + filters.length + ")" : "")}
+            border={false}
+            icon="filter_list"
+            bind:this={filterButton}
+            style="margin-right:0"
+            on:click={onClickFilters}
+        />
+    </Toolbar>
     <!-- TABLE -->
     <div class="grid-table">
         <table>
@@ -376,25 +375,20 @@
     </div>
 </div>
 
-<!-- FILTERS -->
-<div class="grid-filter-mask"
-    class:grid-filter-visible={showFilter}
-    style="--filter-width: {filterWidth}px"
-    on:click={onClickMask}
-    on:keydown={onEscMask}>
-    <div class="grid-filter-main">
+<!-- FILTER MODAL -->
+<Modal
+    minHeight={350}
+    bind:visible={showFilter}
+    title={ operation == "view" && tmpFilters.length == 0 ? "Aucun filtre actif" : 
+            operation == "view" && tmpFilters.length == 1 ? tmpFilters.length + " filtre actif" : 
+            operation == "view" && tmpFilters.length >  1 ? tmpFilters.length + " filtres actifs" :
+            operation == "add" ? "Ajouter un filtre" :
+            operation == "edit" ? "Modifier un filtre" : ""}
+>
+    <!-- CONTENT -->
+    <div slot="modal-content">
         <!-- VIEW -->
         {#if operation == "view"}
-            <!-- TITLE -->
-            <div class="grid-filter-title">
-                {#if tmpFilters.length == 0}
-                    Aucun filtre actif
-                {:else if tmpFilters.length == 1}
-                    {tmpFilters.length} filtre actif
-                {:else}
-                    {tmpFilters.length} filtres actifs
-                {/if}
-            </div>
             <!-- ADD BUTTON -->
             <Button
                 text="Ajouter"
@@ -404,14 +398,14 @@
                 on:click={onClickAjouter}
             />
             <!-- FILTERS -->
-            <div class="grid-filter-filters">
-                {#each tmpFilters as filter}
+            {#each tmpFilters as filter}
                 <div style="display: flex;">
                     <Button
                         text={getLabel(filter)}
                         border={false}
+                        flex={true}
+                        style="text-align: left;"
                         on:click={onClickModifier.bind(this, filter.id)}
-                        style="flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
                     />
                     <Button
                         border={false}
@@ -419,52 +413,19 @@
                         on:click={onClickSupprimer1.bind(this, filter.id)}
                     />
                 </div>
-                {/each}
-            </div>
-            <!-- BUTTONS -->
-            <div class="grid-filter-buttons">
-                <Button
-                    text="Fermer"
-                    icon="close"
-                    border={false}
-                    style="flex-grow:1; text-align: center"
-                    on:click={onClickFermer}
-                />
-                {#if tmpFilters.length > 0}
-                    <Button
-                        text="Réinitialiser"
-                        icon="restart_alt"
-                        border={false}
-                        style="flex-grow:1; text-align: center"
-                        on:click={onClickReset}
-                    />
-                {/if}
-                <Button
-                    text="Valider"
-                    icon="done"
-                    primary={true}
-                    style="flex-grow:1; text-align: center"
-                    on:click={onClickValider}
-                />
-            </div>
+            {/each}
         <!-- ADD/MODIFY -->
         {:else}
-            <!-- TITLE -->
-            <div class="grid-filter-title">
-                {#if operation == "add"}
-                    Ajouter un filtre
-                {:else}
-                    Modifier un filtre
-                {/if}
-            </div>
             <!-- FILTER -->
-            <div class="grid-filter-filters grid-filter-edit">
+            <div class="grid-filter-edit">
                 <!-- COLUMN -->
+                <!-- TODO arriver à faire sortir la combo de la popup -->
                 <Droplist 
                     label="Colonne"
                     bind:value={currentFilter.property}
                     items={columnsFilter}
                     width={filtersWidth}
+                    flex={true}
                     on:change={onChangeColonne}
                     required={true}
                     bind:this={filterDroplistCol}
@@ -477,6 +438,7 @@
                         items={filterTypes}
                         width={filtersWidth}
                         required={true}
+                        flex={true}
                     />
                 {/if}
                 <!-- VALUES -->
@@ -484,54 +446,54 @@
                     <!-- DATE -->
                     {#if currentFilter.dataType == "date"}
                         {#if currentFilter.type == "between"}
-                            <div class="grid-filter-between">
+                            <Toolbar>
                                 <DatePicker
                                     label="Du"
                                     bind:value={currentFilter.min}
                                     required={true}
                                     format={currentFilter.format || Dates.D_M_Y}
-                                    width={filtersWidth / 2 - 5}
+                                    flex={true}
                                 />
                                 <DatePicker
                                     label="Au"
                                     bind:value={currentFilter.max}
                                     required={true}
                                     format={currentFilter.format || Dates.D_M_Y}
-                                    width={filtersWidth / 2 - 5}
+                                    flex={true}
                                 />
-                            </div>
+                            </Toolbar>
                         {:else}
                             <DatePicker
                                 label="Valeur"
                                 bind:value={currentFilter.value}
                                 required={true}
                                 format={currentFilter.format || Dates.D_M_Y}
-                                width={filtersWidth}
+                                flex={true}
                             />
                         {/if}
                     <!-- NUMBER -->
                     {:else if currentFilter.dataType == "number"}
                         {#if currentFilter.type == "between"}
-                            <div class="grid-filter-between">
+                            <Toolbar>
                                 <Numberfield
                                     label="Valeur min"
                                     bind:value={currentFilter.min}
                                     required={true}
-                                    width={filtersWidth / 2 - 5}
+                                    flex={true}
                                 />
                                 <Numberfield
                                     label="Valeur max"
                                     bind:value={currentFilter.max}
                                     required={true}
-                                    width={filtersWidth / 2 - 5}
+                                    flex={true}
                                 />
-                            </div>
+                            </Toolbar>
                         {:else}
                             <Numberfield
                                 label="Valeur"
                                 bind:value={currentFilter.value}
                                 required={true}
-                                width={filtersWidth}
+                                flex={true}
                             />
                         {/if}
                     <!-- STRING -->
@@ -540,50 +502,69 @@
                             label="Valeur"
                             bind:value={currentFilter.value}
                             required={true}
-                            width={filtersWidth}
+                            flex={true}
                         />
                     {/if}
                 {/if}
             </div>
-            <!-- BUTTONS -->
-            <div class="grid-filter-buttons">
-                {#if tmpFilters.length == 0}
-                    <Button
-                        text="Fermer"
-                        icon="close"
-                        border={false}
-                        style="flex-grow:1; text-align: center"
-                        on:click={onClickFermer}
-                    />
-                {:else}
-                    <Button
-                        text="Retour"
-                        icon="arrow_back"
-                        border={false}
-                        style="flex-grow:1; text-align: center"
-                        on:click={onClickRetour}
-                    />
-                {/if}
-                {#if operation == "edit"}
-                    <Button
-                        text="Supprimer"
-                        icon="delete"
-                        border={false}
-                        style="flex-grow:1; text-align: center"
-                        on:click={onClickSupprimer2}
-                    />
-                {/if}
-                <Button
-                    text="Valider"
-                    icon="done"
-                    primary={true}
-                    style="flex-grow:1; text-align: center"
-                    on:click={onClickValider}
-                />
-            </div>
         {/if}
     </div>
-</div>
+    <!-- BUTTONS -->
+    <Toolbar slot="modal-buttons">
+        {#if operation == "view"}
+            <Button
+                text="Fermer"
+                icon="close"
+                border={false}
+                flex={true}
+                on:click={onClickFermer}
+            />
+            {#if tmpFilters.length > 0}
+                <Button
+                    text="Réinitialiser"
+                    icon="restart_alt"
+                    border={false}
+                    flex={true}
+                    on:click={onClickReset}
+                />
+            {/if}
+        {:else}
+            {#if tmpFilters.length == 0}
+                <Button
+                    text="Fermer"
+                    icon="close"
+                    border={false}
+                    flex={true}
+                    on:click={onClickFermer}
+                />
+            {:else}
+                <Button
+                    text="Retour"
+                    icon="arrow_back"
+                    border={false}
+                    flex={true}
+                    on:click={onClickRetour}
+                />
+            {/if}
+            {#if operation == "edit"}
+                <Button
+                    text="Supprimer"
+                    icon="delete"
+                    border={false}
+                    flex={true}
+                    on:click={onClickSupprimer2}
+                />
+            {/if}
+        {/if}
+        <Button
+            text="Valider"
+            icon="done"
+            primary={true}
+            flex={true}
+            on:click={onClickValider}
+        />
+    </Toolbar>
+</Modal>
 
 <style>
     .grid-main .grid-table {
@@ -631,68 +612,9 @@
         justify-content: space-between;
         align-items: center;
     }
-    .grid-main .grid-toolbar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .grid-filter-mask {
-        position: fixed;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(150,150,150,0.5);
-        top: 0;
-        left: 0;
-        backdrop-filter: blur(2px);
-        visibility: hidden;
-        pointer-events: none;
-        opacity: 0;
-        transition: opacity 0.2s;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 2;
-    }
-    .grid-filter-visible {
-        visibility: visible;
-        pointer-events: auto;
-        opacity: 1;
-    }
-    .grid-filter-main {
-        width: var(--filter-width);
-        transform: scale(0.8);
-        background-color: #FFF;
-        border-radius: 8px;
-        box-shadow: 0 6px 25px rgba(150,150,150,0.7);
-        overflow: hidden;
-        transition: transform 0.2s;
-        overflow: visible;
-        padding: 10px 10px 5px 10px;
-    }
-    .grid-filter-visible .grid-filter-main {
-        transform: scale(1);
-    }
-    .grid-filter-title {
-        font-weight: bold;
-        font-size: 20px;
-        margin: 10px 5px;
-    }
-    .grid-filter-filters {
-        min-height: 200px;
-    }
     .grid-filter-edit {
         display: grid;
         grid-auto-rows: min-content;
         grid-row-gap: 5px;
-    }
-    .grid-filter-buttons {
-        width: 100%;
-        display: flex;
-        justify-content: flex-end;
-    }
-    .grid-filter-between {
-        display: flex;
-        width: 100%;
-        justify-content: space-between;
     }
 </style>

@@ -15,6 +15,8 @@
 	import Dates from './Utils/Dates';
 	import Times from './Utils/Times';
 	import Ajax from './Utils/Ajax';
+  	import Modal from './Components/Modal.svelte';
+	import Toolbar from './Components/Toolbar.svelte';
 
 	function clickButton(){
 		alert('click');
@@ -23,102 +25,36 @@
 		alert(evt.detail.check)
 	}
 
-	let radios = [{
-		label: 'Radio 1',
-		value: 1,
-		disable: false
-	},{
-		label: 'Radio 2',
-		value: 2,
-		disable: false
-	},{
-		label: 'Radio 3',
-		value: 3,
-		disable: true
-	}];
 	let radioValue = 1;
 	function onChangeRadio(event){
 		alert(event.detail.selectedValue);
 	}
 
-	let checkboxes = [{
-		label: 'Checkbox 1',
-		value: 1
-	},{
-		label: 'Checkbox 2',
-		value: 2
-	},{
-		label: 'Checkbox 3',
-		value: 3
-	},];
 	let checkboxValues = [1,2];
 	function onChangeCheckboxes(event){
 		alert(event.detail.selectedValues);
 	}
 
-	let date = '25/11/2021';
 	function onChangeDate(evt){
 		alert(evt.detail.value)
 	}
 
-	let droplistValue = 'fr';
-	let droplistItems =  [
-		{ value: '',   label: '' },
-		{ value: 'fr',  label: 'Français'},
-		{ value: 'gb',  label: 'English'},
-		{ value: 'es',  label: 'Espanol'},
-		{ value: 'de', label: 'Deutsch'},
-		{ value: 'it', label: 'Italiano'},
-		{ value: 'ru',  label: 'русский'}
-	];
-	let droplistItemsRender = (record) => '<span class="flag-icon flag-icon-' + record.value + '"></span> ' + record.label;
-
-	let droplistItems2 =  [
-		{ value: '',   label: '' },
-		{ value: 'H',  label: 'Homme', sexe: 'male' },
-		{ value: 'F',  label: 'Femme', sexe: 'female'}
-	];
-	let droplistItems2Render = (record) => '<span class="material-icons-round" style="vertical-align:middle">' + record.sexe + '</span> <span style="vertical-align:middle">' + record.label + '</span>';
+	let droplist = 'fr';
 
 	function sendRequest(){
 		Ajax.send(
-			'TestServlet',
-			'test',
-			{
+			// servlet, action
+			'TestServlet', 'test', 
+			{ // params
 				toto: ['aaa','bbb']
-			},
-			(response) => {
+			}, (response) => { // success
 				alert(response.toto)
-			},
-			() => {}
+			}, () => {} // error
 		);
 	}
 
-	let gridColumn = [
-		{label: 'Colonne 1', property: 'prop1', type: 'date', format: Dates.D_M_Y},
-		{label: 'Colonne 2', property: 'prop2'},
-		{label: 'Colonne 3', property: 'prop3', type: 'number', render: (record) => record.prop3 || '<i>Vide</i>'}
-	];
-	let gridData = [
-		{prop1: '01/01/2023', prop2: 'Valeur A', prop3: 'Valeur 1'},
-		{prop1: '02/01/2023', prop2: 'Valeur B'},
-		{prop1: '03/03/2023', prop2: 'Valeur C', prop3: 'Valeur 2', prop4: 'Valeur'},
-		{prop1: '04/01/2023', prop2: 'Valeur D', prop3: 'Valeur 1'},
-		{prop1: '05/01/2023', prop2: 'Valeur E'},
-		{prop1: '06/07/2023', prop2: 'Valeur F', prop3: 'Valeur 2', prop4: 'Valeur'},
-		{prop1: '07/01/2023', prop2: 'Valeur G', prop3: 'Valeur 1'},
-		{prop1: '08/01/2023', prop2: 'Valeur H'},
-		{prop1: '09/11/2023', prop2: 'Valeur I', prop3: 'Valeur 1', prop4: 'Valeur'},
-	];
-	let gridSelection = [
-		{prop1: 'Valeur B', prop2: 'Valeur 2'}
-	]
-	let filters = [{
-		property: 'prop2',
-		dataType: 'string',
-		type: 'equals',	
-		value: 'Valeur A',
-	}];
+	let modal;
+	let modal2;
 </script>
 
 <main>
@@ -137,12 +73,55 @@
 		<Button
 			icon="search"
 			text="Secondary"
-			on:click={clickButton}
+			on:click={() => modal.show()}
 		/>
+		<Modal title="Modal" bind:this={modal}>
+			<span slot="modal-content">
+				<p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nihil eos itaque, quam labore necessitatibus sunt a enim, perspiciatis architecto modi, at asperiores nobis ut dolorem aliquam iste aliquid? Inventore, laborum.</p>
+				<p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nihil eos itaque, quam labore necessitatibus sunt a enim, perspiciatis architecto modi, at asperiores nobis ut dolorem aliquam iste aliquid? Inventore, laborum.</p>
+				<p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nihil eos itaque, quam labore necessitatibus sunt a enim, perspiciatis architecto modi, at asperiores nobis ut dolorem aliquam iste aliquid? Inventore, laborum.</p>
+				<p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nihil eos itaque, quam labore necessitatibus sunt a enim, perspiciatis architecto modi, at asperiores nobis ut dolorem aliquam iste aliquid? Inventore, laborum.</p>
+				<p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nihil eos itaque, quam labore necessitatibus sunt a enim, perspiciatis architecto modi, at asperiores nobis ut dolorem aliquam iste aliquid? Inventore, laborum.</p>
+				<p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nihil eos itaque, quam labore necessitatibus sunt a enim, perspiciatis architecto modi, at asperiores nobis ut dolorem aliquam iste aliquid? Inventore, laborum.</p>
+				<p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nihil eos itaque, quam labore necessitatibus sunt a enim, perspiciatis architecto modi, at asperiores nobis ut dolorem aliquam iste aliquid? Inventore, laborum.</p>
+				<p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nihil eos itaque, quam labore necessitatibus sunt a enim, perspiciatis architecto modi, at asperiores nobis ut dolorem aliquam iste aliquid? Inventore, laborum.</p>
+				<p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nihil eos itaque, quam labore necessitatibus sunt a enim, perspiciatis architecto modi, at asperiores nobis ut dolorem aliquam iste aliquid? Inventore, laborum.</p>
+				<p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nihil eos itaque, quam labore necessitatibus sunt a enim, perspiciatis architecto modi, at asperiores nobis ut dolorem aliquam iste aliquid? Inventore, laborum.</p>
+				<p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nihil eos itaque, quam labore necessitatibus sunt a enim, perspiciatis architecto modi, at asperiores nobis ut dolorem aliquam iste aliquid? Inventore, laborum.</p>
+				<p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nihil eos itaque, quam labore necessitatibus sunt a enim, perspiciatis architecto modi, at asperiores nobis ut dolorem aliquam iste aliquid? Inventore, laborum.</p>
+				<p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nihil eos itaque, quam labore necessitatibus sunt a enim, perspiciatis architecto modi, at asperiores nobis ut dolorem aliquam iste aliquid? Inventore, laborum.</p>
+				<p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nihil eos itaque, quam labore necessitatibus sunt a enim, perspiciatis architecto modi, at asperiores nobis ut dolorem aliquam iste aliquid? Inventore, laborum.</p>
+				<p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nihil eos itaque, quam labore necessitatibus sunt a enim, perspiciatis architecto modi, at asperiores nobis ut dolorem aliquam iste aliquid? Inventore, laborum.</p>
+				<p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nihil eos itaque, quam labore necessitatibus sunt a enim, perspiciatis architecto modi, at asperiores nobis ut dolorem aliquam iste aliquid? Inventore, laborum.</p>
+				<p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nihil eos itaque, quam labore necessitatibus sunt a enim, perspiciatis architecto modi, at asperiores nobis ut dolorem aliquam iste aliquid? Inventore, laborum.</p>
+				<p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nihil eos itaque, quam labore necessitatibus sunt a enim, perspiciatis architecto modi, at asperiores nobis ut dolorem aliquam iste aliquid? Inventore, laborum.</p>
+			</span>
+			<Toolbar slot="modal-buttons">
+				<Button
+					text="Fermer"
+					flex={true}
+					border={false}
+					on:click={() => modal.close()}
+				/>
+				<Button
+					text="Valider"
+					primary={true}
+					flex={true}
+					on:click={() => modal.close()}
+				/>
+			</Toolbar>
+		</Modal>
 		<Button
 			text="Tertiary"
 			border={false}
+			on:show={() => alert('show')}
+			on:click={() => modal2.show()}
 		/>
+		<Modal title="Modal 2" bind:this={modal2}>
+			<span slot="modal-content">
+				<p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nihil eos itaque, quam labore necessitatibus sunt a enim, perspiciatis architecto modi, at asperiores nobis ut dolorem aliquam iste aliquid? Inventore, laborum.</p>
+			</span>
+		</Modal>
 		<Button
 			text="Disabled"
 			disable={true}
@@ -164,7 +143,16 @@
 		/>
 		<br/>
 		<CheckboxGroup
-			bind:items={checkboxes}
+			items={[{
+				label: 'Checkbox 1',
+				value: 1
+			},{
+				label: 'Checkbox 2',
+				value: 2
+			},{
+				label: 'Checkbox 3',
+				value: 3
+			}]}
 			name="checkboxgroup"
 			bind:selectedValues={checkboxValues}
 			on:change={onChangeCheckboxes}
@@ -172,7 +160,19 @@
 
 		<h3>Radios</h3>
 		<RadioGroup
-			bind:items={radios}
+			items={[{
+				label: 'Radio 1',
+				value: 1,
+				disable: false
+			},{
+				label: 'Radio 2',
+				value: 2,
+				disable: false
+			},{
+				label: 'Radio 3',
+				value: 3,
+				disable: true
+			}]}
 			name="radiogroup"
 			bind:selectedValue={radioValue}
 			on:change={onChangeRadio}
@@ -251,14 +251,25 @@
 		<Droplist 
 			label="Langue"
 			filter={true}
-			value={droplistValue}
-			items={droplistItems}
-			render={droplistItemsRender}
+			items={[
+				{ value: '',   label: '' },
+				{ value: 'fr',  label: 'Français'},
+				{ value: 'gb',  label: 'English'},
+				{ value: 'es',  label: 'Espanol'},
+				{ value: 'de', label: 'Deutsch'},
+				{ value: 'it', label: 'Italiano'},
+				{ value: 'ru',  label: 'русский'}
+			]}
+			bind:value={droplist}
+			render={(record) => '<span class="flag-icon flag-icon-' + record.value + '"></span> ' + record.label}
 		/>
 		<Droplist 
-			label="Sexe"
-			items={droplistItems2}
-			render={droplistItems2Render}
+			label=""
+			items={[
+				{ value: '',   label: '' },
+				{ value: 'H',  label: 'Homme', sexe: 'male' },
+				{ value: 'F',  label: 'Femme', sexe: 'female'}
+			]}
 		/>
 	</section>
 	<br/>
@@ -266,10 +277,31 @@
 		<h2>Grid</h2>
 
 		<Grid 
-			columns={gridColumn} 
-			datas={gridData}
-			selection={gridSelection}
-			filters={filters}
+			columns={[
+				{label: 'Colonne 1', property: 'prop1', type: 'date', format: Dates.D_M_Y},
+				{label: 'Colonne 2', property: 'prop2'},
+				{label: 'Colonne 3', property: 'prop3', type: 'number', render: (record) => record.prop3 || '<i>Vide</i>'},
+			]} 
+			datas={[
+				{prop1: '01/01/2023', prop2: 'Valeur A', prop3: 'Valeur 1'},
+				{prop1: '02/01/2023', prop2: 'Valeur B'},
+				{prop1: '03/03/2023', prop2: 'Valeur C', prop3: 'Valeur 2', prop4: 'Valeur'},
+				{prop1: '04/01/2023', prop2: 'Valeur D', prop3: 'Valeur 1'},
+				{prop1: '05/01/2023', prop2: 'Valeur E'},
+				{prop1: '06/07/2023', prop2: 'Valeur F', prop3: 'Valeur 2', prop4: 'Valeur'},
+				{prop1: '07/01/2023', prop2: 'Valeur G', prop3: 'Valeur 1'},
+				{prop1: '08/01/2023', prop2: 'Valeur H'},
+				{prop1: '09/11/2023', prop2: 'Valeur I', prop3: 'Valeur 1', prop4: 'Valeur'},
+			]}
+			selection={[
+				{prop1: 'Valeur B', prop2: 'Valeur 2'}
+			]}
+			filters={[{
+				property: 'prop2',
+				dataType: 'string',
+				type: 'equals',	
+				value: 'Valeur A',
+			}]}
 			pageSize=5
 			select="multiple">
 			<span slot="grid-toolbar">

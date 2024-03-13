@@ -11,6 +11,7 @@
         export let disable = false;
         export let style = "";
         export let cls = "";
+        export let flex = false;
         
         // PRIVATE ATTRIBUTES
         let iconPadding = text == "" ? '0 12px' : '0 16px 0 12px';
@@ -56,6 +57,7 @@
      class:primary
      class:border
      class:disable
+     class:flex
      role="button"
      bind:this={button}
      tabindex={disable ? "-1" : "0"}
@@ -82,6 +84,9 @@
                 user-select: none;
                 text-decoration: none;
                 outline: none;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
         }
         .btn-main.disable {
                 cursor: not-allowed;
@@ -102,6 +107,10 @@
         .btn-main.primary:focus,
         .btn-main.primary:focus-visible {
                 border-color: var(--color-hover);
+        }
+        .btn-main.flex {
+                flex-grow: 1;
+                text-align: center;
         }
         .btn-with-icon {
                 padding: var(--icon-padding);

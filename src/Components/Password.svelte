@@ -15,6 +15,9 @@
         export let readonly = false;
         export let format = null;
         export let filled = true;
+        export let flex = false;
+        export let cls = "";
+        export let style = "";
         
         // PRIVATE ATTRIBUTES
         let showPassword = false;
@@ -48,6 +51,9 @@
                 iconRight="visibility_off"
                 {label}
                 {filled}
+                {flex}
+                {cls}
+                {style}
                 bind:errorMessage={errorMessage}
                 on:change
                 on:blur
@@ -70,6 +76,9 @@
                 iconRight="visibility"
                 {label}
                 {filled}
+                {flex}
+                {cls}
+                {style}
                 bind:errorMessage={errorMessage}
                 on:change
                 on:blur

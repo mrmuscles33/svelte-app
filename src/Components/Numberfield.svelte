@@ -16,6 +16,7 @@
         export let readonly = false;
         export let filled = true;
         export let style = "";
+        export let flex = false;
 
         export let decimal = 2;
         export let integer = 7;
@@ -63,6 +64,7 @@
         {label}
         {filled}
         {style}
+        {flex}
         bind:errorMessage={errorMessage}
         on:change={onChange}
         on:blur

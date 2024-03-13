@@ -19,6 +19,7 @@
         export let style = "";
         export let format = null;
         export let filled = true;
+        export let flex = false;
         
         // PRIVATE ATTRIBUTES
         $: inputWidth = width - (iconLeft != "" ? 40 : 12) - (iconRight != "" ? 32 : 0) - 12;
@@ -133,12 +134,13 @@
      class:textfield-icon-right={iconRight != ""}
      class:disable
      class:filled
+     class:flex
      class:labelled={label!=""}
      class:textfield-error={hasError}
      on:click={onClick}
      on:keypress={nothing}
      style="--width: {width}px;
-            --width-input: {inputWidth}px;
+            --width-input: calc(100% - {width - inputWidth}px);
             {style}">
         <input use:typeAction 
                 bind:this={input} 
@@ -191,6 +193,10 @@
                 box-sizing: border-box;
                 cursor: text;
                 margin: 0 5px 5px 0;
+        }
+        .textfield-main.flex {
+                flex-grow: 1;
+                width: auto;
         }
         .textfield-main.labelled {
                 height: 48px;

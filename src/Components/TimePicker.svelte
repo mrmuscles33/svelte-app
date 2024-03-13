@@ -18,10 +18,15 @@
         export let required = false;
         export let readonly = false;
         export let filled = true;
+        export let flex = false;
+        export let cls = "";
+        export let style = "";
 
         export let minTime = Times.format('00:00', format);
         export let maxTime = Times.format('23:59', format);
         export let clockOnly = false;
+        export let pickerCls = "";
+        export let pickerStyle = "";
         
         // PRIVATE ATTRIBUTES
         let pattern = Times.getPattern(format);
@@ -229,6 +234,9 @@
         {pattern}
         {label}
         {filled}
+        {flex}
+        {cls}
+        {style}
         bind:errorMessage={errorMessage}
         on:change={onChange}
         on:blur={onBlur}
@@ -241,10 +249,10 @@
         bind:this={input}
 />
 
-<div class="timepicker-mask"
+<div class="timepicker-mask {pickerCls}"
      class:timepicker-visible={visible}
      style="--rotate-hour : {(30 * Times.getHours(tmpValue)) + (0.5 * Times.getMinutes(tmpValue))}deg;
-            --rotate-minute : {6 * Times.getMinutes(tmpValue)}deg;"
+            --rotate-minute : {6 * Times.getMinutes(tmpValue)}deg; {pickerStyle}"
      on:click={onClickMask}
      on:keydown={onEscMask}>
         <div class="timepicker-main">
@@ -384,7 +392,7 @@
                 position: fixed;
                 width: 100%;
                 height: 100%;
-                background-color: rgba(150,150,150,0.5);
+                background-color: var(--mask-color);
                 top: 0;
                 left: 0;
                 backdrop-filter: blur(2px);
