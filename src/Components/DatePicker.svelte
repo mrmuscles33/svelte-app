@@ -51,6 +51,7 @@
         $: allYear = getDisplayedYears(realMinDate,realMaxDate);
         $: displayedDays = getDisplayedDays(currentMonth);
         $: sortedDays = days.slice(startWeek,7).concat(days.slice(0,startWeek));
+        $: maxLength = format.length;
 
         // EVENTS
         const dispatch = createEventDispatcher();
@@ -331,6 +332,7 @@
         {filled}
         {style}
         {flex}
+        {maxLength}
         bind:errorMessage={errorMessage}
         on:change={onChange}
         on:blur={onBlur}

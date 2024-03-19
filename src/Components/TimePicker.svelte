@@ -41,6 +41,7 @@
         let focusedHour = Times.getHours(tmpValue);
         let focusedMinute = minutes.slice().sort((a,b) => Math.abs(a - Times.getMinutes(tmpValue)) <= Math.abs(b - Times.getMinutes(tmpValue)) ? -1 : 1)[0];
         $: displayedHours = morning ? [12,1,2,3,4,5,6,7,8,9,10,11] : [0,13,14,15,16,17,18,19,20,21,22,23];
+        $: maxLength = format.length;
 
         // EVENTS
         const dispatch = createEventDispatcher();
@@ -237,6 +238,7 @@
         {flex}
         {cls}
         {style}
+        {maxLength}
         bind:errorMessage={errorMessage}
         on:change={onChange}
         on:blur={onBlur}

@@ -17,6 +17,8 @@
 	import Ajax from './Utils/Ajax';
   	import Modal from './Components/Modal.svelte';
 	import Toolbar from './Components/Toolbar.svelte';
+  	import Phonefield from './Components/Phonefield.svelte';
+  	import Emailfield from './Components/Emailfield.svelte';
 
 	function clickButton(){
 		alert('click');
@@ -228,6 +230,16 @@
 			integer=2
 			decimal=1
 			min=-1
+		/>
+
+		<h3>Phonefield</h3>
+		<Phonefield 
+			label="Phone"
+		/>
+
+		<h3>Emailfields</h3>
+		<Emailfield 
+			label="Email"
 		/>
 
 		<h3>Date & Time Pickers</h3>

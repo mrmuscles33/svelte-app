@@ -18,6 +18,7 @@
         export let flex = false;
         export let cls = "";
         export let style = "";
+        export let maxLength = 128;
         
         // PRIVATE ATTRIBUTES
         let showPassword = false;
@@ -54,6 +55,7 @@
                 {flex}
                 {cls}
                 {style}
+                {maxLength}
                 bind:errorMessage={errorMessage}
                 on:change
                 on:blur
@@ -79,6 +81,7 @@
                 {flex}
                 {cls}
                 {style}
+                {maxLength}
                 bind:errorMessage={errorMessage}
                 on:change
                 on:blur

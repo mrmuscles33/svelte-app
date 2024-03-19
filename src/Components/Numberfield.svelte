@@ -19,13 +19,14 @@
         export let flex = false;
 
         export let decimal = 2;
-        export let integer = 7;
+        export let integer = 9;
         export let min = null;
         export let max = null;
         
         // PRIVATE ATTRIBUTES
         $: pattern = decimal > 0 ? "^" + (max != null & min < 0 ? "(-?)" : "") + "[0-9]{1," + integer + "}((\\\.|,)[0-9]{1," + decimal + "})?$" : "^(-?)[0-9]{1," + integer + "}$";
         $: format = (min != null & min < 0 ? "-" : "") + "".padStart(integer, "X") + (decimal > 0 ? ".".padEnd(parseInt(decimal) + 1, "x") : "");
+        $: maxLength = (min != null & min < 0 ? 1 : 0) + integer + (decimal > 0 ? 1 : 0) + decimal;
 
         // EVENTS
         const dispatch = createEventDispatcher();
@@ -65,6 +66,7 @@
         {filled}
         {style}
         {flex}
+        {maxLength}
         bind:errorMessage={errorMessage}
         on:change={onChange}
         on:blur

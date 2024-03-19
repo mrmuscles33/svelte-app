@@ -20,6 +20,7 @@
         export let format = null;
         export let filled = true;
         export let flex = false;
+        export let maxLength = 128;
         
         // PRIVATE ATTRIBUTES
         $: inputWidth = width - (iconLeft != "" ? 40 : 12) - (iconRight != "" ? 32 : 0) - 12;
@@ -57,6 +58,9 @@
                                                         format ? 
                                                                 "La donnée " + label  + " doit être au format " + format : 
                                                                 "Erreur dans le format de la donnée " + label;
+                        }
+                        if(errorMessage == "" && value.length > maxlength) {
+                                errorMessage = "La donnée " + label + " ne doit pas dépasser " + maxlength + " caractères";
                         }
                         let params = Events.copy(event);
                         params.value = value;
@@ -152,6 +156,7 @@
                 disabled={disable} 
                 tabindex={readonly || disable ? "-1" : "0"} 
                 placeholder="." 
+                maxlength={maxLength}
                 on:change={onChange} 
                 on:input={onInput}
                 on:focus={onFocus}
